@@ -316,14 +316,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     <div className="min-h-screen bg-white flex flex-col">
       {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
       <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200">
-        <div className="px-4 py-2.5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-6 bg-[#FFC354] rounded-full flex items-center justify-center">
-              <span className="text-xs font-bold text-white">{availabilities.length}</span>
-            </div>
+        <div className="flex">
+          <div className="bg-black" style={{ minWidth: '50px', maxWidth: 'min-content' }}></div>
+          <div className="flex-1 px-4 py-2.5 flex items-center justify-between">
             <span className="text-base font-bold text-gray-800">전체 참여자 {availabilities.length}</span>
-          </div>
-          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
             {showAddInput ? (
               <>
                 <input
@@ -362,11 +359,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             ) : (
               <button 
                 onClick={() => setShowAddInput(true)}
-                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
+                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
               >
                 추가 <Plus className="w-4 h-4" />
               </button>
             )}
+            </div>
           </div>
         </div>
       </div>
