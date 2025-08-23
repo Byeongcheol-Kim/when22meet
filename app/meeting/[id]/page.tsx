@@ -222,15 +222,20 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     const gridData: GridCell[][] = [];
     
     // 첫 번째 날짜의 월을 기본값으로 사용
-    let defaultMonth = '날짜';
+    let defaultYear = '';
+    let defaultMonth = '';
     if (meeting.dates.length > 0) {
       const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
-      defaultMonth = `${firstDate.getFullYear()}.${String(firstDate.getMonth() + 1).padStart(2, '0')}`;
+      defaultYear = String(firstDate.getFullYear());
+      defaultMonth = String(firstDate.getMonth() + 1).padStart(2, '0');
     }
+    
+    // 현재 월 파싱
+    const [currentYear, currentMonthOnly] = currentMonth ? currentMonth.split('.') : [defaultYear, defaultMonth];
     
     // 헤더 행 생성
     const headerRow: GridCell[] = [
-      { type: 'header-corner', content: currentMonth || defaultMonth }
+      { type: 'header-corner', content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}` }
     ];
     
     // 참여자 헤더 추가
@@ -249,8 +254,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       
       // 월이 바뀌면 구분선 추가
       if (lastMonth && lastMonth !== currentMonth) {
+        const [year, month] = currentMonth.split('.');
         const separatorRow: GridCell[] = [
-          { type: 'month-separator', content: currentMonth, month: currentMonth }
+          { type: 'month-separator', content: `${year}\n${month}`, month: currentMonth }
         ];
         // 참여자 수만큼 빈 셀 추가
         for (let i = 0; i < allParticipants.length; i++) {
@@ -309,13 +315,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
-      <div className="flex-shrink-0 bg-white border-b border-gray-200">
-        <div className="px-4 py-3 flex items-center justify-between">
+      <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200">
+        <div className="px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#FFE5B4] rounded-full flex items-center justify-center">
-              <span className="text-sm font-bold">{availabilities.length}</span>
+            <div className="w-6 h-6 bg-[#FFC354] rounded-full flex items-center justify-center">
+              <span className="text-xs font-bold text-white">{availabilities.length}</span>
             </div>
-            <span className="font-medium">전체 참여자 {availabilities.length}</span>
+            <span className="text-base font-bold text-gray-800">전체 참여자 {availabilities.length}</span>
           </div>
           <div className="flex items-center gap-2">
             {showAddInput ? (
@@ -333,13 +339,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     }
                   }}
                   placeholder="이름 입력"
-                  className="w-32 px-3 py-1.5 text-sm border rounded-lg outline-none focus:border-blue-500"
+                  className="w-32 px-3 py-1.5 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                   autoFocus
                 />
                 <button
                   onClick={handleAddParticipant}
                   disabled={isSubmitting || !newParticipantName.trim()}
-                  className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+                  className="px-4 py-1.5 text-sm bg-green-500 text-white rounded-md disabled:bg-gray-300 hover:bg-green-600 transition-colors"
                 >
                   추가
                 </button>
@@ -356,7 +362,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             ) : (
               <button 
                 onClick={() => setShowAddInput(true)}
-                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600"
+                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-md transition-colors"
               >
                 추가 <Plus className="w-4 h-4" />
               </button>
@@ -374,7 +380,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           <div 
             className="meeting-grid-container"
             style={{
-              gridTemplateColumns: `80px ${allParticipants.map(() => '100px').join(' ')}`
+              gridTemplateColumns: `minmax(50px, min-content) ${allParticipants.map(() => '90px').join(' ')}`
             }}
           >
           {gridData.map((row, rowIndex) => (
@@ -385,17 +391,20 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   return (
                     <div
                       key={`${rowIndex}-${colIndex}`}
-                      className="px-2 py-2 font-bold text-sm text-gray-700 border-b border-r border-gray-300 bg-gray-100"
+                      className="px-2 py-2 border-b border-r border-gray-200 bg-black"
                       style={{ position: 'sticky', left: 0, zIndex: 10 }}
                     >
-                      {cell.content}
+                      <div className="flex flex-col items-end justify-center">
+                        <span className="text-xs font-medium text-yellow-400">{cell.content?.split('\n')[0]}</span>
+                        <span className="text-sm font-bold text-yellow-400">{cell.content?.split('\n')[1]}</span>
+                      </div>
                     </div>
                   );
                 } else {
                   return (
                     <div
                       key={`${rowIndex}-${colIndex}`}
-                      className="bg-gray-100 border-b border-r border-gray-300"
+                      className="bg-gray-50 border-b border-r border-gray-200"
                     />
                   );
                 }
@@ -406,10 +415,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 text-xs font-medium text-gray-600 border-r border-b border-gray-200 bg-gray-50"
+                    className="px-2 py-2 border-r border-b border-gray-100 bg-black"
                     style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
                   >
-                    {cell.content}
+                    <div className="flex flex-col items-end justify-center">
+                      <span className="text-xs font-medium text-yellow-400">{cell.content?.split('\n')[0]}</span>
+                      <span className="text-sm font-bold text-yellow-400">{cell.content?.split('\n')[1]}</span>
+                    </div>
                   </div>
                 );
               }
@@ -420,7 +432,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className={`px-2 py-2 text-center text-xs font-medium border-r border-b border-gray-200 ${
+                    className={`px-2 py-2 text-center text-sm font-bold border-r border-b border-gray-100 ${
                       isLocked ? 'bg-gray-50' : 'bg-white'
                     }`}
                     style={{ position: 'sticky', top: 0, zIndex: 20 }}
@@ -439,7 +451,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                         });
                       }}
                       className={`w-full ${
-                        isLocked ? 'text-gray-500' : 'text-gray-700 hover:text-blue-600'
+                        isLocked ? 'text-gray-500' : 'text-gray-800 hover:text-blue-500 transition-colors'
                       }`}
                     >
                       {cell.content}
@@ -458,14 +470,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-3 border-r border-b border-gray-200 bg-white"
+                    className="px-2 py-2 border-r border-b border-gray-100 bg-black"
                     style={{ position: 'sticky', left: 0, zIndex: 10 }}
                     data-date-row
                     data-month={cell.month}
                   >
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-lg font-bold">{dayNumber}</span>
-                      <span className="text-xs text-gray-500">{dayOfWeek}</span>
+                    <div className="flex flex-col items-end justify-center">
+                      <span className="text-[10px] text-white">{dayOfWeek}</span>
+                      <span className="text-lg font-black text-white leading-tight">{dayNumber}</span>
                     </div>
                   </div>
                 );
@@ -478,7 +490,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-3 border-r border-b border-gray-200 bg-white"
+                    className="px-2 py-2 border-r border-b border-gray-100 bg-white"
                   >
                     <button
                       onClick={() => {
@@ -488,11 +500,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       }}
                       disabled={!isEditable}
                       className={`
-                        w-full h-8 rounded flex items-center justify-center text-xs font-medium transition-all
-                        ${cell.status === 'available' ? 'bg-[#FFE5B4] text-gray-700' : 
-                          cell.status === 'unavailable' ? 'bg-[#9CA3AF] text-white' : 
-                          'bg-[#E5E7EB] text-gray-500'}
-                        ${isEditable ? 'cursor-pointer hover:opacity-80' : 'cursor-default opacity-60'}
+                        w-full h-10 rounded-md flex items-center justify-center text-sm font-medium transition-all shadow-sm
+                        ${cell.status === 'available' ? 'bg-[#FFC354] text-gray-800' : 
+                          cell.status === 'unavailable' ? 'bg-[#6B7280] text-white' : 
+                          'bg-gray-50 text-gray-400 border border-gray-200'}
+                        ${isEditable ? 'cursor-pointer hover:shadow-md hover:scale-105' : 'cursor-default opacity-60'}
                       `}
                     >
                       {cell.status === 'available' ? '참여' : 
