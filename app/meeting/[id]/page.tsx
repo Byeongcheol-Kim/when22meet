@@ -389,7 +389,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   return (
                     <div
                       key={`${rowIndex}-${colIndex}`}
-                      className="px-2 py-2 border-b border-r border-gray-200 bg-black"
+                      className="px-2 py-1 bg-black"
                       style={{ position: 'sticky', left: 0, zIndex: 10 }}
                     >
                       <div className="flex flex-col items-end justify-center">
@@ -402,7 +402,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   return (
                     <div
                       key={`${rowIndex}-${colIndex}`}
-                      className="bg-gray-50 border-b border-r border-gray-200"
+                      className="bg-gray-50"
                     />
                   );
                 }
@@ -413,7 +413,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 border-r border-b border-gray-100 bg-black"
+                    className="px-2 py-1 bg-black"
                     style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
                   >
                     <div className="flex flex-col items-end justify-center">
@@ -430,7 +430,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className={`px-2 py-2 text-center text-sm font-bold border-r border-b border-gray-100 ${
+                    className={`px-2 py-1 text-center text-sm font-bold ${
                       isLocked ? 'bg-gray-50' : 'bg-white'
                     }`}
                     style={{ position: 'sticky', top: 0, zIndex: 20 }}
@@ -468,7 +468,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 border-r border-b border-gray-100 bg-black"
+                    className="px-2 py-1.5 bg-black"
                     style={{ position: 'sticky', left: 0, zIndex: 10 }}
                     data-date-row
                     data-month={cell.month}
@@ -488,7 +488,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 border-r border-b border-gray-100 bg-white"
+                    className="px-2 py-2 bg-white"
                   >
                     <button
                       onClick={() => {
