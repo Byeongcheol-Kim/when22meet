@@ -31,6 +31,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   useEffect(() => {
     fetchMeetingData();
   }, [resolvedParams.id]);
+  
+  // 초기 월 설정
+  useEffect(() => {
+    if (meeting && meeting.dates.length > 0 && !currentMonth) {
+      const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
+      setCurrentMonth(`${firstDate.getFullYear()}.${String(firstDate.getMonth() + 1).padStart(2, '0')}`);
+    }
+  }, [meeting]);
 
   const fetchMeetingData = async () => {
     try {
@@ -81,42 +89,42 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   };
 
   const handleScroll = () => {
-    if (!scrollContainerRef.current) return;
+    if (!scrollContainerRef.current || !meeting) return;
     
     const container = scrollContainerRef.current;
+    const scrollTop = container.scrollTop;
+    const rowHeight = 56; // 대략적인 행 높이
     
-    // 현재 보이는 첫 번째 날짜 찾기
-    const dateElements = container.querySelectorAll('[data-date-row]');
-    let foundMonth = '';
+    // 스크롤 위치로 현재 보이는 날짜 인덱스 계산
+    const visibleIndex = Math.floor((scrollTop + 40) / rowHeight); // 헤더 높이 40px 고려
+    const dateIndex = Math.max(0, Math.min(visibleIndex - 1, meeting.dates.length - 1)); // 월 구분 행 고려
     
-    for (let i = 0; i < dateElements.length; i++) {
-      const element = dateElements[i] as HTMLElement;
-      const rect = element.getBoundingClientRect();
-      const containerRect = container.getBoundingClientRect();
+    if (meeting.dates[dateIndex]) {
+      const date = new Date(meeting.dates[dateIndex] + 'T00:00:00');
+      const month = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
       
-      // 헤더 높이(약 40px) 고려
-      if (rect.top >= containerRect.top + 40 && rect.top <= containerRect.top + 100) {
-        const dateMonth = element.getAttribute('data-month');
-        if (dateMonth) {
-          foundMonth = dateMonth;
-          break;
-        }
+      if (month !== currentMonth) {
+        setCurrentMonth(month);
       }
-    }
-    
-    if (foundMonth && foundMonth !== currentMonth) {
-      setCurrentMonth(foundMonth);
     }
   };
 
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
-      container.addEventListener('scroll', handleScroll);
-      handleScroll(); // 초기값 설정
-      return () => container.removeEventListener('scroll', handleScroll);
+      const scrollHandler = () => {
+        handleScroll();
+      };
+      
+      container.addEventListener('scroll', scrollHandler);
+      // 초기값 설정
+      setTimeout(() => handleScroll(), 100);
+      
+      return () => {
+        container.removeEventListener('scroll', scrollHandler);
+      };
     }
-  }, [meeting, availabilities]);
+  }, [meeting, availabilities, currentMonth]); // currentMonth 의존성 추가
 
   if (isLoading) {
     return (
@@ -133,9 +141,16 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
     const gridData: GridCell[][] = [];
     
+    // 첫 번째 날짜의 월을 기본값으로 사용
+    let defaultMonth = '날짜';
+    if (meeting.dates.length > 0) {
+      const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
+      defaultMonth = `${firstDate.getFullYear()}.${String(firstDate.getMonth() + 1).padStart(2, '0')}`;
+    }
+    
     // 헤더 행 생성
     const headerRow: GridCell[] = [
-      { type: 'header-corner', content: currentMonth || '날짜' }
+      { type: 'header-corner', content: currentMonth || defaultMonth }
     ];
     
     // 참여자 헤더 추가
@@ -206,12 +221,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       
       gridData.push(dateRow);
     });
-    
-    // 첫 번째 날짜의 월을 초기값으로 설정
-    if (!currentMonth && meeting.dates.length > 0) {
-      const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
-      setCurrentMonth(`${firstDate.getFullYear()}.${String(firstDate.getMonth() + 1).padStart(2, '0')}`);
-    }
     
     return gridData;
   };
