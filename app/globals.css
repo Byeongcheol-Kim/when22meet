@@ -43,3 +43,35 @@ body {
 .animation-delay-200 {
   animation-delay: 200ms;
 }
+
+/* Meeting Grid Styles */
+.meeting-grid-container {
+  display: grid;
+  min-width: max-content;
+  align-content: start;
+}
+
+.meeting-grid-header-corner {
+  position: sticky !important;
+  top: 0;
+  left: 0;
+  z-index: 30;
+}
+
+.meeting-grid-header {
+  position: sticky !important;
+  top: 0;
+  z-index: 20;
+}
+
+.meeting-grid-date {
+  position: sticky !important;
+  left: 0;
+  z-index: 10;
+}
+
+.meeting-grid-month {
+  position: sticky !important;
+  left: 0;
+  z-index: 10;
+}
