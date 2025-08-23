@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { participantName, availableDates } = body;
+    const { participantName, availableDates, unavailableDates, statusUpdate } = body;
 
     if (!participantName || !availableDates) {
       return NextResponse.json(
@@ -39,11 +39,41 @@ export async function POST(
       );
     }
 
-    // Save availability with same TTL as meeting
+    // Get existing data to preserve timestamp and unavailable dates
+    const existingData = await redis.get(`availability:${id}:${participantName}`);
+    let existingParsed: any = null;
+    let timestamp = Date.now();
+    let currentUnavailableDates: string[] = [];
+    
+    if (existingData) {
+      existingParsed = JSON.parse(existingData);
+      // Preserve timestamp from existing data
+      timestamp = existingParsed.timestamp || timestamp;
+      currentUnavailableDates = existingParsed.unavailableDates || [];
+    }
+    
+    // Update unavailable dates based on status update
+    if (statusUpdate) {
+      if (statusUpdate.status === 'unavailable') {
+        // Add to unavailable list
+        if (!currentUnavailableDates.includes(statusUpdate.date)) {
+          currentUnavailableDates.push(statusUpdate.date);
+        }
+      } else {
+        // Remove from unavailable list (for available or undecided)
+        currentUnavailableDates = currentUnavailableDates.filter(d => d !== statusUpdate.date);
+      }
+    }
+    
+    // Save availability with timestamp for ordering
     await redis.setex(
       `availability:${id}:${participantName}`,
       30 * 24 * 60 * 60,
-      JSON.stringify(availableDates)
+      JSON.stringify({
+        dates: availableDates,
+        unavailableDates: currentUnavailableDates,
+        timestamp: timestamp
+      })
     );
 
     return NextResponse.json({ 

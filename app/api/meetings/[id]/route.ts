@@ -27,12 +27,29 @@ export async function GET(
       const data = await redis.get(key);
       if (data) {
         const participantName = key.split(':')[2];
-        availabilities.push({
-          participantName,
-          availableDates: JSON.parse(data)
-        });
+        const parsedData = JSON.parse(data);
+        
+        // Handle both old format (array) and new format (object with timestamp)
+        if (Array.isArray(parsedData)) {
+          availabilities.push({
+            participantName,
+            availableDates: parsedData,
+            unavailableDates: [],
+            timestamp: 0 // Old entries without timestamp
+          });
+        } else {
+          availabilities.push({
+            participantName,
+            availableDates: parsedData.dates || [],
+            unavailableDates: parsedData.unavailableDates || [],
+            timestamp: parsedData.timestamp || 0
+          });
+        }
       }
     }
+    
+    // Sort by timestamp (newest first)
+    availabilities.sort((a, b) => b.timestamp - a.timestamp);
 
     return NextResponse.json({
       meeting,

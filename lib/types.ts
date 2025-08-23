@@ -10,6 +10,8 @@ export interface Meeting {
 export interface Availability {
   participantName: string;
   availableDates: string[]; // 참가 가능한 날짜 목록
+  unavailableDates?: string[]; // 명시적으로 불참인 날짜 목록 (없으면 미정)
+  timestamp?: number;
 }
 
 export interface TimeSlot {

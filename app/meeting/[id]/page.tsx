@@ -25,6 +25,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [newParticipantName, setNewParticipantName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentMonth, setCurrentMonth] = useState('');
+  const [lockedParticipants, setLockedParticipants] = useState<Set<string>>(new Set());
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -79,12 +80,91 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         await fetchMeetingData();
         setNewParticipantName('');
         setShowAddInput(false);
+        // 새 참여자는 기본적으로 편집 가능 상태 (잠기지 않음)
       }
     } catch (error) {
       console.error('Error adding participant:', error);
       alert('참가자 추가에 실패했습니다.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleStatusClick = async (participant: string, date: string, currentStatus: ParticipantStatus) => {
+    // 상태 순환: 미정 -> 참여 -> 불참 -> 미정
+    let newStatus: ParticipantStatus;
+    if (currentStatus === 'undecided') {
+      newStatus = 'available';
+    } else if (currentStatus === 'available') {
+      newStatus = 'unavailable';
+    } else {
+      newStatus = 'undecided';
+    }
+
+    // 현재 참여자의 availability 찾기
+    const currentAvailability = availabilities.find(a => a.participantName === participant);
+    const currentAvailableDates = currentAvailability?.availableDates || [];
+    const currentUnavailableDates = currentAvailability?.unavailableDates || [];
+    
+    // Optimistic UI - 즉시 상태 업데이트
+    const optimisticAvailabilities = availabilities.map(a => {
+      if (a.participantName === participant) {
+        let newAvailableDates = [...currentAvailableDates];
+        let newUnavailableDates = [...currentUnavailableDates];
+        
+        // Remove from all lists first
+        newAvailableDates = newAvailableDates.filter(d => d !== date);
+        newUnavailableDates = newUnavailableDates.filter(d => d !== date);
+        
+        // Add to appropriate list
+        if (newStatus === 'available') {
+          newAvailableDates.push(date);
+        } else if (newStatus === 'unavailable') {
+          newUnavailableDates.push(date);
+        }
+        
+        return {
+          ...a,
+          availableDates: newAvailableDates,
+          unavailableDates: newUnavailableDates
+        };
+      }
+      return a;
+    });
+    
+    // Optimistic update
+    setAvailabilities(optimisticAvailabilities);
+    
+    // Calculate final dates for API
+    let newAvailableDates = [...currentAvailableDates];
+    newAvailableDates = newAvailableDates.filter(d => d !== date);
+    if (newStatus === 'available') {
+      newAvailableDates.push(date);
+    }
+
+    try {
+      const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          participantName: participant,
+          availableDates: newAvailableDates,
+          unavailableDates: newStatus === 'unavailable' ? [date] : [],
+          statusUpdate: { date, status: newStatus }
+        })
+      });
+
+      if (!response.ok) {
+        // Rollback on error
+        await fetchMeetingData();
+        alert('상태 업데이트에 실패했습니다. 다시 시도해주세요.');
+      }
+      // Success - keep optimistic update
+    } catch (error) {
+      console.error('Error updating status:', error);
+      // Rollback on error
+      await fetchMeetingData();
+      alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -158,11 +238,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       headerRow.push({ type: 'header-participant', content: name, participant: name });
     });
     
-    // 참여자 추가 입력 헤더
-    if (showAddInput) {
-      headerRow.push({ type: 'add-input' });
-    }
-    
     gridData.push(headerRow);
     
     // 날짜별 행 생성
@@ -178,7 +253,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           { type: 'month-separator', content: currentMonth, month: currentMonth }
         ];
         // 참여자 수만큼 빈 셀 추가
-        for (let i = 0; i < allParticipants.length + (showAddInput ? 1 : 0); i++) {
+        for (let i = 0; i < allParticipants.length; i++) {
           separatorRow.push({ type: 'month-separator' });
         }
         gridData.push(separatorRow);
@@ -198,9 +273,21 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       // 각 참여자의 상태 추가
       allParticipants.forEach(name => {
         const availability = availabilities.find(a => a.participantName === name);
-        const status: ParticipantStatus = availability?.availableDates.includes(date) 
-          ? 'available' 
-          : 'unavailable';
+        let status: ParticipantStatus;
+        
+        if (!availability) {
+          // 새로 추가된 참여자
+          status = 'undecided';
+        } else if (availability.availableDates.includes(date)) {
+          // 참여 가능
+          status = 'available';
+        } else if (availability.unavailableDates?.includes(date)) {
+          // 명시적으로 불참
+          status = 'unavailable';
+        } else {
+          // 미정 (아직 선택하지 않음)
+          status = 'undecided';
+        }
         
         dateRow.push({
           type: 'status',
@@ -209,15 +296,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           date: date
         });
       });
-      
-      // 새 참여자 추가 중이면 미정 상태 셀 추가
-      if (showAddInput) {
-        dateRow.push({
-          type: 'status',
-          status: 'undecided',
-          date: date
-        });
-      }
       
       gridData.push(dateRow);
     });
@@ -239,12 +317,51 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             </div>
             <span className="font-medium">전체 참여자 {availabilities.length}</span>
           </div>
-          <button 
-            onClick={() => setShowAddInput(true)}
-            className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600"
-          >
-            추가 <Plus className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            {showAddInput ? (
+              <>
+                <input
+                  type="text"
+                  value={newParticipantName}
+                  onChange={(e) => setNewParticipantName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !isSubmitting) {
+                      handleAddParticipant();
+                    } else if (e.key === 'Escape') {
+                      setShowAddInput(false);
+                      setNewParticipantName('');
+                    }
+                  }}
+                  placeholder="이름 입력"
+                  className="w-32 px-3 py-1.5 text-sm border rounded-lg outline-none focus:border-blue-500"
+                  autoFocus
+                />
+                <button
+                  onClick={handleAddParticipant}
+                  disabled={isSubmitting || !newParticipantName.trim()}
+                  className="px-3 py-1.5 text-sm bg-blue-500 text-white rounded-lg disabled:bg-gray-300"
+                >
+                  추가
+                </button>
+                <button
+                  onClick={() => {
+                    setShowAddInput(false);
+                    setNewParticipantName('');
+                  }}
+                  className="px-3 py-1.5 text-sm text-gray-600"
+                >
+                  취소
+                </button>
+              </>
+            ) : (
+              <button 
+                onClick={() => setShowAddInput(true)}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600"
+              >
+                추가 <Plus className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -257,7 +374,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           <div 
             className="meeting-grid-container"
             style={{
-              gridTemplateColumns: `80px ${allParticipants.map(() => '100px').join(' ')}${showAddInput ? ' 150px' : ''}`
+              gridTemplateColumns: `80px ${allParticipants.map(() => '100px').join(' ')}`
             }}
           >
           {gridData.map((row, rowIndex) => (
@@ -299,47 +416,34 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               
               // 참여자 헤더
               if (cell.type === 'header-participant') {
+                const isLocked = lockedParticipants.has(cell.participant || '');
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 text-center text-xs font-medium text-gray-700 border-r border-b border-gray-200 bg-white"
+                    className={`px-2 py-2 text-center text-xs font-medium border-r border-b border-gray-200 ${
+                      isLocked ? 'bg-gray-50' : 'bg-white'
+                    }`}
                     style={{ position: 'sticky', top: 0, zIndex: 20 }}
                   >
-                    {cell.content}
-                  </div>
-                );
-              }
-              
-              // 참여자 추가 입력
-              if (cell.type === 'add-input') {
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-1 border-r border-b border-gray-200 bg-white flex items-center gap-2"
-                    style={{ position: 'sticky', top: 0, zIndex: 20 }}
-                  >
-                    <input
-                      type="text"
-                      value={newParticipantName}
-                      onChange={(e) => setNewParticipantName(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !isSubmitting) {
-                          handleAddParticipant();
-                        } else if (e.key === 'Escape') {
-                          setShowAddInput(false);
-                          setNewParticipantName('');
-                        }
-                      }}
-                      placeholder="이름"
-                      className="w-20 px-2 py-1 text-xs border rounded outline-none focus:border-blue-500"
-                      autoFocus
-                    />
                     <button
-                      onClick={handleAddParticipant}
-                      disabled={isSubmitting || !newParticipantName.trim()}
-                      className="px-2 py-1 text-xs bg-blue-500 text-white rounded disabled:bg-gray-300"
+                      onClick={() => {
+                        const participant = cell.participant || '';
+                        setLockedParticipants(prev => {
+                          const newSet = new Set(prev);
+                          if (newSet.has(participant)) {
+                            newSet.delete(participant);
+                          } else {
+                            newSet.add(participant);
+                          }
+                          return newSet;
+                        });
+                      }}
+                      className={`w-full ${
+                        isLocked ? 'text-gray-500' : 'text-gray-700 hover:text-blue-600'
+                      }`}
                     >
-                      추가
+                      {cell.content}
+                      {isLocked && <span className="ml-1 text-xs">✓</span>}
                     </button>
                   </div>
                 );
@@ -369,20 +473,31 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               
               // 상태 셀
               if (cell.type === 'status') {
+                const isLocked = lockedParticipants.has(cell.participant || '');
+                const isEditable = !isLocked;
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className="px-2 py-3 border-r border-b border-gray-200 bg-white"
                   >
-                    <div className={`
-                      h-8 rounded flex items-center justify-center text-xs font-medium
-                      ${cell.status === 'available' ? 'bg-[#FFE5B4] text-gray-700' : 
-                        cell.status === 'unavailable' ? 'bg-[#9CA3AF] text-white' : 
-                        'bg-[#E5E7EB] text-gray-500'}
-                    `}>
+                    <button
+                      onClick={() => {
+                        if (isEditable && cell.participant && cell.date) {
+                          handleStatusClick(cell.participant, cell.date, cell.status!);
+                        }
+                      }}
+                      disabled={!isEditable}
+                      className={`
+                        w-full h-8 rounded flex items-center justify-center text-xs font-medium transition-all
+                        ${cell.status === 'available' ? 'bg-[#FFE5B4] text-gray-700' : 
+                          cell.status === 'unavailable' ? 'bg-[#9CA3AF] text-white' : 
+                          'bg-[#E5E7EB] text-gray-500'}
+                        ${isEditable ? 'cursor-pointer hover:opacity-80' : 'cursor-default opacity-60'}
+                      `}
+                    >
                       {cell.status === 'available' ? '참여' : 
                        cell.status === 'unavailable' ? '불참' : '미정'}
-                    </div>
+                    </button>
                   </div>
                 );
               }
@@ -394,13 +509,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         </div>
       </div>
 
-      {/* 플로팅 액션 버튼 */}
-      <button
-        onClick={() => setShowAddInput(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-500 rounded-full flex items-center justify-center shadow-lg"
-      >
-        <Plus className="w-6 h-6 text-white" />
-      </button>
     </div>
   );
 }
