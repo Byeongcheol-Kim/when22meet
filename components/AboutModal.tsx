@@ -48,39 +48,6 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <p className="text-sm text-gray-500 mb-3">제작자</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">김병철</span>
-                <div className="flex gap-2">
-                  <a 
-                    href="https://github.com/Byeongcheol-Kim/graphchat"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
-                    title="GitHub"
-                  >
-                    <Github className="w-4 h-4" />
-                  </a>
-                  <a 
-                    href="https://www.linkedin.com/in/byeongcheol-kim-a477a7263/"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-blue-600 transition-colors"
-                    title="LinkedIn"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                  <a 
-                    href="https://instagram.com/byeongcheol.kim"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-pink-600 transition-colors"
-                    title="Instagram"
-                  >
-                    <Instagram className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-700">이진휘</span>
                 <div className="flex gap-2">
                   <a 
@@ -103,6 +70,39 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                   </a>
                   <a 
                     href="https://instagram.com/jinhwi.lee"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-pink-600 transition-colors"
+                    title="Instagram"
+                  >
+                    <Instagram className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-700">김병철</span>
+                <div className="flex gap-2">
+                  <a 
+                    href="https://github.com/Byeongcheol-Kim/graphchat"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    title="GitHub"
+                  >
+                    <Github className="w-4 h-4" />
+                  </a>
+                  <a 
+                    href="https://www.linkedin.com/in/byeongcheol-kim-a477a7263/"
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-gray-500 hover:text-blue-600 transition-colors"
+                    title="LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4" />
+                  </a>
+                  <a 
+                    href="https://www.instagram.com/benchley_goo/?igsh=cHI1emRjaXJpcWdm&utm_source=qr#"
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-gray-500 hover:text-pink-600 transition-colors"
