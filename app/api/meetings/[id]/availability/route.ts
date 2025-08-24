@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { participantName, availableDates, unavailableDates, statusUpdate, isLocked } = body;
+    const { participantName, availableDates, statusUpdate, isLocked } = body;
 
     if (!participantName || !availableDates) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function POST(
 
     // Get existing data to preserve timestamp and unavailable dates
     const existingData = await redis.get(`availability:${id}:${participantName}`);
-    let existingParsed: any = null;
+    let existingParsed: { timestamp?: number; unavailableDates?: string[]; isLocked?: boolean; dates?: string[] } | null = null;
     let timestamp = Date.now();
     let currentUnavailableDates: string[] = [];
     let currentIsLocked = false;
@@ -49,9 +49,11 @@ export async function POST(
     if (existingData) {
       existingParsed = JSON.parse(existingData);
       // Preserve timestamp from existing data
-      timestamp = existingParsed.timestamp || timestamp;
-      currentUnavailableDates = existingParsed.unavailableDates || [];
-      currentIsLocked = existingParsed.isLocked || false;
+      if (existingParsed) {
+        timestamp = existingParsed.timestamp || timestamp;
+        currentUnavailableDates = existingParsed.unavailableDates || [];
+        currentIsLocked = existingParsed.isLocked || false;
+      }
     }
     
     // Update locked status if provided

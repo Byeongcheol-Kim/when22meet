@@ -8,7 +8,6 @@ import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
-import AvailabilityGrid from '@/components/AvailabilityGrid';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
@@ -35,7 +34,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [datePositions, setDatePositions] = useState<{[date: string]: number}>({});
   const [scrollTop, setScrollTop] = useState(0);
-  const [scrollHeight, setScrollHeight] = useState(0);
   const [clientHeight, setClientHeight] = useState(0);
   const [highlightedDate, setHighlightedDate] = useState<string | null>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
@@ -51,6 +49,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   useEffect(() => {
     fetchMeetingData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
   
   // 초기 잠금 상태만 설정 (첫 로드시에만)
@@ -73,6 +72,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       const firstDate = parseStringToDate(meeting.dates[0]);
       setCurrentMonth(formatYearMonth(firstDate));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [meeting]);
 
   const fetchMeetingData = async (preserveLocalLockState = false) => {
@@ -253,7 +253,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     if (container) {
       const handleScroll = () => {
         setScrollTop(container.scrollTop);
-        setScrollHeight(container.scrollHeight);
         setClientHeight(container.clientHeight);
       };
       
@@ -379,7 +378,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     
     // 날짜별 행 생성
     let lastMonth = '';
-    meeting.dates.forEach((date, index) => {
+    meeting.dates.forEach((date) => {
       const dateObj = new Date(date + 'T00:00:00');
       const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
@@ -465,7 +464,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     return Object.entries(dateScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
-      .filter(([_, count]) => count > 0)
+      .filter(([, count]) => count > 0)
       .map(([date, count], index) => ({
         date,
         count,
