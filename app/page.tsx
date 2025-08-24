@@ -1,21 +1,49 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Info } from 'lucide-react';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Info, Link2, Calendar, Check } from 'lucide-react';
 import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
+import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
 
-export default function Home() {
+function HomeContent() {
   const [showSplash, setShowSplash] = useState(true);
   const [title, setTitle] = useState('');
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [participants, setParticipants] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<DateTemplate | null>(null);
+  const [showShareUrl, setShowShareUrl] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // URL 파라미터에서 템플릿 설정 읽기
+  useEffect(() => {
+    const templateTitle = searchParams.get('title');
+    const templateParticipants = searchParams.get('participants');
+    const templateDates = searchParams.get('template') as DateTemplate | null;
+    const templateMonths = searchParams.get('months');
+    
+    if (templateTitle) {
+      setTitle(decodeURIComponent(templateTitle));
+    }
+    
+    if (templateParticipants) {
+      const participantList = decodeURIComponent(templateParticipants).split(',').filter(p => p);
+      setParticipants(participantList);
+    }
+    
+    if (templateDates && ['weekend', 'weekday', 'fri-sat-sun', 'full'].includes(templateDates)) {
+      const months = templateMonths ? parseInt(templateMonths) : 2;
+      const dates = generateDatesFromTemplate(templateDates, months);
+      setSelectedDates(dates);
+      setSelectedTemplate(templateDates);
+    }
+  }, [searchParams]);
 
   // 2초 후 자동으로 메인 화면으로 전환
   useEffect(() => {
@@ -25,6 +53,39 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, []);
 
+
+  const handleTemplateSelect = (template: DateTemplate) => {
+    const dates = generateDatesFromTemplate(template, 2);
+    setSelectedDates(dates);
+    setSelectedTemplate(template);
+  };
+
+  const generateShareUrl = () => {
+    const params = new URLSearchParams();
+    
+    if (title) {
+      params.set('title', encodeURIComponent(title));
+    }
+    
+    if (participants.length > 0) {
+      params.set('participants', encodeURIComponent(participants.join(',')));
+    }
+    
+    if (selectedTemplate) {
+      params.set('template', selectedTemplate);
+      params.set('months', '2');
+    }
+    
+    const baseUrl = window.location.origin;
+    return `${baseUrl}?${params.toString()}`;
+  };
+
+  const handleCopyShareUrl = () => {
+    const url = generateShareUrl();
+    navigator.clipboard.writeText(url);
+    setShowShareUrl(true);
+    setTimeout(() => setShowShareUrl(false), 1500);
+  };
 
   const handleCreateMeeting = async () => {
     if (!title || selectedDates.length === 0) {
@@ -90,10 +151,64 @@ export default function Home() {
           </div>
         </div>
 
+        {/* 날짜 템플릿 선택 */}
+        <div className="mb-4">
+          <label className="text-sm text-gray-600 block mb-2">빠른 날짜 선택</label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleTemplateSelect('weekend')}
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                selectedTemplate === 'weekend' 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-1" />
+              주말 (토, 일)
+            </button>
+            <button
+              onClick={() => handleTemplateSelect('weekday')}
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                selectedTemplate === 'weekday' 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-1" />
+              주중 (월~금)
+            </button>
+            <button
+              onClick={() => handleTemplateSelect('fri-sat-sun')}
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                selectedTemplate === 'fri-sat-sun' 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-1" />
+              금토일
+            </button>
+            <button
+              onClick={() => handleTemplateSelect('full')}
+              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                selectedTemplate === 'full' 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Calendar className="w-4 h-4 inline mr-1" />
+              전체 날짜
+            </button>
+          </div>
+        </div>
+
         <div className="mb-8">
           <DateSelector 
             selectedDates={selectedDates}
-            onDatesChange={setSelectedDates}
+            onDatesChange={(dates) => {
+              setSelectedDates(dates);
+              setSelectedTemplate(null); // 수동 선택시 템플릿 해제
+            }}
           />
         </div>
 
@@ -105,6 +220,30 @@ export default function Home() {
           >
             {isCreating ? '생성 중...' : '약속 만들기'}
           </button>
+          
+          {/* 템플릿 URL 공유 버튼 */}
+          {(title || participants.length > 0 || selectedTemplate) && (
+            <button
+              onClick={handleCopyShareUrl}
+              className={`w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
+                showShareUrl 
+                  ? 'bg-blue-100 text-blue-700' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {showShareUrl ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  복사 완료!
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-4 h-4" />
+                  템플릿 URL 복사
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
       
@@ -120,5 +259,13 @@ export default function Home() {
       {/* About Modal */}
       <AboutModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <HomeContent />
+    </Suspense>
   );
 }

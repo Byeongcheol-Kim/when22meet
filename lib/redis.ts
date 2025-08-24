@@ -4,7 +4,15 @@ import IORedis from 'ioredis';
 // Production에서는 Upstash, 개발에서는 로컬 Redis 사용
 const isProduction = process.env.NODE_ENV === 'production';
 
-let redis: any;
+interface RedisInterface {
+  get: (key: string) => Promise<string | null>;
+  set: (key: string, value: string) => Promise<string | null>;
+  setex: (key: string, seconds: number, value: string) => Promise<string | null>;
+  del: (key: string) => Promise<number>;
+  keys: (pattern: string) => Promise<string[]>;
+}
+
+let redis: RedisInterface;
 
 if (isProduction && process.env.REDIS_URL && process.env.REDIS_TOKEN) {
   // Upstash Redis for production

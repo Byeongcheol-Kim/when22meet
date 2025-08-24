@@ -118,7 +118,7 @@ export async function PATCH(
     if (participants !== undefined) {
       // Get current availabilities
       const availabilityKeys = await redis.keys(`availability:${id}:*`);
-      const currentParticipants = availabilityKeys.map(key => 
+      const currentParticipants = availabilityKeys.map((key: string) => 
         key.replace(`availability:${id}:`, '')
       );
 

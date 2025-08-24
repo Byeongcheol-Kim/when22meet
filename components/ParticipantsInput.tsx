@@ -42,7 +42,9 @@ export default function ParticipantsInput({
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addParticipants(inputValue);
+      if (inputValue.trim()) {
+        addParticipants(inputValue);
+      }
     } else if (e.key === 'Backspace' && !inputValue && participants.length > 0) {
       // 입력이 비어있을 때 백스페이스를 누르면 마지막 참여자 제거
       removeParticipant(participants[participants.length - 1]);
@@ -50,10 +52,16 @@ export default function ParticipantsInput({
   };
 
   const handleInputChange = (value: string) => {
-    setInputValue(value);
     // 쉼표가 입력되면 자동으로 추가
     if (value.endsWith(',')) {
-      addParticipants(value.slice(0, -1));
+      const nameToAdd = value.slice(0, -1).trim();
+      if (nameToAdd) {
+        addParticipants(nameToAdd);
+      } else {
+        setInputValue(''); // 쉼표만 입력된 경우 초기화
+      }
+    } else {
+      setInputValue(value);
     }
   };
 
@@ -92,9 +100,12 @@ export default function ParticipantsInput({
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => {
-            if (inputValue.trim()) {
-              addParticipants(inputValue);
-            }
+            // onBlur시 중복 방지를 위해 setTimeout 사용
+            setTimeout(() => {
+              if (inputValue.trim()) {
+                addParticipants(inputValue);
+              }
+            }, 100);
           }}
           placeholder={placeholder}
           disabled={disabled}

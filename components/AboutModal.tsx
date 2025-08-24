@@ -48,28 +48,10 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <p className="text-sm text-gray-500 mb-3">제작자</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">이진휘</span>
+                <span className="text-sm font-semibold text-gray-700">이진휘 - 디자인</span>
                 <div className="flex gap-2">
                   <a 
-                    href="https://github.com/lymsbk"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
-                    title="GitHub"
-                  >
-                    <Github className="w-4 h-4" />
-                  </a>
-                  <a 
-                    href="https://www.linkedin.com/in/sukbeom-lim"
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-blue-600 transition-colors"
-                    title="LinkedIn"
-                  >
-                    <Linkedin className="w-4 h-4" />
-                  </a>
-                  <a 
-                    href="https://instagram.com/jinhwi.lee"
+                    href="https://www.instagram.com/jinhwi_12?igsh=MTMwd2MzdzJoOGc2bQ=="
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-gray-500 hover:text-pink-600 transition-colors"
@@ -81,7 +63,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">김병철</span>
+                <span className="text-sm font-semibold text-gray-700">김병철 - 개발</span>
                 <div className="flex gap-2">
                   <a 
                     href="https://github.com/Byeongcheol-Kim/graphchat"
