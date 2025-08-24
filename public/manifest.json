@@ -1,0 +1,11 @@
+{
+  "name": "언제만나? - 간편한 일정 조율 서비스",
+  "short_name": "언제만나",
+  "description": "여러 사람이 모임 일정을 쉽게 조율할 수 있는 무료 스케줄링 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "icons": []
+}

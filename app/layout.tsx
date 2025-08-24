@@ -14,6 +14,17 @@ export const metadata: Metadata = {
   keywords: "일정조율, 약속잡기, 모임일정, 스케줄링, when2meet, 언제만나",
   authors: [{ name: "이진휘" }, { name: "김병철" }],
   creator: "언제만나 팀",
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
+  icons: {
+    icon: '/icon',
+    apple: '/apple-icon',
+  },
+  manifest: '/manifest.json',
   openGraph: {
     title: "언제만나?",
     description: "약속 일정을 쉽게 조율하세요.",

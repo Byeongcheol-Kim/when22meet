@@ -38,11 +38,40 @@ body {
   animation-delay: 200ms;
 }
 
+/* Mobile scroll optimization */
+@supports (-webkit-overflow-scrolling: touch) {
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Prevent overscroll bounce on mobile */
+.overscroll-none {
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* Meeting Grid Styles */
 .meeting-grid-container {
   display: grid;
   min-width: max-content;
   align-content: start;
+  /* Mobile sticky fix */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: scroll-position;
+  /* Prevent layout shifts */
+  isolation: isolate;
+  contain: layout style;
+}
+
+/* Mobile-specific grid fixes */
+@supports (-webkit-touch-callout: none) {
+  .meeting-grid-container {
+    /* iOS specific fixes */
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
 }
 
 /* PC에서 더 넓은 그리드 셀 */
@@ -58,25 +87,53 @@ body {
 
 .meeting-grid-header-corner {
   position: sticky !important;
+  position: -webkit-sticky !important;
   top: 0;
   left: 0;
   z-index: 30;
+  /* Mobile optimization */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .meeting-grid-header {
   position: sticky !important;
+  position: -webkit-sticky !important;
   top: 0;
   z-index: 20;
+  /* Mobile optimization */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .meeting-grid-date {
   position: sticky !important;
+  position: -webkit-sticky !important;
   left: 0;
   z-index: 10;
+  /* Mobile optimization */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .meeting-grid-month {
   position: sticky !important;
+  position: -webkit-sticky !important;
   left: 0;
   z-index: 10;
+  /* Mobile optimization */
+  -webkit-transform: translate3d(0,0,0);
+  transform: translate3d(0,0,0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }

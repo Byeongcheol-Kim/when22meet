@@ -536,16 +536,23 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* Grid 컨테이너 */}
-      <div className="flex-1 relative overflow-hidden">
+      <div className="flex-1 relative overflow-hidden" style={{ isolation: 'isolate' }}>
         <div 
           ref={scrollContainerRef}
-          className="absolute inset-0 overflow-auto"
+          className="absolute inset-0 overflow-auto overscroll-none"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            contain: 'layout',
+            touchAction: 'pan-x pan-y',
+          }}
         >
           <div 
             className="meeting-grid-container"
             style={{
               gridTemplateColumns: `minmax(50px, min-content) ${allParticipants.map(() => 'var(--col-width)').join(' ')}`,
-              ['--col-width' as string]: 'clamp(90px, 10vw, 120px)'
+              ['--col-width' as string]: 'clamp(90px, 10vw, 120px)',
+              position: 'relative',
+              paddingBottom: '100px', // Add padding to ensure bottom content is visible
             } as React.CSSProperties}
           >
           {gridData.map((row, rowIndex) => (
