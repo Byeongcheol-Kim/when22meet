@@ -15,8 +15,8 @@ export const metadata: Metadata = {
   authors: [{ name: "이진휘" }, { name: "김병철" }],
   creator: "언제만나 팀",
   openGraph: {
-    title: "언제만나? - 간편한 일정 조율 서비스",
-    description: "여러 사람이 모임 일정을 쉽게 조율할 서비스",
+    title: "언제만나?",
+    description: "약속 일정을 쉽게 조율하세요.",
     url: "https://when2meet.vercel.app",
     siteName: "언제만나?",
     images: [

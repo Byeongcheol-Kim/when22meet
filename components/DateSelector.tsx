@@ -116,7 +116,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
           
           return (
             <div key={`${year}-${month}`} className="mb-6">
-              <h4 className="text-sm font-bold text-gray-700 mb-3 sticky top-0 bg-white py-1">
+              <h4 className="text-sm font-bold text-gray-900 mb-3 sticky top-0 bg-white py-1">
                 {monthData.displayName}
               </h4>
               <div className="grid grid-cols-7 gap-1 select-none">
@@ -149,7 +149,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                           ? 'text-gray-300 cursor-not-allowed'
                           : isToday
                           ? 'bg-blue-100 text-blue-600 font-medium hover:bg-blue-200'
-                          : 'text-gray-700 hover:bg-gray-50'
+                          : 'text-gray-900 hover:bg-gray-50'
                       }`}
                     >
                       {day}
@@ -162,7 +162,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
         })}
       </div>
       
-      <div className="text-sm text-gray-500 text-center mt-3">
+      <div className="text-sm text-gray-700 text-center mt-3">
         {selectedDates.length > 0 
           ? `${selectedDates.length}개의 날짜가 선택됨`
           : '날짜를 선택해주세요'}

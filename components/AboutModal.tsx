@@ -17,7 +17,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
           <h2 className="text-xl font-bold">언제만나?</h2>
           <button 
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-700 hover:text-gray-900 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -26,17 +26,18 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
         <div className="space-y-4">
           <div>
             <h3 className="font-semibold mb-2">서비스 소개</h3>
-            <p className="text-sm text-gray-600">
-              언제만나는 여러 사람이 모임 일정을 조율할 수 있도록
-              도와주는 간편한 스케줄링 서비스입니다.
-              가능한 날짜를 선택하고 참여자들이 각자 가능한 날짜를 표시하면, 
-              가장 많은 사람이 참여 가능한 날짜를 쉽게 찾을 수 있습니다.
+            <p className="text-sm text-gray-800 whitespace-pre-line">
+              {`언제만나는 여러 사람이 모임 일정을 조율할 수 있도록
+도와주는 간편한 스케줄링 서비스입니다.
+
+가능한 날짜를 선택하고 참여자들이 각자 가능한 날짜를 표시하면,
+가장 많은 사람이 참여 가능한 날짜를 쉽게 찾을 수 있습니다.`}
             </p>
           </div>
           
           <div>
             <h3 className="font-semibold mb-2">사용 방법</h3>
-            <ol className="text-sm text-gray-600 space-y-1 list-decimal list-inside">
+            <ol className="text-sm text-gray-800 space-y-1 list-decimal list-inside">
               <li>약속 이름을 입력하세요</li>
               <li>후보 날짜들을 선택하세요 (드래그로 여러 날짜 선택 가능)</li>
               <li>약속 만들기 버튼을 눌러 링크를 생성하세요</li>
@@ -45,16 +46,16 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
           </div>
           
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-500 mb-3">제작자</p>
+            <p className="text-sm text-gray-700 mb-3">제작자</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">이진휘 - 디자인</span>
+                <span className="text-sm font-semibold text-gray-900">이진휘 - 디자인</span>
                 <div className="flex gap-2">
                   <a 
                     href="https://www.instagram.com/jinhwi_12?igsh=MTMwd2MzdzJoOGc2bQ=="
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-pink-600 transition-colors"
+                    className="text-gray-700 hover:text-pink-600 transition-colors"
                     title="Instagram"
                   >
                     <Instagram className="w-4 h-4" />
@@ -63,13 +64,13 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">김병철 - 개발</span>
+                <span className="text-sm font-semibold text-gray-900">김병철 - 개발</span>
                 <div className="flex gap-2">
                   <a 
                     href="https://github.com/Byeongcheol-Kim/graphchat"
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    className="text-gray-700 hover:text-gray-900 transition-colors"
                     title="GitHub"
                   >
                     <Github className="w-4 h-4" />
@@ -78,7 +79,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                     href="https://www.linkedin.com/in/byeongcheol-kim-a477a7263/"
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-blue-600 transition-colors"
+                    className="text-gray-700 hover:text-blue-600 transition-colors"
                     title="LinkedIn"
                   >
                     <Linkedin className="w-4 h-4" />
@@ -87,7 +88,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                     href="https://www.instagram.com/benchley_goo/?igsh=cHI1emRjaXJpcWdm&utm_source=qr#"
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-gray-500 hover:text-pink-600 transition-colors"
+                    className="text-gray-700 hover:text-pink-600 transition-colors"
                     title="Instagram"
                   >
                     <Instagram className="w-4 h-4" />
@@ -100,10 +101,10 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
           <div className="pt-4 border-t bg-yellow-50 -mx-6 -mb-6 px-6 py-3 rounded-b-xl">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-xs text-gray-700 font-medium">
+                <p className="text-xs text-gray-900 font-medium">
                   💙 광고 없는 무료 서비스입니다
                 </p>
-                <p className="text-xs text-gray-600 mt-0.5">
+                <p className="text-xs text-gray-800 mt-0.5">
                   도움이 되셨다면 커피 한 잔 부탁드려요!
                 </p>
               </div>

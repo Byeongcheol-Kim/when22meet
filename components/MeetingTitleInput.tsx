@@ -17,7 +17,7 @@ export default function MeetingTitleInput({
 }: MeetingTitleInputProps) {
   return (
     <div>
-      <label className="text-sm text-gray-600 block mb-2">{label}</label>
+      <label className="text-sm text-gray-800 font-medium block mb-2">{label}</label>
       <input
         type="text"
         value={value}

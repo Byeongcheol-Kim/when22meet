@@ -172,13 +172,13 @@ function HomeContent() {
               label="참여자 (선택사항)"
               placeholder="이름을 입력하고 Enter 또는 쉼표로 구분"
             />
-            <p className="text-sm text-gray-500">아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.</p>
+            <p className="text-sm text-gray-700">아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.</p>
           </div>
         </div>
 
         {/* 날짜 템플릿 선택 */}
         <div className="mb-4">
-          <label className="text-sm text-gray-600 block mb-2">빠른 날짜 선택</label>
+          <label className="text-sm text-gray-800 font-medium block mb-2">빠른 날짜 선택</label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleTemplateSelect('weekend')}
@@ -278,7 +278,7 @@ function HomeContent() {
         className="absolute top-8 right-8 hover:opacity-70 transition-opacity"
         title="정보"
       >
-        <Info className="w-6 h-6 text-gray-400" />
+        <Info className="w-6 h-6 text-gray-600" />
       </button>
 
       {/* About Modal */}

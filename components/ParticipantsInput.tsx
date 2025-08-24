@@ -67,7 +67,7 @@ export default function ParticipantsInput({
 
   return (
     <div>
-      <label className="text-sm text-gray-600 block mb-2">{label}</label>
+      <label className="text-sm text-gray-800 font-medium block mb-2">{label}</label>
       
       {/* 참여자 칩스 표시 */}
       {participants.length > 0 && (
@@ -111,11 +111,11 @@ export default function ParticipantsInput({
           disabled={disabled}
           className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
-        <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />
       </div>
 
       {participants.length > 0 && (
-        <p className="text-xs text-gray-500 mt-2">
+        <p className="text-xs text-gray-700 mt-2">
           {participants.length}명의 참여자가 추가됨
         </p>
       )}
