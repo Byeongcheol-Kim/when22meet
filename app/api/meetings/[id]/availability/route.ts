@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
+import { Meeting, StoredAvailability } from '@/lib/types';
 
 // Update participant availability
 export async function POST(
@@ -27,7 +28,7 @@ export async function POST(
       );
     }
 
-    const meeting = meetingData;
+    const meeting = meetingData as Meeting;
     
     // Add participant to meeting if not already there
     if (!meeting.participants.includes(participantName)) {
@@ -41,13 +42,13 @@ export async function POST(
 
     // Get existing data to preserve timestamp and unavailable dates
     const existingData = await redis.get(`availability:${id}:${participantName}`);
-    let existingParsed: { timestamp?: number; unavailableDates?: string[]; isLocked?: boolean; dates?: string[] } | null = null;
+    let existingParsed: StoredAvailability | null = null;
     let timestamp = Date.now();
     let currentUnavailableDates: string[] = [];
     let currentIsLocked = false;
     
     if (existingData) {
-      existingParsed = existingData;
+      existingParsed = existingData as StoredAvailability;
       // Preserve timestamp from existing data
       if (existingParsed) {
         timestamp = existingParsed.timestamp || timestamp;

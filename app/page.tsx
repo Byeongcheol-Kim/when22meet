@@ -80,11 +80,36 @@ function HomeContent() {
     return `${baseUrl}?${params.toString()}`;
   };
 
-  const handleCopyShareUrl = () => {
-    const url = generateShareUrl();
-    navigator.clipboard.writeText(url);
-    setShowShareUrl(true);
-    setTimeout(() => setShowShareUrl(false), 1500);
+  const handleCopyShareUrl = async () => {
+    try {
+      const url = generateShareUrl();
+      
+      // URL 단축 API 호출
+      const response = await fetch('/api/shorten', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        navigator.clipboard.writeText(data.shortUrl);
+        setShowShareUrl(true);
+        setTimeout(() => setShowShareUrl(false), 1500);
+      } else {
+        // 단축 실패 시 원본 URL 복사
+        navigator.clipboard.writeText(url);
+        setShowShareUrl(true);
+        setTimeout(() => setShowShareUrl(false), 1500);
+      }
+    } catch (error) {
+      console.error('Error copying URL:', error);
+      // 에러 시 원본 URL 복사
+      const url = generateShareUrl();
+      navigator.clipboard.writeText(url);
+      setShowShareUrl(true);
+      setTimeout(() => setShowShareUrl(false), 1500);
+    }
   };
 
   const handleCreateMeeting = async () => {

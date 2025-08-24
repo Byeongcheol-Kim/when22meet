@@ -1,60 +1,17 @@
 import { Redis } from '@upstash/redis';
-import IORedis from 'ioredis';
 
-// Production에서는 Upstash, 개발에서는 로컬 Redis 사용
-const isProduction = process.env.NODE_ENV === 'production';
-
-interface RedisInterface {
-  get: (key: string) => Promise<any>;
-  set: (key: string, value: any) => Promise<string | null>;
-  setex: (key: string, seconds: number, value: any) => Promise<string | null>;
-  del: (key: string) => Promise<number>;
-  keys: (pattern: string) => Promise<string[]>;
+// Upstash Redis 인스턴스 생성
+// 환경변수가 없으면 오류
+if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+  console.error('Upstash Redis 환경변수가 설정되지 않았습니다.');
+  console.error('1. https://console.upstash.com 에서 Redis 데이터베이스를 생성하세요.');
+  console.error('2. .env.local 파일에 UPSTASH_REDIS_REST_URL과 UPSTASH_REDIS_REST_TOKEN을 추가하세요.');
+  throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables are required');
 }
 
-let redis: RedisInterface;
-
-if (isProduction && process.env.REDIS_URL && process.env.REDIS_TOKEN) {
-  // Upstash Redis for production
-  const upstashRedis = new Redis({
-    url: process.env.REDIS_URL,
-    token: process.env.REDIS_TOKEN,
-  });
-  
-  // Upstash는 자동으로 JSON을 파싱/문자열화함
-  redis = {
-    get: async (key: string) => upstashRedis.get(key),
-    set: async (key: string, value: any) => upstashRedis.set(key, value),
-    setex: async (key: string, seconds: number, value: any) => upstashRedis.setex(key, seconds, value),
-    del: async (key: string) => upstashRedis.del(key),
-    keys: async (pattern: string) => upstashRedis.keys(pattern),
-  };
-} else {
-  // Local Redis for development
-  const ioRedis = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379');
-  
-  // ioredis는 문자열을 반환하므로 JSON 파싱이 필요
-  redis = {
-    get: async (key: string) => {
-      const data = await ioRedis.get(key);
-      if (!data) return null;
-      try {
-        return JSON.parse(data);
-      } catch {
-        return data;
-      }
-    },
-    set: async (key: string, value: any) => {
-      const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-      return ioRedis.set(key, stringValue);
-    },
-    setex: async (key: string, seconds: number, value: any) => {
-      const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
-      return ioRedis.setex(key, seconds, stringValue);
-    },
-    del: async (key: string) => ioRedis.del(key),
-    keys: async (pattern: string) => ioRedis.keys(pattern),
-  };
-}
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 export default redis;

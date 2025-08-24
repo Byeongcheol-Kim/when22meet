@@ -545,8 +545,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             className="meeting-grid-container"
             style={{
               gridTemplateColumns: `minmax(50px, min-content) ${allParticipants.map(() => 'var(--col-width)').join(' ')}`,
-              ['--col-width' as any]: 'clamp(90px, 10vw, 120px)'
-            }}
+              ['--col-width' as string]: 'clamp(90px, 10vw, 120px)'
+            } as React.CSSProperties}
           >
           {gridData.map((row, rowIndex) => (
             row.map((cell, colIndex) => {

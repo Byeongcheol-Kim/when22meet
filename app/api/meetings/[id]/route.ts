@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
+import { Meeting, StoredAvailability } from '@/lib/types';
 
 // Get meeting details
 export async function GET(
@@ -17,7 +18,7 @@ export async function GET(
       );
     }
 
-    const meeting = meetingData;
+    const meeting = meetingData as Meeting;
     
     // Get all availabilities for this meeting
     const availabilityKeys = await redis.keys(`availability:${id}:*`);
@@ -27,7 +28,7 @@ export async function GET(
       const data = await redis.get(key);
       if (data) {
         const participantName = key.split(':')[2];
-        const parsedData = data;
+        const parsedData = data as StoredAvailability | string[];
         
         // Handle both old format (array) and new format (object with timestamp)
         if (Array.isArray(parsedData)) {
@@ -35,7 +36,8 @@ export async function GET(
             participantName,
             availableDates: parsedData,
             unavailableDates: [],
-            timestamp: 0 // Old entries without timestamp
+            timestamp: 0, // Old entries without timestamp
+            isLocked: false
           });
         } else {
           availabilities.push({
@@ -98,7 +100,7 @@ export async function PATCH(
       );
     }
 
-    const meeting = meetingData;
+    const meeting = meetingData as Meeting;
     
     // Update fields
     if (title !== undefined) {
