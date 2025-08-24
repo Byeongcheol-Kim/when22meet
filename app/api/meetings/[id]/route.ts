@@ -64,3 +64,98 @@ export async function GET(
     );
   }
 }
+
+// Update meeting dates
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const body = await request.json();
+    const { title, dates, participants } = body;
+
+    if (!dates || dates.length === 0) {
+      return NextResponse.json(
+        { error: 'Dates are required' },
+        { status: 400 }
+      );
+    }
+
+    if (title !== undefined && !title.trim()) {
+      return NextResponse.json(
+        { error: 'Title cannot be empty' },
+        { status: 400 }
+      );
+    }
+
+    // Get existing meeting
+    const meetingData = await redis.get(`meeting:${id}`);
+    if (!meetingData) {
+      return NextResponse.json(
+        { error: 'Meeting not found' },
+        { status: 404 }
+      );
+    }
+
+    const meeting = JSON.parse(meetingData);
+    
+    // Update fields
+    if (title !== undefined) {
+      meeting.title = title.trim();
+    }
+    meeting.dates = dates;
+    meeting.updatedAt = new Date().toISOString();
+
+    // Save updated meeting with same TTL
+    await redis.setex(
+      `meeting:${id}`,
+      18 * 30 * 24 * 60 * 60, // 18개월
+      JSON.stringify(meeting)
+    );
+
+    // Handle participant updates if provided
+    if (participants !== undefined) {
+      // Get current availabilities
+      const availabilityKeys = await redis.keys(`availability:${id}:*`);
+      const currentParticipants = availabilityKeys.map(key => 
+        key.replace(`availability:${id}:`, '')
+      );
+
+      // Add new participants
+      for (const participantName of participants) {
+        if (!currentParticipants.includes(participantName)) {
+          const availability = {
+            participantName,
+            availableDates: [],
+            unavailableDates: [],
+            isLocked: false
+          };
+          await redis.setex(
+            `availability:${id}:${participantName}`,
+            18 * 30 * 24 * 60 * 60, // 18개월
+            JSON.stringify(availability)
+          );
+        }
+      }
+
+      // Remove participants that are no longer in the list
+      for (const currentParticipant of currentParticipants) {
+        if (!participants.includes(currentParticipant)) {
+          await redis.del(`availability:${id}:${currentParticipant}`);
+        }
+      }
+    }
+
+    return NextResponse.json({
+      success: true,
+      meeting
+    });
+  } catch (error) {
+    console.error('Error updating meeting:', error);
+    return NextResponse.json(
+      { error: 'Failed to update meeting' },
+      { status: 500 }
+    );
+  }
+}

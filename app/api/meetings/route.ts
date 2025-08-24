@@ -7,7 +7,7 @@ import { Meeting } from '@/lib/types';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, dates } = body;
+    const { title, dates, participants = [] } = body;
 
     if (!title || !dates || dates.length === 0) {
       return NextResponse.json(
@@ -32,6 +32,23 @@ export async function POST(request: NextRequest) {
       18 * 30 * 24 * 60 * 60, // 18개월
       JSON.stringify(meeting)
     );
+
+    // If participants were provided, add them as availabilities
+    if (participants && participants.length > 0) {
+      for (const participantName of participants) {
+        const availability = {
+          participantName,
+          availableDates: [],
+          unavailableDates: [],
+          isLocked: false
+        };
+        await redis.setex(
+          `availability:${meetingId}:${participantName}`,
+          18 * 30 * 24 * 60 * 60, // 18개월
+          JSON.stringify(availability)
+        );
+      }
+    }
 
     return NextResponse.json({ 
       success: true, 
