@@ -17,7 +17,7 @@ export async function GET(
       );
     }
 
-    const meeting = JSON.parse(meetingData);
+    const meeting = meetingData;
     
     // Get all availabilities for this meeting
     const availabilityKeys = await redis.keys(`availability:${id}:*`);
@@ -27,7 +27,7 @@ export async function GET(
       const data = await redis.get(key);
       if (data) {
         const participantName = key.split(':')[2];
-        const parsedData = JSON.parse(data);
+        const parsedData = data;
         
         // Handle both old format (array) and new format (object with timestamp)
         if (Array.isArray(parsedData)) {
@@ -98,7 +98,7 @@ export async function PATCH(
       );
     }
 
-    const meeting = JSON.parse(meetingData);
+    const meeting = meetingData;
     
     // Update fields
     if (title !== undefined) {
@@ -111,7 +111,7 @@ export async function PATCH(
     await redis.setex(
       `meeting:${id}`,
       18 * 30 * 24 * 60 * 60, // 18개월
-      JSON.stringify(meeting)
+      meeting
     );
 
     // Handle participant updates if provided
@@ -134,7 +134,7 @@ export async function PATCH(
           await redis.setex(
             `availability:${id}:${participantName}`,
             18 * 30 * 24 * 60 * 60, // 18개월
-            JSON.stringify(availability)
+            availability
           );
         }
       }

@@ -27,7 +27,7 @@ export async function POST(
       );
     }
 
-    const meeting = JSON.parse(meetingData);
+    const meeting = meetingData;
     
     // Add participant to meeting if not already there
     if (!meeting.participants.includes(participantName)) {
@@ -35,7 +35,7 @@ export async function POST(
       await redis.setex(
         `meeting:${id}`,
         18 * 30 * 24 * 60 * 60, // 18개월
-        JSON.stringify(meeting)
+        meeting
       );
     }
 
@@ -47,7 +47,7 @@ export async function POST(
     let currentIsLocked = false;
     
     if (existingData) {
-      existingParsed = JSON.parse(existingData);
+      existingParsed = existingData;
       // Preserve timestamp from existing data
       if (existingParsed) {
         timestamp = existingParsed.timestamp || timestamp;
@@ -78,12 +78,12 @@ export async function POST(
     await redis.setex(
       `availability:${id}:${participantName}`,
       18 * 30 * 24 * 60 * 60, // 18개월
-      JSON.stringify({
+      {
         dates: availableDates,
         unavailableDates: currentUnavailableDates,
         timestamp: timestamp,
         isLocked: currentIsLocked
-      })
+      }
     );
 
     return NextResponse.json({ 

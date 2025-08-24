@@ -50,6 +50,17 @@ body {
   align-content: start;
 }
 
+/* PC에서 더 넓은 그리드 셀 */
+@media (min-width: 768px) {
+  .meeting-grid-container {
+    font-size: 14px;
+  }
+  
+  .meeting-grid-container > div {
+    min-height: 48px;
+  }
+}
+
 .meeting-grid-header-corner {
   position: sticky !important;
   top: 0;

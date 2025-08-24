@@ -132,7 +132,7 @@ function HomeContent() {
   // 날짜 선택 화면
   return (
     <div className="min-h-screen bg-white px-4 py-8">
-      <div className="w-full max-w-sm mx-auto">
+      <div className="w-full max-w-sm md:max-w-xl lg:max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-xl font-bold mb-4">언제만나!</h1>
           

@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     await redis.setex(
       `meeting:${meetingId}`,
       18 * 30 * 24 * 60 * 60, // 18개월
-      JSON.stringify(meeting)
+      meeting
     );
 
     // If participants were provided, add them as availabilities
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         await redis.setex(
           `availability:${meetingId}:${participantName}`,
           18 * 30 * 24 * 60 * 60, // 18개월
-          JSON.stringify(availability)
+          availability
         );
       }
     }
