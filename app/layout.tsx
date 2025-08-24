@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 
@@ -8,18 +8,19 @@ const notoSansKr = Noto_Sans_KR({
   variable: "--font-noto-sans-kr",
 });
 
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata: Metadata = {
   title: "언제만나? - 간편한 일정 조율 서비스",
   description: "여러 사람이 모임 일정을 쉽게 조율할 수 있는 무료 스케줄링 서비스입니다. 가능한 날짜를 선택하고 최적의 일정을 찾아보세요!",
   keywords: "일정조율, 약속잡기, 모임일정, 스케줄링, when2meet, 언제만나",
   authors: [{ name: "이진휘" }, { name: "김병철" }],
   creator: "언제만나 팀",
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
   icons: {
     icon: '/icon',
     apple: '/apple-icon',
