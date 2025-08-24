@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { formatDateToString, isPastDate, getDayName, getMonthDisplayName } from '@/lib/utils/date';
 
 interface DateSelectorProps {
   selectedDates: string[];
@@ -14,10 +15,8 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
   const calendarRef = useRef<HTMLDivElement>(null);
   
   // 로케일 기반 요일 이름
-  const isKorean = typeof navigator !== 'undefined' && navigator.language.startsWith('ko');
-  const dayNames = isKorean 
-    ? ['일', '월', '화', '수', '목', '금', '토']
-    : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const locale = typeof navigator !== 'undefined' && navigator.language.startsWith('ko') ? 'ko-KR' : 'en-US';
+  const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i, locale));
 
   const handleDateToggle = (date: string) => {
     if (disabled) return;
@@ -46,7 +45,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
     const current = new Date(minDate);
     
     while (current <= maxDate) {
-      const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
+      const dateStr = formatDateToString(current);
       if (!isPastDate(current) && !isDateBeyondLimit(current)) {
         dates.push(dateStr);
       }
@@ -66,11 +65,6 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
     return () => document.removeEventListener('mouseup', handleMouseUp);
   }, []);
 
-  const isPastDate = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return date < today;
-  };
   
   const isDateBeyondLimit = (date: Date) => {
     const today = new Date();
@@ -89,7 +83,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
       months.push({
         year: date.getFullYear(),
         month: date.getMonth(),
-        displayName: `${date.getFullYear()}. ${String(date.getMonth() + 1).padStart(2, '0')}.`
+        displayName: getMonthDisplayName(date.getFullYear(), date.getMonth())
       });
     }
     
@@ -134,8 +128,8 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                 {/* Days of the month */}
                 {Array.from({ length: daysInMonth }, (_, i) => {
                   const day = i + 1;
-                  const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                   const dateObj = new Date(year, month, day);
+                  const date = formatDateToString(dateObj);
                   const isSelected = selectedDates.includes(date);
                   const isPast = isPastDate(dateObj);
                   const isBeyondLimit = isDateBeyondLimit(dateObj);

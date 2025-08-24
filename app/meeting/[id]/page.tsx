@@ -8,6 +8,8 @@ import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
+import AvailabilityGrid from '@/components/AvailabilityGrid';
+import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -68,8 +70,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   // 초기 월 설정
   useEffect(() => {
     if (meeting && meeting.dates.length > 0 && !currentMonth) {
-      const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
-      setCurrentMonth(`${firstDate.getFullYear()}.${String(firstDate.getMonth() + 1).padStart(2, '0')}`);
+      const firstDate = parseStringToDate(meeting.dates[0]);
+      setCurrentMonth(formatYearMonth(firstDate));
     }
   }, [meeting]);
 
@@ -224,8 +226,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       const dateIndex = Math.max(0, Math.min(visibleIndex - 1, meeting.dates.length - 1)); // 월 구분 행 고려
       
       if (meeting.dates[dateIndex]) {
-        const date = new Date(meeting.dates[dateIndex] + 'T00:00:00');
-        const month = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}`;
+        const date = parseStringToDate(meeting.dates[dateIndex]);
+        const month = formatYearMonth(date);
         
         if (month !== currentMonth) {
           setCurrentMonth(month);
