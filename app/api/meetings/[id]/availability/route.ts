@@ -9,7 +9,7 @@ export async function POST(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { participantName, availableDates, unavailableDates, statusUpdate } = body;
+    const { participantName, availableDates, unavailableDates, statusUpdate, isLocked } = body;
 
     if (!participantName || !availableDates) {
       return NextResponse.json(
@@ -34,7 +34,7 @@ export async function POST(
       meeting.participants.push(participantName);
       await redis.setex(
         `meeting:${id}`,
-        30 * 24 * 60 * 60,
+        18 * 30 * 24 * 60 * 60, // 18개월
         JSON.stringify(meeting)
       );
     }
@@ -44,12 +44,19 @@ export async function POST(
     let existingParsed: any = null;
     let timestamp = Date.now();
     let currentUnavailableDates: string[] = [];
+    let currentIsLocked = false;
     
     if (existingData) {
       existingParsed = JSON.parse(existingData);
       // Preserve timestamp from existing data
       timestamp = existingParsed.timestamp || timestamp;
       currentUnavailableDates = existingParsed.unavailableDates || [];
+      currentIsLocked = existingParsed.isLocked || false;
+    }
+    
+    // Update locked status if provided
+    if (isLocked !== undefined) {
+      currentIsLocked = isLocked;
     }
     
     // Update unavailable dates based on status update
@@ -68,11 +75,12 @@ export async function POST(
     // Save availability with timestamp for ordering
     await redis.setex(
       `availability:${id}:${participantName}`,
-      30 * 24 * 60 * 60,
+      18 * 30 * 24 * 60 * 60, // 18개월
       JSON.stringify({
         dates: availableDates,
         unavailableDates: currentUnavailableDates,
-        timestamp: timestamp
+        timestamp: timestamp,
+        isLocked: currentIsLocked
       })
     );
 

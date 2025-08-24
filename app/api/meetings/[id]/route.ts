@@ -42,7 +42,8 @@ export async function GET(
             participantName,
             availableDates: parsedData.dates || [],
             unavailableDates: parsedData.unavailableDates || [],
-            timestamp: parsedData.timestamp || 0
+            timestamp: parsedData.timestamp || 0,
+            isLocked: parsedData.isLocked || false
           });
         }
       }

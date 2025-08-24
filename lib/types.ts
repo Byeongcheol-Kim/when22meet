@@ -12,6 +12,7 @@ export interface Availability {
   availableDates: string[]; // 참가 가능한 날짜 목록
   unavailableDates?: string[]; // 명시적으로 불참인 날짜 목록 (없으면 미정)
   timestamp?: number;
+  isLocked?: boolean; // 스케줄 확정 여부
 }
 
 export interface TimeSlot {

@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
       dates,
       participants: [], // 초기에는 빈 배열
       createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      expiresAt: new Date(Date.now() + 18 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 18개월
     };
 
-    // Save to Redis with 30-day TTL
+    // Save to Redis with 18-month TTL
     await redis.setex(
       `meeting:${meetingId}`,
-      30 * 24 * 60 * 60,
+      18 * 30 * 24 * 60 * 60, // 18개월
       JSON.stringify(meeting)
     );
 

@@ -33,6 +33,22 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     fetchMeetingData();
   }, [resolvedParams.id]);
   
+  // 초기 잠금 상태만 설정 (첫 로드시에만)
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
+  useEffect(() => {
+    if (isInitialLoad && availabilities.length > 0) {
+      const locked = new Set<string>();
+      availabilities.forEach(a => {
+        if (a.isLocked) {
+          locked.add(a.participantName);
+        }
+      });
+      setLockedParticipants(locked);
+      setIsInitialLoad(false);
+    }
+  }, [availabilities, isInitialLoad]);
+  
   // 초기 월 설정
   useEffect(() => {
     if (meeting && meeting.dates.length > 0 && !currentMonth) {
@@ -41,7 +57,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
   }, [meeting]);
 
-  const fetchMeetingData = async () => {
+  const fetchMeetingData = async (preserveLocalLockState = false) => {
     try {
       const response = await fetch(`/api/meetings/${resolvedParams.id}`);
       if (!response.ok) {
@@ -49,7 +65,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
       const data = await response.json();
       setMeeting(data.meeting);
-      setAvailabilities(data.availabilities);
+      
+      // preserveLocalLockState가 true면 현재 클라이언트의 잠금 상태를 유지
+      if (preserveLocalLockState) {
+        const currentLocked = new Set(lockedParticipants);
+        setAvailabilities(data.availabilities.map((a: Availability) => ({
+          ...a,
+          isLocked: currentLocked.has(a.participantName) || a.isLocked
+        })));
+      } else {
+        setAvailabilities(data.availabilities);
+      }
     } catch (error) {
       console.error('Error fetching meeting:', error);
       alert('미팅을 찾을 수 없습니다.');
@@ -77,7 +103,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       });
 
       if (response.ok) {
-        await fetchMeetingData();
+        await fetchMeetingData(true); // 잠금 상태 유지하면서 데이터 새로고침
         setNewParticipantName('');
         setShowAddInput(false);
         // 새 참여자는 기본적으로 편집 가능 상태 (잠기지 않음)
@@ -150,20 +176,21 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           participantName: participant,
           availableDates: newAvailableDates,
           unavailableDates: newStatus === 'unavailable' ? [date] : [],
-          statusUpdate: { date, status: newStatus }
+          statusUpdate: { date, status: newStatus },
+          isLocked: lockedParticipants.has(participant) // 현재 잠금 상태 유지
         })
       });
 
       if (!response.ok) {
-        // Rollback on error
-        await fetchMeetingData();
+        // Rollback on error, but preserve lock state
+        await fetchMeetingData(true);
         alert('상태 업데이트에 실패했습니다. 다시 시도해주세요.');
       }
       // Success - keep optimistic update
     } catch (error) {
       console.error('Error updating status:', error);
-      // Rollback on error
-      await fetchMeetingData();
+      // Rollback on error, but preserve lock state
+      await fetchMeetingData(true);
       alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
@@ -436,17 +463,46 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     style={{ position: 'sticky', top: 0, zIndex: 20 }}
                   >
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const participant = cell.participant || '';
+                        const currentAvailability = availabilities.find(a => a.participantName === participant);
+                        if (!currentAvailability) return;
+                        
+                        const newIsLocked = !lockedParticipants.has(participant);
+                        
+                        // Optimistic update
                         setLockedParticipants(prev => {
                           const newSet = new Set(prev);
-                          if (newSet.has(participant)) {
-                            newSet.delete(participant);
-                          } else {
+                          if (newIsLocked) {
                             newSet.add(participant);
+                          } else {
+                            newSet.delete(participant);
                           }
                           return newSet;
                         });
+                        
+                        // Send to backend
+                        try {
+                          const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              participantName: participant,
+                              availableDates: currentAvailability.availableDates,
+                              unavailableDates: currentAvailability.unavailableDates,
+                              isLocked: newIsLocked
+                            })
+                          });
+                          
+                          if (!response.ok) {
+                            // Rollback on error
+                            await fetchMeetingData();
+                          }
+                        } catch (error) {
+                          console.error('Error updating lock status:', error);
+                          // Rollback on error
+                          await fetchMeetingData();
+                        }
                       }}
                       className={`w-full ${
                         isLocked ? 'text-gray-500' : 'text-gray-800 hover:text-blue-500 transition-colors'

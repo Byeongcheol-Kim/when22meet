@@ -9,13 +9,17 @@ export default function Home() {
   const [title, setTitle] = useState('');
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
   const [isCreating, setIsCreating] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState(() => {
-    const today = new Date();
-    return { year: today.getFullYear(), month: today.getMonth() };
-  });
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const calendarRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const router = useRouter();
+  
+  // 로케일 기반 요일 이름
+  const isKorean = typeof navigator !== 'undefined' && navigator.language.startsWith('ko');
+  const dayNames = isKorean 
+    ? ['일', '월', '화', '수', '목', '금', '토']
+    : ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
   // 2초 후 자동으로 메인 화면으로 전환
   useEffect(() => {
@@ -33,15 +37,15 @@ export default function Home() {
     );
   };
 
-  const handleMouseDown = (date: string, isPast: boolean) => {
-    if (isPast) return;
+  const handleMouseDown = (date: string, isDisabled: boolean) => {
+    if (isDisabled) return;
     setIsDragging(true);
     setDragStart(date);
     handleDateToggle(date);
   };
 
-  const handleMouseEnter = (date: string, isPast: boolean) => {
-    if (!isDragging || isPast || !dragStart) return;
+  const handleMouseEnter = (date: string, isDisabled: boolean) => {
+    if (!isDragging || isDisabled || !dragStart) return;
     
     const startDate = new Date(dragStart);
     const currentDate = new Date(date);
@@ -53,7 +57,7 @@ export default function Home() {
     
     while (current <= maxDate) {
       const dateStr = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}-${String(current.getDate()).padStart(2, '0')}`;
-      if (!isPastDate(current)) {
+      if (!isPastDate(current) && !isDateBeyondLimit(current)) {
         dates.push(dateStr);
       }
       current.setDate(current.getDate() + 1);
@@ -77,22 +81,33 @@ export default function Home() {
     today.setHours(0, 0, 0, 0);
     return date < today;
   };
-
-  const handlePrevMonth = () => {
-    setCurrentMonth(prev => {
-      const newMonth = prev.month === 0 ? 11 : prev.month - 1;
-      const newYear = prev.month === 0 ? prev.year - 1 : prev.year;
-      return { year: newYear, month: newMonth };
-    });
+  
+  const isDateBeyondLimit = (date: Date) => {
+    const today = new Date();
+    const maxDate = new Date(today);
+    maxDate.setMonth(maxDate.getMonth() + 12);
+    return date > maxDate;
   };
-
-  const handleNextMonth = () => {
-    setCurrentMonth(prev => {
-      const newMonth = prev.month === 11 ? 0 : prev.month + 1;
-      const newYear = prev.month === 11 ? prev.year + 1 : prev.year;
-      return { year: newYear, month: newMonth };
-    });
+  
+  // 스크롤 가능한 12개월 데이터 생성
+  const generateMonthsData = () => {
+    const months = [];
+    const today = new Date();
+    
+    for (let i = 0; i < 12; i++) {
+      const date = new Date(today.getFullYear(), today.getMonth() + i, 1);
+      months.push({
+        year: date.getFullYear(),
+        month: date.getMonth(),
+        displayName: `${date.getFullYear()}. ${String(date.getMonth() + 1).padStart(2, '0')}.`
+      });
+    }
+    
+    return months;
   };
+  
+  const monthsData = generateMonthsData();
+
 
   const handleCreateMeeting = async () => {
     if (!title || selectedDates.length === 0) {
@@ -158,73 +173,72 @@ export default function Home() {
         </div>
 
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <button onClick={handlePrevMonth} className="p-2">
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
-            </button>
-            <h3 className="text-xl font-bold">
-              {currentMonth.year}. {String(currentMonth.month + 1).padStart(2, '0')}.
-            </h3>
-            <button onClick={handleNextMonth} className="p-2">
-              <ChevronRight className="w-5 h-5 text-gray-600" />
-            </button>
+          <div className="mb-4">
+            <h3 className="text-lg font-bold mb-2">날짜 선택</h3>
+            <div className="grid grid-cols-7 gap-1 text-center sticky top-0 bg-white z-10 pb-1">
+              {dayNames.map((day, index) => (
+                <div key={index} className="text-sm font-bold text-gray-900 py-1">{day}</div>
+              ))}
+            </div>
           </div>
           
-          <div className="grid grid-cols-7 gap-1 text-center mb-2">
-            <div className="text-xs text-gray-400 py-2">SUN</div>
-            <div className="text-xs text-gray-400 py-2">MON</div>
-            <div className="text-xs text-gray-400 py-2">TUE</div>
-            <div className="text-xs text-gray-400 py-2">WED</div>
-            <div className="text-xs text-gray-400 py-2">THU</div>
-            <div className="text-xs text-gray-400 py-2">FRI</div>
-            <div className="text-xs text-gray-400 py-2">SAT</div>
-          </div>
-          
-          <div className="grid grid-cols-7 gap-1 select-none">
-            {(() => {
-              const year = currentMonth.year;
-              const month = currentMonth.month;
+          <div 
+            ref={calendarRef}
+            className="h-96 overflow-y-auto border rounded-lg p-2"
+            style={{ scrollbarWidth: 'thin' }}
+          >
+            {monthsData.map((monthData, monthIndex) => {
+              const year = monthData.year;
+              const month = monthData.month;
               const firstDay = new Date(year, month, 1).getDay();
               const daysInMonth = new Date(year, month + 1, 0).getDate();
               
-              const days = [];
-              
-              // Empty cells for padding
-              for (let i = 0; i < firstDay; i++) {
-                days.push(<div key={`empty-${i}`} className="aspect-square" />);
-              }
-              
-              // Days of the month
-              for (let day = 1; day <= daysInMonth; day++) {
-                const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const dateObj = new Date(year, month, day);
-                const isSelected = selectedDates.includes(date);
-                const isPast = isPastDate(dateObj);
-                const isToday = dateObj.toDateString() === new Date().toDateString();
-                
-                days.push(
-                  <button
-                    key={day}
-                    onMouseDown={() => handleMouseDown(date, isPast)}
-                    onMouseEnter={() => handleMouseEnter(date, isPast)}
-                    disabled={isPast}
-                    className={`aspect-square rounded-full flex items-center justify-center text-sm transition-all ${
-                      isSelected
-                        ? 'bg-blue-500 text-white font-medium'
-                        : isPast
-                        ? 'text-gray-300 cursor-not-allowed'
-                        : isToday
-                        ? 'bg-blue-100 text-blue-600 font-medium hover:bg-blue-200'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {day}
-                  </button>
-                );
-              }
-              
-              return days;
-            })()}
+              return (
+                <div key={`${year}-${month}`} className="mb-6">
+                  <h4 className="text-sm font-bold text-gray-700 mb-3 sticky top-0 bg-white py-1">
+                    {monthData.displayName}
+                  </h4>
+                  <div className="grid grid-cols-7 gap-1 select-none">
+                    {/* Empty cells for padding */}
+                    {Array.from({ length: firstDay }, (_, i) => (
+                      <div key={`empty-${monthIndex}-${i}`} className="aspect-square" />
+                    ))}
+                    
+                    {/* Days of the month */}
+                    {Array.from({ length: daysInMonth }, (_, i) => {
+                      const day = i + 1;
+                      const date = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                      const dateObj = new Date(year, month, day);
+                      const isSelected = selectedDates.includes(date);
+                      const isPast = isPastDate(dateObj);
+                      const isBeyondLimit = isDateBeyondLimit(dateObj);
+                      const isDisabled = isPast || isBeyondLimit;
+                      const isToday = dateObj.toDateString() === new Date().toDateString();
+                      
+                      return (
+                        <button
+                          key={day}
+                          onMouseDown={() => handleMouseDown(date, isDisabled)}
+                          onMouseEnter={() => handleMouseEnter(date, isDisabled)}
+                          disabled={isDisabled}
+                          className={`aspect-square rounded-full flex items-center justify-center text-sm transition-all ${
+                            isSelected
+                              ? 'bg-blue-500 text-white font-medium'
+                              : isDisabled
+                              ? 'text-gray-300 cursor-not-allowed'
+                              : isToday
+                              ? 'bg-blue-100 text-blue-600 font-medium hover:bg-blue-200'
+                              : 'text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          {day}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
 
