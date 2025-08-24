@@ -315,10 +315,10 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
-      <div className="flex-shrink-0 bg-gray-50 border-b border-gray-200">
+      <div className="flex-shrink-0 bg-gray-50">
         <div className="flex">
           <div className="bg-black" style={{ minWidth: '50px', maxWidth: 'min-content' }}></div>
-          <div className="flex-1 px-4 py-2.5 flex items-center justify-between">
+          <div className="flex-1 px-4 py-2 flex items-center justify-between">
             <span className="text-base font-bold text-gray-800">전체 참여자 {availabilities.length}</span>
             <div className="flex items-center gap-2">
             {showAddInput ? (
@@ -336,13 +336,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     }
                   }}
                   placeholder="이름 입력"
-                  className="w-32 px-3 py-1.5 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                  className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                   autoFocus
                 />
                 <button
                   onClick={handleAddParticipant}
                   disabled={isSubmitting || !newParticipantName.trim()}
-                  className="px-4 py-1.5 text-sm bg-green-500 text-white rounded-md disabled:bg-gray-300 hover:bg-green-600 transition-colors"
+                  className="px-3 py-1 text-sm bg-[#6B7280] text-white rounded-md disabled:bg-gray-300 hover:bg-gray-700 transition-colors"
                 >
                   추가
                 </button>
@@ -351,7 +351,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     setShowAddInput(false);
                     setNewParticipantName('');
                   }}
-                  className="px-3 py-1.5 text-sm text-gray-600"
+                  className="px-2 py-1 text-sm text-gray-600"
                 >
                   취소
                 </button>
@@ -359,7 +359,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             ) : (
               <button 
                 onClick={() => setShowAddInput(true)}
-                className="flex items-center gap-1 px-4 py-1.5 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
+                className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
               >
                 추가 <Plus className="w-4 h-4" />
               </button>
