@@ -49,7 +49,7 @@ export default async function Image({ params }: { params: { id: string } }) {
       }
     );
   } catch {
-    // 에러 시 기본 이미지
+    // Default image on error
     return new ImageResponse(
       (
         <div

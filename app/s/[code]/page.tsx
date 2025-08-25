@@ -14,14 +14,14 @@ export default function ShortUrlRedirect({ params }: { params: Promise<{ code: s
         const response = await fetch(`/api/shorten?code=${resolvedParams.code}`);
         
         if (!response.ok) {
-          // 단축 URL을 찾을 수 없으면 홈으로
+          // Redirect to home if short URL not found
           router.push('/');
           return;
         }
         
         const data = await response.json();
         if (data.success && data.data) {
-          // 압축된 데이터를 URL 파라미터로 복원
+          // Restore compressed data to URL parameters
           const urlParams = decompressToUrlParams(data.data);
           router.push(`/?${urlParams.toString()}`);
         } else {

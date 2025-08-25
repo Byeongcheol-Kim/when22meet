@@ -112,7 +112,7 @@ export async function PATCH(
     // Save updated meeting with same TTL
     await redis.setex(
       `meeting:${id}`,
-      18 * 30 * 24 * 60 * 60, // 18개월
+      18 * 30 * 24 * 60 * 60, // 18 months
       meeting
     );
 
@@ -135,7 +135,7 @@ export async function PATCH(
           };
           await redis.setex(
             `availability:${id}:${participantName}`,
-            18 * 30 * 24 * 60 * 60, // 18개월
+            18 * 30 * 24 * 60 * 60, // 18 months
             availability
           );
         }

@@ -35,7 +35,7 @@ export async function POST(
       meeting.participants.push(participantName);
       await redis.setex(
         `meeting:${id}`,
-        18 * 30 * 24 * 60 * 60, // 18개월
+        18 * 30 * 24 * 60 * 60, // 18 months
         meeting
       );
     }
@@ -78,7 +78,7 @@ export async function POST(
     // Save availability with timestamp for ordering
     await redis.setex(
       `availability:${id}:${participantName}`,
-      18 * 30 * 24 * 60 * 60, // 18개월
+      18 * 30 * 24 * 60 * 60, // 18 months
       {
         dates: availableDates,
         unavailableDates: currentUnavailableDates,

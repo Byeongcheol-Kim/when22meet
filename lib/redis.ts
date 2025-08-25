@@ -1,11 +1,11 @@
 import { Redis } from '@upstash/redis';
 
-// Upstash Redis 인스턴스 생성
-// 환경변수가 없으면 오류
+// Create Upstash Redis instance
+// Error if environment variables are missing
 if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
-  console.error('Upstash Redis 환경변수가 설정되지 않았습니다.');
-  console.error('1. https://console.upstash.com 에서 Redis 데이터베이스를 생성하세요.');
-  console.error('2. .env.local 파일에 UPSTASH_REDIS_REST_URL과 UPSTASH_REDIS_REST_TOKEN을 추가하세요.');
+  console.error('Upstash Redis environment variables are not set.');
+  console.error('1. Create a Redis database at https://console.upstash.com');
+  console.error('2. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to your .env.local file.');
   throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables are required');
 }
 

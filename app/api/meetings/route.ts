@@ -21,15 +21,15 @@ export async function POST(request: NextRequest) {
       id: meetingId,
       title,
       dates,
-      participants: [], // 초기에는 빈 배열
+      participants: [], // Initially empty array
       createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 18 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 18개월
+      expiresAt: new Date(Date.now() + 18 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 18 months
     };
 
     // Save to Redis with 18-month TTL
     await redis.setex(
       `meeting:${meetingId}`,
-      18 * 30 * 24 * 60 * 60, // 18개월
+      18 * 30 * 24 * 60 * 60, // 18 months
       meeting
     );
 
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         };
         await redis.setex(
           `availability:${meetingId}:${participantName}`,
-          18 * 30 * 24 * 60 * 60, // 18개월
+          18 * 30 * 24 * 60 * 60, // 18 months
           availability
         );
       }

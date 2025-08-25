@@ -21,7 +21,7 @@ function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // URL 파라미터에서 템플릿 설정 읽기
+  // Read template settings from URL parameters
   useEffect(() => {
     const templateTitle = searchParams.get('title');
     const templateParticipants = searchParams.get('participants');
@@ -45,7 +45,7 @@ function HomeContent() {
     }
   }, [searchParams]);
 
-  // 2초 후 자동으로 메인 화면으로 전환
+  // Automatically switch to main screen after 2 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -84,7 +84,7 @@ function HomeContent() {
     try {
       const url = generateShareUrl();
       
-      // URL 단축 API 호출
+      // Call URL shortening API
       const response = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -97,14 +97,14 @@ function HomeContent() {
         setShowShareUrl(true);
         setTimeout(() => setShowShareUrl(false), 1500);
       } else {
-        // 단축 실패 시 원본 URL 복사
+        // Copy original URL if shortening fails
         navigator.clipboard.writeText(url);
         setShowShareUrl(true);
         setTimeout(() => setShowShareUrl(false), 1500);
       }
     } catch (error) {
       console.error('Error copying URL:', error);
-      // 에러 시 원본 URL 복사
+      // Copy original URL on error
       const url = generateShareUrl();
       navigator.clipboard.writeText(url);
       setShowShareUrl(true);
@@ -143,7 +143,7 @@ function HomeContent() {
   };
 
   if (showSplash) {
-    // 스플래시 화면 - 2초간 표시
+    // Splash screen - displayed for 2 seconds
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center px-8">
         <div className="w-full max-w-xs text-center">
@@ -154,7 +154,7 @@ function HomeContent() {
     );
   }
 
-  // 날짜 선택 화면
+  // Date selection screen
   return (
     <div className="min-h-screen bg-white px-4 py-8">
       <div className="w-full max-w-sm md:max-w-xl lg:max-w-2xl mx-auto">
@@ -232,7 +232,7 @@ function HomeContent() {
             selectedDates={selectedDates}
             onDatesChange={(dates) => {
               setSelectedDates(dates);
-              setSelectedTemplate(null); // 수동 선택시 템플릿 해제
+              setSelectedTemplate(null); // Clear template on manual selection
             }}
           />
         </div>

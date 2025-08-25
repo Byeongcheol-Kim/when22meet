@@ -23,7 +23,7 @@ export default function ParticipantsInput({
   const addParticipants = (input: string) => {
     if (!input.trim()) return;
 
-    // 쉼표로 구분하여 여러 명 추가
+    // Add multiple participants separated by comma
     const newParticipants = input
       .split(',')
       .map(name => name.trim())
@@ -46,19 +46,19 @@ export default function ParticipantsInput({
         addParticipants(inputValue);
       }
     } else if (e.key === 'Backspace' && !inputValue && participants.length > 0) {
-      // 입력이 비어있을 때 백스페이스를 누르면 마지막 참여자 제거
+      // Remove last participant when backspace is pressed with empty input
       removeParticipant(participants[participants.length - 1]);
     }
   };
 
   const handleInputChange = (value: string) => {
-    // 쉼표가 입력되면 자동으로 추가
+    // Automatically add when comma is entered
     if (value.endsWith(',')) {
       const nameToAdd = value.slice(0, -1).trim();
       if (nameToAdd) {
         addParticipants(nameToAdd);
       } else {
-        setInputValue(''); // 쉼표만 입력된 경우 초기화
+        setInputValue(''); // Reset if only comma was entered
       }
     } else {
       setInputValue(value);
@@ -100,7 +100,7 @@ export default function ParticipantsInput({
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={() => {
-            // onBlur시 중복 방지를 위해 setTimeout 사용
+            // Use setTimeout to prevent duplicates on blur
             setTimeout(() => {
               if (inputValue.trim()) {
                 addParticipants(inputValue);

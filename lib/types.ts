@@ -2,7 +2,7 @@ export interface Meeting {
   id: string;
   title: string;
   dates: string[];
-  participants: string[]; // 참가자 목록
+  participants: string[]; // List of participants
   createdAt: string;
   expiresAt: string;
   updatedAt?: string;
@@ -10,13 +10,13 @@ export interface Meeting {
 
 export interface Availability {
   participantName: string;
-  availableDates: string[]; // 참가 가능한 날짜 목록
-  unavailableDates?: string[]; // 명시적으로 불참인 날짜 목록 (없으면 미정)
+  availableDates: string[]; // List of available dates
+  unavailableDates?: string[]; // List of explicitly unavailable dates (undecided if not present)
   timestamp?: number;
-  isLocked?: boolean; // 스케줄 확정 여부
+  isLocked?: boolean; // Whether schedule is finalized
 }
 
-// Redis에 저장되는 Availability 데이터 구조
+// Availability data structure stored in Redis
 export interface StoredAvailability {
   dates: string[];
   unavailableDates?: string[];

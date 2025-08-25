@@ -9,7 +9,7 @@ interface ShortUrlData {
   accessCount: number;
 }
 
-// URL 단축 생성
+// Create shortened URL
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -22,14 +22,14 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // URL 파싱
+    // Parse URL
     const urlObj = new URL(url);
     const params = urlObj.searchParams;
     
-    // 파라미터 압축
+    // Compress parameters
     const compressed = compressUrlParams(params);
     
-    // 짧은 코드 생성 (중복 체크)
+    // Generate short code (with duplicate check)
     let shortCode = generateShortCode();
     let attempts = 0;
     while (await redis.get(`short:${shortCode}`) && attempts < 10) {
@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
       attempts++;
     }
     
-    // Redis에 저장 (2개월 TTL)
+    // Store in Redis (2-month TTL)
     await redis.setex(
       `short:${shortCode}`,
-      60 * 24 * 60 * 60, // 60일 (2개월)
+      60 * 24 * 60 * 60, // 60 days (2 months)
       {
         original: compressed,
         created: new Date().toISOString(),
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
       }
     );
     
-    // 단축 URL 생성
+    // Generate shortened URL
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || urlObj.origin;
     const shortUrl = `${baseUrl}/s/${shortCode}`;
     
@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// 단축 URL 조회 및 리다이렉트 정보 반환
+// Get shortened URL and return redirect info
 export async function GET(request: NextRequest) {
   try {
     const shortCode = request.nextUrl.searchParams.get('code');
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // Redis에서 조회
+    // Retrieve from Redis
     const data = await redis.get(`short:${shortCode}`);
     
     if (!data) {
@@ -89,7 +89,7 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    // 접근 시간 및 카운트 업데이트 (TTL 갱신)
+    // Update access time and count (refresh TTL)
     const shortUrlData = data as ShortUrlData;
     const updatedData = {
       ...shortUrlData,
@@ -97,10 +97,10 @@ export async function GET(request: NextRequest) {
       accessCount: (shortUrlData.accessCount || 0) + 1
     };
     
-    // TTL 갱신 (다시 2개월로 연장)
+    // Refresh TTL (extend to 2 months again)
     await redis.setex(
       `short:${shortCode}`,
-      60 * 24 * 60 * 60, // 60일 (2개월)
+      60 * 24 * 60 * 60, // 60 days (2 months)
       updatedData
     );
     

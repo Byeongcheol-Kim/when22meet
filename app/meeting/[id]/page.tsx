@@ -52,7 +52,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
   
-  // 초기 잠금 상태만 설정 (첫 로드시에만)
+  // Set initial lock state only (on first load only)
   useEffect(() => {
     if (isInitialLoad && availabilities.length > 0) {
       const locked = new Set<string>();
@@ -66,7 +66,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
   }, [availabilities, isInitialLoad]);
   
-  // 초기 월 설정
+  // Set initial month
   useEffect(() => {
     if (meeting && meeting.dates.length > 0 && !currentMonth) {
       const firstDate = parseStringToDate(meeting.dates[0]);
@@ -84,7 +84,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       const data = await response.json();
       setMeeting(data.meeting);
       
-      // preserveLocalLockState가 true면 현재 클라이언트의 잠금 상태를 유지
+      // If preserveLocalLockState is true, maintain current client's lock state
       if (preserveLocalLockState) {
         const currentLocked = new Set(lockedParticipants);
         setAvailabilities(data.availabilities.map((a: Availability) => ({
@@ -121,9 +121,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       });
 
       if (response.ok) {
-        await fetchMeetingData(true); // 잠금 상태 유지하면서 데이터 새로고침
-        setNewParticipantName(''); // 입력만 초기화, 입력창은 계속 열어둠
-        // 입력창은 닫지 않음 - 계속 추가 가능
+        await fetchMeetingData(true); // Refresh data while maintaining lock state
+        setNewParticipantName(''); // Only reset input, keep input field open
+        // Don't close input field - allow continuous addition
       }
     } catch (error) {
       console.error('Error adding participant:', error);
@@ -134,7 +134,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   };
 
   const handleStatusClick = async (participant: string, date: string, currentStatus: ParticipantStatus) => {
-    // 상태 순환: 미정 -> 참여 -> 불참 -> 미정
+    // Status cycle: undecided -> available -> unavailable -> undecided
     let newStatus: ParticipantStatus;
     if (currentStatus === 'undecided') {
       newStatus = 'available';
@@ -144,12 +144,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       newStatus = 'undecided';
     }
 
-    // 현재 참여자의 availability 찾기
+    // Find current participant's availability
     const currentAvailability = availabilities.find(a => a.participantName === participant);
     const currentAvailableDates = currentAvailability?.availableDates || [];
     const currentUnavailableDates = currentAvailability?.unavailableDates || [];
     
-    // Optimistic UI - 즉시 상태 업데이트
+    // Optimistic UI - Update status immediately
     const optimisticAvailabilities = availabilities.map(a => {
       if (a.participantName === participant) {
         let newAvailableDates = [...currentAvailableDates];
@@ -194,7 +194,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           availableDates: newAvailableDates,
           unavailableDates: newStatus === 'unavailable' ? [date] : [],
           statusUpdate: { date, status: newStatus },
-          isLocked: lockedParticipants.has(participant) // 현재 잠금 상태 유지
+          isLocked: lockedParticipants.has(participant) // Maintain current lock state
         })
       });
 
@@ -212,18 +212,18 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  // 월 표시를 위한 스크롤 핸들러
+  // Scroll handler for month display
   useEffect(() => {
     const handleScroll = () => {
       if (!scrollContainerRef.current || !meeting) return;
       
       const container = scrollContainerRef.current;
       const scrollTop = container.scrollTop;
-      const rowHeight = 56; // 대략적인 행 높이
+      const rowHeight = 56; // Approximate row height
       
-      // 스크롤 위치로 현재 보이는 날짜 인덱스 계산
-      const visibleIndex = Math.floor((scrollTop + 40) / rowHeight); // 헤더 높이 40px 고려
-      const dateIndex = Math.max(0, Math.min(visibleIndex - 1, meeting.dates.length - 1)); // 월 구분 행 고려
+      // Calculate visible date index from scroll position
+      const visibleIndex = Math.floor((scrollTop + 40) / rowHeight); // Consider header height 40px
+      const dateIndex = Math.max(0, Math.min(visibleIndex - 1, meeting.dates.length - 1)); // Consider month separator row
       
       if (meeting.dates[dateIndex]) {
         const date = parseStringToDate(meeting.dates[dateIndex]);
@@ -238,16 +238,16 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener('scroll', handleScroll);
-      // 초기값 설정
+      // Set initial value
       setTimeout(() => handleScroll(), 100);
       
       return () => {
         container.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [meeting, availabilities, currentMonth]); // currentMonth 의존성 추가
+  }, [meeting, availabilities, currentMonth]); // Add currentMonth dependency
   
-  // 스크롤 위치 추적을 위한 useEffect
+  // useEffect for tracking scroll position
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (container) {
@@ -257,9 +257,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       };
       
       container.addEventListener('scroll', handleScroll);
-      handleScroll(); // 초기값 설정
+      handleScroll(); // Set initial value
       
-      // 날짜 위치 계산
+      // Calculate date positions
       const positions: {[date: string]: number} = {};
       const dateRows = container.querySelectorAll('[data-date-row]');
       dateRows.forEach((row) => {
@@ -277,17 +277,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
   }, [meeting, availabilities]);
 
-  // 하이라이트 자동 제거
+  // Auto-remove highlight
   useEffect(() => {
     if (highlightedDate) {
       const timer = setTimeout(() => {
         setHighlightedDate(null);
-      }, 2000); // 2초 후 하이라이트 제거
+      }, 2000); // Remove highlight after 2 seconds
       return () => clearTimeout(timer);
     }
   }, [highlightedDate]);
 
-  // 일정 수정 핸들러
+  // Schedule update handler
   const handleUpdateDates = async () => {
     if (!meeting || editingDates.length === 0) {
       alert('날짜를 선택해주세요.');
@@ -326,12 +326,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
   };
 
-  // 일정 수정 모달 열 때 현재 데이터 로드
+  // Load current data when opening edit modal
   useEffect(() => {
     if (showEditModal && meeting) {
       setEditingDates(meeting.dates);
       setEditingTitle(meeting.title);
-      // 현재 참여자 목록 로드
+      // Load current participant list
       const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
       setEditingParticipants(currentParticipants);
     }
@@ -347,12 +347,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   if (!meeting) return null;
 
-  // 그리드 데이터 생성
+  // Generate grid data
   const buildGridData = () => {
     const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
     const gridData: GridCell[][] = [];
     
-    // 첫 번째 날짜의 월을 기본값으로 사용
+    // Use first date's month as default
     let defaultYear = '';
     let defaultMonth = '';
     if (meeting.dates.length > 0) {
@@ -361,35 +361,35 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       defaultMonth = String(firstDate.getMonth() + 1).padStart(2, '0');
     }
     
-    // 현재 월 파싱
+    // Parse current month
     const [currentYear, currentMonthOnly] = currentMonth ? currentMonth.split('.') : [defaultYear, defaultMonth];
     
-    // 헤더 행 생성
+    // Generate header row
     const headerRow: GridCell[] = [
       { type: 'header-corner', content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}` }
     ];
     
-    // 참여자 헤더 추가
+    // Add participant headers
     allParticipants.forEach(name => {
       headerRow.push({ type: 'header-participant', content: name, participant: name });
     });
     
     gridData.push(headerRow);
     
-    // 날짜별 행 생성
+    // Generate rows by date
     let lastMonth = '';
     meeting.dates.forEach((date) => {
       const dateObj = new Date(date + 'T00:00:00');
       const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
       
-      // 월이 바뀌면 구분선 추가
+      // Add separator when month changes
       if (lastMonth && lastMonth !== currentMonth) {
         const [year, month] = currentMonth.split('.');
         const separatorRow: GridCell[] = [
           { type: 'month-separator', content: `${year}\n${month}`, month: currentMonth }
         ];
-        // 참여자 수만큼 빈 셀 추가
+        // Add empty cells for participants
         for (let i = 0; i < allParticipants.length; i++) {
           separatorRow.push({ type: 'month-separator' });
         }
@@ -397,7 +397,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
       lastMonth = currentMonth;
       
-      // 날짜 행 생성
+      // Generate date row
       const dateRow: GridCell[] = [
         { 
           type: 'date', 
@@ -407,22 +407,22 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         }
       ];
       
-      // 각 참여자의 상태 추가
+      // Add each participant's status
       allParticipants.forEach(name => {
         const availability = availabilities.find(a => a.participantName === name);
         let status: ParticipantStatus;
         
         if (!availability) {
-          // 새로 추가된 참여자
+          // Newly added participant
           status = 'undecided';
         } else if (availability.availableDates.includes(date)) {
-          // 참여 가능
+          // Available
           status = 'available';
         } else if (availability.unavailableDates?.includes(date)) {
-          // 명시적으로 불참
+          // Explicitly unavailable
           status = 'unavailable';
         } else {
-          // 미정 (아직 선택하지 않음)
+          // Undecided (not selected yet)
           status = 'undecided';
         }
         
@@ -443,13 +443,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const gridData = buildGridData();
   const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
   
-  // 참여자가 가장 많은 날짜 TOP 3 계산
+  // Calculate TOP 3 dates with most participants
   const calculateTopDates = () => {
     if (!meeting || availabilities.length === 0) return [];
     
     const dateScores: { [date: string]: number } = {};
     
-    // 각 날짜별 참여 가능한 사람 수 계산
+    // Calculate number of available people for each date
     meeting.dates.forEach(date => {
       let count = 0;
       availabilities.forEach(availability => {
@@ -460,7 +460,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       dateScores[date] = count;
     });
     
-    // 점수 기준으로 정렬하고 TOP 3 추출
+    // Sort by score and extract TOP 3
     return Object.entries(dateScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
@@ -557,7 +557,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           >
           {gridData.map((row, rowIndex) => (
             row.map((cell, colIndex) => {
-              // 월 구분선
+              // Month separator
               if (cell.type === 'month-separator') {
                 if (colIndex === 0) {
                   return (
@@ -582,7 +582,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
               }
               
-              // 헤더 코너 (날짜/참여자 교차점)
+              // Header corner (date/participant intersection)
               if (cell.type === 'header-corner') {
                 return (
                   <div
@@ -598,7 +598,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 );
               }
               
-              // 참여자 헤더
+              // Participant header
               if (cell.type === 'header-participant') {
                 const isLocked = lockedParticipants.has(cell.participant || '');
                 return (
@@ -662,13 +662,13 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 );
               }
               
-              // 날짜 셀
+              // Date cell
               if (cell.type === 'date') {
                 const dateObj = new Date(cell.date + 'T00:00:00');
                 const dayNumber = String(dateObj.getDate()).padStart(2, '0');
                 const dayOfWeek = cell.content?.split(' ')[1];
                 
-                // 해당 날짜가 TOP 3에 있는지 확인
+                // Check if this date is in TOP 3
                 const topDateInfo = topDates.find(td => td.date === cell.date);
                 
                 return (
@@ -700,7 +700,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 );
               }
               
-              // 상태 셀
+              // Status cell
               if (cell.type === 'status') {
                 const isLocked = lockedParticipants.has(cell.participant || '');
                 const isEditable = !isLocked;

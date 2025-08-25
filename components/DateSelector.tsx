@@ -14,7 +14,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   
-  // 로케일 기반 요일 이름
+  // Locale-based day names
   const locale = typeof navigator !== 'undefined' && navigator.language.startsWith('ko') ? 'ko-KR' : 'en-US';
   const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i, locale));
 
@@ -73,7 +73,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
     return date > maxDate;
   };
   
-  // 스크롤 가능한 12개월 데이터 생성
+  // Generate scrollable 12-month data
   const generateMonthsData = () => {
     const months = [];
     const today = new Date();

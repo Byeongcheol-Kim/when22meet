@@ -22,19 +22,19 @@ export function generateDatesFromTemplate(template: DateTemplate, months: number
     
     switch (template) {
       case 'weekend':
-        // 토요일(6), 일요일(0)
+        // Saturday(6), Sunday(0)
         shouldInclude = dayOfWeek === 0 || dayOfWeek === 6;
         break;
       case 'weekday':
-        // 월요일(1) ~ 금요일(5)
+        // Monday(1) ~ Friday(5)
         shouldInclude = dayOfWeek >= 1 && dayOfWeek <= 5;
         break;
       case 'fri-sat-sun':
-        // 금요일(5), 토요일(6), 일요일(0)
+        // Friday(5), Saturday(6), Sunday(0)
         shouldInclude = dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6;
         break;
       case 'full':
-        // 모든 날짜
+        // All dates
         shouldInclude = true;
         break;
     }
