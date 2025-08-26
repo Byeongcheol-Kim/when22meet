@@ -1,0 +1,169 @@
+{
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류가 발생했습니다",
+    "cancel": "취소",
+    "confirm": "확인",
+    "save": "저장",
+    "edit": "수정",
+    "delete": "삭제",
+    "add": "추가",
+    "close": "닫기",
+    "copy": "복사",
+    "copied": "복사됨",
+    "share": "공유",
+    "lock": "잠금",
+    "unlock": "잠금 해제",
+    "person": "{count}명",
+    "date": "{count}개의 날짜"
+  },
+  "landing": {
+    "splash": {
+      "title": "간편한 스케줄링 서비스",
+      "subtitle": "언제만나?"
+    },
+    "title": "언제만나!",
+    "meetingTitle": {
+      "label": "약속 이름",
+      "placeholder": "예: 팀 회의, 친구 모임, 스터디"
+    },
+    "participants": {
+      "label": "참여자 (선택사항)",
+      "placeholder": "이름을 입력하고 Enter 또는 쉼표로 구분",
+      "count": "{count}명의 참여자가 추가됨"
+    },
+    "dateSelection": {
+      "title": "날짜 선택",
+      "selectDates": "날짜를 선택해주세요",
+      "description": "아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.",
+      "quickSelection": "빠른 날짜 선택",
+      "templates": {
+        "weekend": "주말 (토, 일)",
+        "weekday": "주중 (월~금)",
+        "friSatSun": "금토일",
+        "full": "전체 날짜"
+      }
+    },
+    "createMeeting": "약속 만들기",
+    "creating": "생성 중...",
+    "shareTemplate": "템플릿 URL 공유",
+    "alerts": {
+      "selectRequired": "약속 이름과 날짜를 선택해주세요.",
+      "createFailed": "미팅 생성에 실패했습니다."
+    }
+  },
+  "meeting": {
+    "title": "{title} - {count}명",
+    "defaultTitle": "약속",
+    "participantCount": "명",
+    "addParticipant": {
+      "placeholder": "이름 입력",
+      "button": "추가",
+      "alert": "이름을 입력해주세요.",
+      "failed": "참가자 추가에 실패했습니다."
+    },
+    "status": {
+      "available": "참여",
+      "unavailable": "불참",
+      "undecided": "미정"
+    },
+    "topDates": {
+      "badge": {
+        "first": "1",
+        "second": "2",
+        "third": "3"
+      }
+    },
+    "editModal": {
+      "title": "일정 수정",
+      "meetingTitle": "약속 이름",
+      "participants": "참여자",
+      "dateSelection": "날짜 선택",
+      "updating": "수정 중...",
+      "alerts": {
+        "selectDates": "날짜를 선택해주세요.",
+        "enterTitle": "약속 이름을 입력해주세요.",
+        "updateSuccess": "일정이 수정되었습니다.",
+        "updateFailed": "일정 수정에 실패했습니다."
+      }
+    },
+    "edit": {
+      "title": "일정 수정",
+      "manageParticipants": "참여자 관리",
+      "participantPlaceholder": "추가할 참여자 이름을 입력하세요",
+      "updating": "수정 중...",
+      "updateComplete": "수정 완료",
+      "updateSuccess": "일정이 수정되었습니다.",
+      "updateFailed": "일정 수정에 실패했습니다."
+    },
+    "fab": {
+      "edit": "일정 수정",
+      "newMeeting": "새 약속",
+      "info": "정보",
+      "copyLink": "링크 복사",
+      "linkCopied": "링크가 복사되었습니다!"
+    },
+    "alerts": {
+      "notFound": "미팅을 찾을 수 없습니다.",
+      "updateFailed": "상태 업데이트에 실패했습니다. 다시 시도해주세요.",
+      "networkError": "네트워크 오류가 발생했습니다. 다시 시도해주세요."
+    },
+    "redirecting": "리다이렉트 중..."
+  },
+  "about": {
+    "title": "언제만나?",
+    "description": "가장 쉽고 빠른 일정 조율 서비스",
+    "features": {
+      "title": "주요 기능",
+      "dragSelect": "드래그로 여러 날짜 선택",
+      "realTimeSync": "실시간 동기화",
+      "noLogin": "로그인 없이 사용 가능",
+      "responsive": "모바일 최적화"
+    },
+    "howTo": {
+      "title": "사용 방법",
+      "step1": "1. 약속 이름과 날짜 선택",
+      "step2": "2. 링크 공유",
+      "step3": "3. 참여자들이 가능한 날짜 표시",
+      "step4": "4. 최적의 날짜 확인"
+    },
+    "footer": {
+      "madeBy": "Made by",
+      "contact": "문의"
+    }
+  },
+  "monthNames": {
+    "1": "1월",
+    "2": "2월",
+    "3": "3월",
+    "4": "4월",
+    "5": "5월",
+    "6": "6월",
+    "7": "7월",
+    "8": "8월",
+    "9": "9월",
+    "10": "10월",
+    "11": "11월",
+    "12": "12월"
+  },
+  "dayNames": {
+    "short": {
+      "0": "일",
+      "1": "월",
+      "2": "화",
+      "3": "수",
+      "4": "목",
+      "5": "금",
+      "6": "토"
+    },
+    "full": {
+      "0": "일요일",
+      "1": "월요일",
+      "2": "화요일",
+      "3": "수요일",
+      "4": "목요일",
+      "5": "금요일",
+      "6": "토요일"
+    }
+  }
+}

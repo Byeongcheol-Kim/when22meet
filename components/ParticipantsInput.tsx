@@ -2,6 +2,7 @@
 
 import { useState, KeyboardEvent } from 'react';
 import { X, UserPlus } from 'lucide-react';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface ParticipantsInputProps {
   participants: string[];
@@ -9,16 +10,22 @@ interface ParticipantsInputProps {
   disabled?: boolean;
   placeholder?: string;
   label?: string;
+  countText?: string;
 }
 
 export default function ParticipantsInput({
   participants,
   onParticipantsChange,
   disabled = false,
-  placeholder = "이름을 입력하고 Enter 또는 쉼표로 구분",
-  label = "참여자"
+  placeholder,
+  label,
+  countText
 }: ParticipantsInputProps) {
+  const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
+  
+  const displayLabel = label || t('landing.participants.label');
+  const displayPlaceholder = placeholder || t('landing.participants.placeholder');
 
   const addParticipants = (input: string) => {
     if (!input.trim()) return;
@@ -67,7 +74,7 @@ export default function ParticipantsInput({
 
   return (
     <div>
-      <label className="text-sm text-gray-800 font-medium block mb-2">{label}</label>
+      <label className="text-sm text-gray-800 font-medium block mb-2">{displayLabel}</label>
       
       {/* 참여자 칩스 표시 */}
       {participants.length > 0 && (
@@ -107,16 +114,16 @@ export default function ParticipantsInput({
               }
             }, 100);
           }}
-          placeholder={placeholder}
+          placeholder={displayPlaceholder}
           disabled={disabled}
           className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
         <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />
       </div>
 
-      {participants.length > 0 && (
+      {participants.length > 0 && countText && (
         <p className="text-xs text-gray-700 mt-2">
-          {participants.length}명의 참여자가 추가됨
+          {countText}
         </p>
       )}
     </div>

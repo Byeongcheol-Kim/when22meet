@@ -9,6 +9,7 @@ import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
+import { useTranslation } from '@/lib/useTranslation';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -22,6 +23,7 @@ interface GridCell {
 }
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t, locale } = useTranslation();
   const resolvedParams = use(params);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
@@ -314,9 +316,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       if (response.ok) {
         await fetchMeetingData(true);
         setShowEditModal(false);
-        alert('일정이 수정되었습니다.');
+        alert(t('meeting.edit.updateSuccess'));
       } else {
-        alert('일정 수정에 실패했습니다.');
+        alert(t('meeting.edit.updateFailed'));
       }
     } catch (error) {
       console.error('Error updating dates:', error);
@@ -340,7 +342,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">로딩 중...</div>
+        <div className="text-lg">{t('common.loading')}</div>
       </div>
     );
   }
@@ -381,7 +383,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     meeting.dates.forEach((date) => {
       const dateObj = new Date(date + 'T00:00:00');
       const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+      const dayNames = locale === 'ko' 
+        ? ['일', '월', '화', '수', '목', '금', '토']
+        : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       
       // Add separator when month changes
       if (lastMonth && lastMonth !== currentMonth) {
@@ -483,7 +487,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           <div className="flex-1 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-base font-bold text-gray-800">
-                {meeting?.title || '약속'} - {availabilities.length}명
+                {meeting?.title || t('meeting.defaultTitle')} - {availabilities.length}{t('meeting.participantCount')}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -501,7 +505,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       setNewParticipantName('');
                     }
                   }}
-                  placeholder="이름 입력"
+                  placeholder={t('meeting.enterName')}
                   className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                   autoFocus
                 />
@@ -510,7 +514,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   disabled={isSubmitting || !newParticipantName.trim()}
                   className="px-3 py-1 text-sm bg-[#6B7280] text-white rounded-md disabled:bg-gray-300 hover:bg-gray-700 transition-colors"
                 >
-                  추가
+                  {t('common.add')}
                 </button>
                 <button
                   onClick={() => {
@@ -519,7 +523,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   }}
                   className="px-2 py-1 text-sm text-gray-600"
                 >
-                  취소
+                  {t('common.cancel')}
                 </button>
               </>
             ) : (
@@ -527,7 +531,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 onClick={() => setShowAddInput(true)}
                 className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
               >
-                추가 <Plus className="w-4 h-4" />
+                {t('common.add')} <Plus className="w-4 h-4" />
               </button>
             )}
             </div>
@@ -724,8 +728,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                         ${isEditable ? 'cursor-pointer hover:shadow-md hover:scale-105' : 'cursor-default opacity-60'}
                       `}
                     >
-                      {cell.status === 'available' ? '참여' : 
-                       cell.status === 'unavailable' ? '불참' : '미정'}
+                      {cell.status === 'available' ? t('meeting.status.available') : 
+                       cell.status === 'unavailable' ? t('meeting.status.unavailable') : t('meeting.status.undecided')}
                     </button>
                   </div>
                 );
@@ -814,7 +818,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title="일정 수정"
+              title={t('meeting.edit.title')}
             >
               <Calendar className="w-5 h-5 text-gray-600" />
             </button>
@@ -825,7 +829,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title="새 약속"
+              title={t('meeting.fab.newMeeting')}
             >
               <PlusCircle className="w-5 h-5 text-gray-600" />
             </button>
@@ -836,7 +840,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title="정보"
+              title={t('meeting.fab.info')}
             >
               <Info className="w-5 h-5 text-gray-600" />
             </button>
@@ -863,7 +867,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">일정 수정</h2>
+              <h2 className="text-xl font-bold">{t('meeting.edit.title')}</h2>
               <button 
                 onClick={() => setShowEditModal(false)}
                 className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -885,8 +889,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 participants={editingParticipants}
                 onParticipantsChange={setEditingParticipants}
                 disabled={isUpdating}
-                label="참여자 관리"
-                placeholder="추가할 참여자 이름을 입력하세요"
+                label={t('meeting.edit.manageParticipants')}
+                placeholder={t('meeting.edit.participantPlaceholder')}
               />
             </div>
             
@@ -901,14 +905,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 onClick={() => setShowEditModal(false)}
                 className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
               >
-                취소
+                {t('common.cancel')}
               </button>
               <button
                 onClick={handleUpdateDates}
                 disabled={isUpdating || editingDates.length === 0}
                 className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-semibold disabled:bg-gray-300 transition-colors"
               >
-                {isUpdating ? '수정 중...' : '수정 완료'}
+                {isUpdating ? t('meeting.edit.updating') : t('meeting.edit.updateComplete')}
               </button>
             </div>
           </div>
@@ -916,7 +920,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       )}
 
       {/* About Modal */}
-      <AboutModal isOpen={showCreatorModal} onClose={() => setShowCreatorModal(false)} />
+      {showCreatorModal && (
+        <AboutModal onClose={() => setShowCreatorModal(false)} />
+      )}
 
     </div>
   );

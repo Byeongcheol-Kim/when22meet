@@ -164,9 +164,9 @@ Optional:
 - Quick templates for common patterns (weekdays, weekends, specific days)
 
 ### Availability States
-- **Available (참여)**: Green indicator, participant can attend
-- **Unavailable (불참)**: Gray indicator, participant cannot attend  
-- **Undecided (미정)**: Light gray with border, not yet decided
+- **Yes/참여**: Yellow indicator, participant can attend
+- **No/불참**: Gray indicator, participant cannot attend  
+- **Maybe/미정**: Light gray with border, not yet decided
 
 ### Best Dates Algorithm
 The app calculates optimal meeting dates based on:

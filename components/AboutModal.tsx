@@ -1,20 +1,20 @@
 'use client';
 
 import { X, Github, Linkedin, Instagram } from 'lucide-react';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface AboutModalProps {
-  isOpen: boolean;
   onClose: () => void;
 }
 
-export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
-  if (!isOpen) return null;
-
+export default function AboutModal({ onClose }: AboutModalProps) {
+  const { t, locale } = useTranslation();
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-xl p-6 max-w-md w-full animate-fade-in">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">언제만나?</h2>
+          <h2 className="text-xl font-bold">{t('about.title')}</h2>
           <button 
             onClick={onClose}
             className="text-gray-700 hover:text-gray-900 transition-colors"
@@ -25,31 +25,29 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
         
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">서비스 소개</h3>
+            <h3 className="font-semibold mb-2">{locale === 'ko' ? '서비스 소개' : 'About'}</h3>
             <p className="text-sm text-gray-800 whitespace-pre-line">
-              {`언제만나는 여러 사람이 모임 일정을 조율할 수 있도록
-도와주는 간편한 스케줄링 서비스입니다.
-
-가능한 날짜를 선택하고 참여자들이 각자 가능한 날짜를 표시하면,
-가장 많은 사람이 참여 가능한 날짜를 쉽게 찾을 수 있습니다.`}
+              {t('about.description')}
             </p>
           </div>
           
           <div>
-            <h3 className="font-semibold mb-2">사용 방법</h3>
+            <h3 className="font-semibold mb-2">{t('about.howTo.title')}</h3>
             <ol className="text-sm text-gray-800 space-y-1 list-decimal list-inside">
-              <li>약속 이름을 입력하세요</li>
-              <li>후보 날짜들을 선택하세요 (드래그로 여러 날짜 선택 가능)</li>
-              <li>약속 만들기 버튼을 눌러 링크를 생성하세요</li>
-              <li>생성된 링크를 참여자들에게 공유하세요</li>
+              <li>{t('about.howTo.step1')}</li>
+              <li>{t('about.howTo.step2')}</li>
+              <li>{t('about.howTo.step3')}</li>
+              <li>{t('about.howTo.step4')}</li>
             </ol>
           </div>
           
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-700 mb-3">제작자</p>
+            <p className="text-sm text-gray-700 mb-3">{locale === 'ko' ? '제작자' : 'Creators'}</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">이진휘 - 디자인</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  이진휘 - {locale === 'ko' ? '디자인' : 'Design'}
+                </span>
                 <div className="flex gap-2">
                   <a 
                     href="https://www.instagram.com/jinhwi_12?igsh=MTMwd2MzdzJoOGc2bQ=="
@@ -64,7 +62,9 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
               </div>
               
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-900">김병철 - 개발</span>
+                <span className="text-sm font-semibold text-gray-900">
+                  김병철 - {locale === 'ko' ? '개발' : 'Development'}
+                </span>
                 <div className="flex gap-2">
                   <a 
                     href="https://github.com/Byeongcheol-Kim/graphchat"
@@ -102,10 +102,10 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs text-gray-900 font-medium">
-                  💙 광고 없는 무료 서비스입니다
+                  💙 {locale === 'ko' ? '광고 없는 무료 서비스입니다' : 'Free service without ads'}
                 </p>
                 <p className="text-xs text-gray-800 mt-0.5">
-                  도움이 되셨다면 커피 한 잔 부탁드려요!
+                  {locale === 'ko' ? '도움이 되셨다면 커피 한 잔 부탁드려요!' : 'If you found this helpful, buy us a coffee!'}
                 </p>
               </div>
               <a 
@@ -115,7 +115,7 @@ export default function AboutModal({ isOpen, onClose }: AboutModalProps) {
                 className="ml-3 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-800 text-xs font-semibold rounded-md transition-all hover:scale-105 flex items-center gap-1"
               >
                 <span>☕</span>
-                <span>후원하기</span>
+                <span>{locale === 'ko' ? '후원하기' : 'Support'}</span>
               </a>
             </div>
           </div>

@@ -2,21 +2,25 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { formatDateToString, isPastDate, getDayName, getMonthDisplayName } from '@/lib/utils/date';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface DateSelectorProps {
   selectedDates: string[];
   onDatesChange: (dates: string[]) => void;
   disabled?: boolean;
+  title?: string;
 }
 
-export default function DateSelector({ selectedDates, onDatesChange, disabled = false }: DateSelectorProps) {
+export default function DateSelector({ selectedDates, onDatesChange, disabled = false, title }: DateSelectorProps) {
+  const { t, locale } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   
   // Locale-based day names
-  const locale = typeof navigator !== 'undefined' && navigator.language.startsWith('ko') ? 'ko-KR' : 'en-US';
-  const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i, locale));
+  const localeCode = locale === 'ko' ? 'ko-KR' : 'en-US';
+  const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i, localeCode));
+  const displayTitle = title || t('landing.dateSelection.selectDates');
 
   const handleDateToggle = (date: string) => {
     if (disabled) return;
@@ -95,7 +99,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
   return (
     <div>
       <div className="mb-4">
-        <h3 className="text-lg font-bold mb-2">날짜 선택</h3>
+        <h3 className="text-lg font-bold mb-2">{displayTitle}</h3>
         <div className="grid grid-cols-7 gap-1 text-center sticky top-0 bg-white z-10 pb-1">
           {dayNames.map((day, index) => (
             <div key={index} className="text-sm font-bold text-gray-900 py-1">{day}</div>
@@ -164,8 +168,10 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
       
       <div className="text-sm text-gray-700 text-center mt-3">
         {selectedDates.length > 0 
-          ? `${selectedDates.length}개의 날짜가 선택됨`
-          : '날짜를 선택해주세요'}
+          ? locale === 'ko' 
+            ? `${selectedDates.length}개의 날짜가 선택됨`
+            : `${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} selected`
+          : t('landing.dateSelection.selectDates')}
       </div>
     </div>
   );

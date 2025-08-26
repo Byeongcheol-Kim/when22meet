@@ -1,0 +1,169 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "add": "Add",
+    "close": "Close",
+    "copy": "Copy",
+    "copied": "Copied",
+    "share": "Share",
+    "lock": "Lock",
+    "unlock": "Unlock",
+    "person": "{count} {count, plural, one {person} other {people}}",
+    "date": "{count} {count, plural, one {date} other {dates}}"
+  },
+  "landing": {
+    "splash": {
+      "title": "Simple Scheduling Service",
+      "subtitle": "When2Meet?"
+    },
+    "title": "When2Meet!",
+    "meetingTitle": {
+      "label": "Meeting Title",
+      "placeholder": "e.g., Team Meeting, Friend Gathering, Study Group"
+    },
+    "participants": {
+      "label": "Participants (Optional)",
+      "placeholder": "Enter names separated by Enter or comma",
+      "count": "{count} {count, plural, one {participant} other {participants}} added"
+    },
+    "dateSelection": {
+      "title": "Select Dates",
+      "selectDates": "Select dates",
+      "description": "Select available dates below. You can drag to select multiple dates at once.",
+      "quickSelection": "Quick Date Selection",
+      "templates": {
+        "weekend": "Weekends (Sat, Sun)",
+        "weekday": "Weekdays (Mon-Fri)",
+        "friSatSun": "Fri-Sat-Sun",
+        "full": "All Dates"
+      }
+    },
+    "createMeeting": "Create Meeting",
+    "creating": "Creating...",
+    "shareTemplate": "Share Template URL",
+    "alerts": {
+      "selectRequired": "Please select a meeting title and dates.",
+      "createFailed": "Failed to create meeting."
+    }
+  },
+  "meeting": {
+    "title": "{title} - {count} {count, plural, one {person} other {people}}",
+    "defaultTitle": "Meeting",
+    "participantCount": " people",
+    "addParticipant": {
+      "placeholder": "Enter name",
+      "button": "Add",
+      "alert": "Please enter a name.",
+      "failed": "Failed to add participant."
+    },
+    "status": {
+      "available": "Yes",
+      "unavailable": "No",
+      "undecided": "Maybe"
+    },
+    "topDates": {
+      "badge": {
+        "first": "1",
+        "second": "2",
+        "third": "3"
+      }
+    },
+    "editModal": {
+      "title": "Edit Schedule",
+      "meetingTitle": "Meeting Title",
+      "participants": "Participants",
+      "dateSelection": "Date Selection",
+      "updating": "Updating...",
+      "alerts": {
+        "selectDates": "Please select dates.",
+        "enterTitle": "Please enter a meeting title.",
+        "updateSuccess": "Schedule has been updated.",
+        "updateFailed": "Failed to update schedule."
+      }
+    },
+    "edit": {
+      "title": "Edit Schedule",
+      "manageParticipants": "Manage Participants",
+      "participantPlaceholder": "Enter participant name to add",
+      "updating": "Updating...",
+      "updateComplete": "Update Complete",
+      "updateSuccess": "Schedule has been updated.",
+      "updateFailed": "Failed to update schedule."
+    },
+    "fab": {
+      "edit": "Edit Schedule",
+      "newMeeting": "New Meeting",
+      "info": "Info",
+      "copyLink": "Copy Link",
+      "linkCopied": "Link copied!"
+    },
+    "alerts": {
+      "notFound": "Meeting not found.",
+      "updateFailed": "Failed to update status. Please try again.",
+      "networkError": "A network error occurred. Please try again."
+    },
+    "redirecting": "Redirecting..."
+  },
+  "about": {
+    "title": "When2Meet?",
+    "description": "The easiest and fastest scheduling service",
+    "features": {
+      "title": "Key Features",
+      "dragSelect": "Select multiple dates by dragging",
+      "realTimeSync": "Real-time synchronization",
+      "noLogin": "No login required",
+      "responsive": "Mobile optimized"
+    },
+    "howTo": {
+      "title": "How to Use",
+      "step1": "1. Select meeting title and dates",
+      "step2": "2. Share the link",
+      "step3": "3. Participants mark their availability",
+      "step4": "4. Find the best date"
+    },
+    "footer": {
+      "madeBy": "Made by",
+      "contact": "Contact"
+    }
+  },
+  "monthNames": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "dayNames": {
+    "short": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "full": {
+      "0": "Sunday",
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday"
+    }
+  }
+}

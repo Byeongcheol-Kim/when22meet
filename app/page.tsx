@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslation } from '@/lib/useTranslation';
 import { Info, Link2, Calendar, Check } from 'lucide-react';
 import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
@@ -10,6 +11,7 @@ import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
 
 function HomeContent() {
+  const { t, locale } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
   const [title, setTitle] = useState('');
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -77,7 +79,8 @@ function HomeContent() {
     }
     
     const baseUrl = window.location.origin;
-    return `${baseUrl}?${params.toString()}`;
+    const currentPath = window.location.pathname;
+    return `${baseUrl}${currentPath}?${params.toString()}`;
   };
 
   const handleCopyShareUrl = async () => {
@@ -114,7 +117,7 @@ function HomeContent() {
 
   const handleCreateMeeting = async () => {
     if (!title || selectedDates.length === 0) {
-      alert('약속 이름과 날짜를 선택해주세요.');
+      alert(t('landing.alerts.selectRequired'));
       return;
     }
 
@@ -136,7 +139,7 @@ function HomeContent() {
       }
     } catch (error) {
       console.error('Error creating meeting:', error);
-      alert('미팅 생성에 실패했습니다.');
+      alert(t('landing.alerts.createFailed'));
     } finally {
       setIsCreating(false);
     }
@@ -147,8 +150,12 @@ function HomeContent() {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center px-8">
         <div className="w-full max-w-xs text-center">
-          <h1 className="text-2xl font-medium mb-2 animate-fade-in">간편한 스케줄링 서비스</h1>
-          <h2 className="text-4xl font-bold animate-fade-in animation-delay-200">언제만나?</h2>
+          <h1 className="text-2xl font-medium mb-2 animate-fade-in">
+            {t('landing.splash.title')}
+          </h1>
+          <h2 className="text-4xl font-bold animate-fade-in animation-delay-200">
+            {t('landing.splash.subtitle')}
+          </h2>
         </div>
       </div>
     );
@@ -159,26 +166,33 @@ function HomeContent() {
     <div className="min-h-screen bg-white px-4 py-8">
       <div className="w-full max-w-sm md:max-w-xl lg:max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-xl font-bold mb-4">언제만나!</h1>
+          <h1 className="text-xl font-bold mb-4">{t('landing.title')}</h1>
           
           <div className="space-y-4">
             <MeetingTitleInput 
               value={title}
               onChange={setTitle}
+              label={t('landing.meetingTitle.label')}
+              placeholder={t('landing.meetingTitle.placeholder')}
             />
             <ParticipantsInput
               participants={participants}
               onParticipantsChange={setParticipants}
-              label="참여자 (선택사항)"
-              placeholder="이름을 입력하고 Enter 또는 쉼표로 구분"
+              label={t('landing.participants.label')}
+              placeholder={t('landing.participants.placeholder')}
+              countText={t('landing.participants.count', { count: participants.length })}
             />
-            <p className="text-sm text-gray-700">아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.</p>
+            <p className="text-sm text-gray-700">
+              {t('landing.dateSelection.description')}
+            </p>
           </div>
         </div>
 
-        {/* 날짜 템플릿 선택 */}
+        {/* Date template selection */}
         <div className="mb-4">
-          <label className="text-sm text-gray-800 font-medium block mb-2">빠른 날짜 선택</label>
+          <label className="text-sm text-gray-800 font-medium block mb-2">
+            {t('landing.dateSelection.quickSelection')}
+          </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleTemplateSelect('weekend')}
@@ -189,7 +203,7 @@ function HomeContent() {
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
-              주말 (토, 일)
+              {t('landing.dateSelection.templates.weekend')}
             </button>
             <button
               onClick={() => handleTemplateSelect('weekday')}
@@ -200,7 +214,7 @@ function HomeContent() {
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
-              주중 (월~금)
+              {t('landing.dateSelection.templates.weekday')}
             </button>
             <button
               onClick={() => handleTemplateSelect('fri-sat-sun')}
@@ -211,7 +225,7 @@ function HomeContent() {
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
-              금토일
+              {t('landing.dateSelection.templates.friSatSun')}
             </button>
             <button
               onClick={() => handleTemplateSelect('full')}
@@ -222,7 +236,7 @@ function HomeContent() {
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
-              전체 날짜
+              {t('landing.dateSelection.templates.full')}
             </button>
           </div>
         </div>
@@ -234,6 +248,7 @@ function HomeContent() {
               setSelectedDates(dates);
               setSelectedTemplate(null); // Clear template on manual selection
             }}
+            title={t('landing.dateSelection.title')}
           />
         </div>
 
@@ -243,53 +258,45 @@ function HomeContent() {
             disabled={isCreating || !title || selectedDates.length === 0}
             className="w-full py-4 bg-blue-500 text-white rounded-xl font-semibold disabled:bg-gray-300 transition-colors"
           >
-            {isCreating ? '생성 중...' : '약속 만들기'}
+            {isCreating ? t('landing.creating') : t('landing.createMeeting')}
           </button>
           
-          {/* 템플릿 URL 공유 버튼 */}
+          {/* Template URL share button */}
           {(title || participants.length > 0 || selectedTemplate) && (
             <button
               onClick={handleCopyShareUrl}
-              className={`w-full py-3 rounded-xl font-medium transition-all flex items-center justify-center gap-2 ${
-                showShareUrl 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
             >
-              {showShareUrl ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  복사 완료!
-                </>
-              ) : (
-                <>
-                  <Link2 className="w-4 h-4" />
-                  템플릿 URL 복사
-                </>
+              <Link2 className="w-4 h-4" />
+              {t('landing.shareTemplate')}
+              {showShareUrl && (
+                <Check className="w-4 h-4 text-green-500 ml-1" />
               )}
             </button>
           )}
         </div>
       </div>
-      
-      {/* 우측 상단 정보 아이콘 */}
-      <button 
+
+      {/* Info icon at top right */}
+      <button
         onClick={() => setShowHelpModal(true)}
-        className="absolute top-8 right-8 hover:opacity-70 transition-opacity"
-        title="정보"
+        className="fixed top-4 right-16 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow z-40"
       >
-        <Info className="w-6 h-6 text-gray-600" />
+        <Info className="w-5 h-5 text-gray-600" />
       </button>
 
-      {/* About Modal */}
-      <AboutModal isOpen={showHelpModal} onClose={() => setShowHelpModal(false)} />
+      {showHelpModal && (
+        <AboutModal onClose={() => setShowHelpModal(false)} />
+      )}
     </div>
   );
 }
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="text-lg">Loading...</div>
+    </div>}>
       <HomeContent />
     </Suspense>
   );
