@@ -23,7 +23,7 @@ interface GridCell {
 }
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const resolvedParams = use(params);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
