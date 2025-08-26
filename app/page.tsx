@@ -11,7 +11,7 @@ import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
 
 function HomeContent() {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
   const [title, setTitle] = useState('');
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -180,7 +180,7 @@ function HomeContent() {
               onParticipantsChange={setParticipants}
               label={t('landing.participants.label')}
               placeholder={t('landing.participants.placeholder')}
-              countText={t('landing.participants.count', { count: participants.length })}
+              countText={t('landing.participants.count').replace('%count%', participants.length.toString())}
             />
             <p className="text-sm text-gray-700">
               {t('landing.dateSelection.description')}

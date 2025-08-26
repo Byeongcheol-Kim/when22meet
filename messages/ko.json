@@ -30,7 +30,7 @@
     "participants": {
       "label": "참여자 (선택사항)",
       "placeholder": "이름을 입력하고 Enter 또는 쉼표로 구분",
-      "count": "{count}명의 참여자가 추가됨"
+      "count": "%count%명의 참여자가 추가됨"
     },
     "dateSelection": {
       "title": "날짜 선택",

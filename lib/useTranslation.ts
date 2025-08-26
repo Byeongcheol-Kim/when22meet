@@ -15,18 +15,18 @@ const messages = {
 function getNestedTranslation(locale: Locale, path: string): string {
   const translations = messages[locale];
   const keys = path.split('.');
-  let current: any = translations;
+  let current: unknown = translations;
   
   for (const key of keys) {
     if (current && typeof current === 'object' && key in current) {
-      current = current[key];
+      current = (current as Record<string, unknown>)[key];
     } else {
       // Fallback to Korean if translation not found
       const koTranslations = messages.ko;
-      let koFallback: any = koTranslations;
+      let koFallback: unknown = koTranslations;
       for (const k of keys) {
         if (koFallback && typeof koFallback === 'object' && k in koFallback) {
-          koFallback = koFallback[k];
+          koFallback = (koFallback as Record<string, unknown>)[k];
         } else {
           return path; // Return path if no fallback found
         }
@@ -43,7 +43,7 @@ function detectBrowserLanguage(): Locale {
   if (typeof window === 'undefined') return 'ko';
   
   // Check navigator.language first
-  const browserLang = navigator.language || (navigator as any).userLanguage;
+  const browserLang = navigator.language || (navigator as unknown as Record<string, string>).userLanguage;
   
   // Check if Korean
   if (browserLang && (browserLang.startsWith('ko') || browserLang.startsWith('kr'))) {

@@ -30,7 +30,7 @@
     "participants": {
       "label": "Participants (Optional)",
       "placeholder": "Enter names separated by Enter or comma",
-      "count": "{count} {count, plural, one {participant} other {participants}} added"
+      "count": "%count% participant(s) added"
     },
     "dateSelection": {
       "title": "Select Dates",
