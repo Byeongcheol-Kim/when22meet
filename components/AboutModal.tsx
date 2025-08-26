@@ -8,11 +8,17 @@ interface AboutModalProps {
 }
 
 export default function AboutModal({ onClose }: AboutModalProps) {
-  const { t, locale } = useTranslation();
+  const { t } = useTranslation();
   
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full animate-fade-in">
+    <div 
+      className="fixed inset-0 backdrop-blur-sm bg-opacity-30 flex items-center justify-center z-50 px-4"
+      onClick={onClose}
+    >
+      <div 
+        className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl animate-fade-in border border-gray-100"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{t('about.title')}</h2>
           <button 
@@ -25,7 +31,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
         
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">{locale === 'ko' ? '서비스 소개' : 'About'}</h3>
+            <h3 className="font-semibold mb-2">{t('about.serviceIntro')}</h3>
             <p className="text-sm text-gray-800 whitespace-pre-line">
               {t('about.description')}
             </p>
@@ -42,11 +48,11 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           </div>
           
           <div className="pt-4 border-t">
-            <p className="text-sm text-gray-700 mb-3">{locale === 'ko' ? '제작자' : 'Creators'}</p>
+            <p className="text-sm text-gray-700 mb-3">{t('about.creators')}</p>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900">
-                  이진휘 - {locale === 'ko' ? '디자인' : 'Design'}
+                  {t('about.team.designer.name')} - {t('about.team.designer.role')}
                 </span>
                 <div className="flex gap-2">
                   <a 
@@ -63,7 +69,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
               
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-900">
-                  김병철 - {locale === 'ko' ? '개발' : 'Development'}
+                  {t('about.team.developer.name')} - {t('about.team.developer.role')}
                 </span>
                 <div className="flex gap-2">
                   <a 
@@ -102,10 +108,10 @@ export default function AboutModal({ onClose }: AboutModalProps) {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <p className="text-xs text-gray-900 font-medium">
-                  💙 {locale === 'ko' ? '광고 없는 무료 서비스입니다' : 'Free service without ads'}
+                  💙 {t('about.freeService')}
                 </p>
                 <p className="text-xs text-gray-800 mt-0.5">
-                  {locale === 'ko' ? '도움이 되셨다면 커피 한 잔 부탁드려요!' : 'If you found this helpful, buy us a coffee!'}
+                  {t('about.supportMessage')}
                 </p>
               </div>
               <a 
@@ -115,7 +121,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                 className="ml-3 px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-800 text-xs font-semibold rounded-md transition-all hover:scale-105 flex items-center gap-1"
               >
                 <span>☕</span>
-                <span>{locale === 'ko' ? '후원하기' : 'Support'}</span>
+                <span>{t('about.supportButton')}</span>
               </a>
             </div>
           </div>

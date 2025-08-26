@@ -168,9 +168,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
       
       <div className="text-sm text-gray-700 text-center mt-3">
         {selectedDates.length > 0 
-          ? locale === 'ko' 
-            ? `${selectedDates.length}개의 날짜가 선택됨`
-            : `${selectedDates.length} date${selectedDates.length > 1 ? 's' : ''} selected`
+          ? t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())
           : t('landing.dateSelection.selectDates')}
       </div>
     </div>

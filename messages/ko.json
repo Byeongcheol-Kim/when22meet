@@ -36,6 +36,7 @@
       "title": "날짜 선택",
       "selectDates": "날짜를 선택해주세요",
       "description": "아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.",
+      "selectedCount": "%count%개의 날짜가 선택됨",
       "quickSelection": "빠른 날짜 선택",
       "templates": {
         "weekend": "주말 (토, 일)",
@@ -56,6 +57,7 @@
     "title": "{title} - {count}명",
     "defaultTitle": "약속",
     "participantCount": "명",
+    "enterName": "이름 입력",
     "addParticipant": {
       "placeholder": "이름 입력",
       "button": "추가",
@@ -113,6 +115,11 @@
   "about": {
     "title": "언제만나?",
     "description": "가장 쉽고 빠른 일정 조율 서비스",
+    "serviceIntro": "서비스 소개",
+    "creators": "제작자",
+    "freeService": "광고 없는 무료 서비스입니다",
+    "supportMessage": "도움이 되셨다면 커피 한 잔 부탁드려요!",
+    "supportButton": "후원하기",
     "features": {
       "title": "주요 기능",
       "dragSelect": "드래그로 여러 날짜 선택",
@@ -122,14 +129,24 @@
     },
     "howTo": {
       "title": "사용 방법",
-      "step1": "1. 약속 이름과 날짜 선택",
-      "step2": "2. 링크 공유",
-      "step3": "3. 참여자들이 가능한 날짜 표시",
-      "step4": "4. 최적의 날짜 확인"
+      "step1": "약속 이름과 날짜 선택",
+      "step2": "링크 공유",
+      "step3": "참여자들이 가능한 날짜 표시",
+      "step4": "최적의 날짜 확인"
     },
     "footer": {
       "madeBy": "Made by",
       "contact": "문의"
+    },
+    "team": {
+      "designer": {
+        "name": "이진휘",
+        "role": "디자인"
+      },
+      "developer": {
+        "name": "김병철",
+        "role": "개발"
+      }
     }
   },
   "monthNames": {

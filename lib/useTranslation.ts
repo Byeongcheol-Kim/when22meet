@@ -56,17 +56,15 @@ function detectBrowserLanguage(): Locale {
 
 // Client-side translation hook with SSR support
 export function useTranslation() {
-  // Start with Korean as default to match SSR
+  // Always start with 'ko' to prevent hydration mismatch
   const [locale, setLocaleState] = useState<Locale>('ko');
-  const [isClient, setIsClient] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Mark as client-side
-    setIsClient(true);
-    
-    // Detect browser language
+    // Only detect and set language after hydration
     const detectedLocale = detectBrowserLanguage();
     setLocaleState(detectedLocale);
+    setIsHydrated(true);
   }, []);
 
   const setLocale = (newLocale: Locale) => {
@@ -74,18 +72,16 @@ export function useTranslation() {
   };
 
   const t = (path: string): string => {
-    // During SSR or before client hydration, always return Korean
-    if (!isClient) {
-      return getNestedTranslation('ko', path);
-    }
+    // Always use the current locale state
+    // This ensures consistency between server and initial client render
     const translation = getNestedTranslation(locale, path);
     return translation;
   };
 
   return {
-    locale: isClient ? locale : 'ko', // Always return 'ko' during SSR
+    locale,
     t,
     setLocale,
-    isClient, // Expose this so components can handle loading states if needed
+    isHydrated, // Components can use this to know when locale detection is complete
   };
 }

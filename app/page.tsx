@@ -166,7 +166,16 @@ function HomeContent() {
     <div className="min-h-screen bg-white px-4 py-8">
       <div className="w-full max-w-sm md:max-w-xl lg:max-w-2xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-xl font-bold mb-4">{t('landing.title')}</h1>
+          <div className="flex items-center gap-2 mb-4">
+            <h1 className="text-xl font-bold">{t('landing.title')}</h1>
+            <button
+              onClick={() => setShowHelpModal(true)}
+              className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+              title={t('about.title')}
+            >
+              <Info className="w-5 h-5" />
+            </button>
+          </div>
           
           <div className="space-y-4">
             <MeetingTitleInput 
@@ -276,14 +285,6 @@ function HomeContent() {
           )}
         </div>
       </div>
-
-      {/* Info icon at top right */}
-      <button
-        onClick={() => setShowHelpModal(true)}
-        className="fixed top-4 right-16 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow z-40"
-      >
-        <Info className="w-5 h-5 text-gray-600" />
-      </button>
 
       {showHelpModal && (
         <AboutModal onClose={() => setShowHelpModal(false)} />

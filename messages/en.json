@@ -36,6 +36,7 @@
       "title": "Select Dates",
       "selectDates": "Select dates",
       "description": "Select available dates below. You can drag to select multiple dates at once.",
+      "selectedCount": "%count% date(s) selected",
       "quickSelection": "Quick Date Selection",
       "templates": {
         "weekend": "Weekends (Sat, Sun)",
@@ -56,6 +57,7 @@
     "title": "{title} - {count} {count, plural, one {person} other {people}}",
     "defaultTitle": "Meeting",
     "participantCount": " people",
+    "enterName": "Enter name",
     "addParticipant": {
       "placeholder": "Enter name",
       "button": "Add",
@@ -113,6 +115,11 @@
   "about": {
     "title": "When2Meet?",
     "description": "The easiest and fastest scheduling service",
+    "serviceIntro": "About",
+    "creators": "Creators",
+    "freeService": "Free service without ads",
+    "supportMessage": "If you found this helpful, buy us a coffee!",
+    "supportButton": "Support",
     "features": {
       "title": "Key Features",
       "dragSelect": "Select multiple dates by dragging",
@@ -122,14 +129,24 @@
     },
     "howTo": {
       "title": "How to Use",
-      "step1": "1. Select meeting title and dates",
-      "step2": "2. Share the link",
-      "step3": "3. Participants mark their availability",
-      "step4": "4. Find the best date"
+      "step1": "Select meeting title and dates",
+      "step2": "Share the link",
+      "step3": "Participants mark their availability",
+      "step4": "Find the best date"
     },
     "footer": {
       "madeBy": "Made by",
       "contact": "Contact"
+    },
+    "team": {
+      "designer": {
+        "name": "Jinhwi Lee",
+        "role": "Design"
+      },
+      "developer": {
+        "name": "Byeongcheol Kim",
+        "role": "Development"
+      }
     }
   },
   "monthNames": {

@@ -383,9 +383,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     meeting.dates.forEach((date) => {
       const dateObj = new Date(date + 'T00:00:00');
       const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-      const dayNames = locale === 'ko' 
-        ? ['일', '월', '화', '수', '목', '금', '토']
-        : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      // Use short day names from translation
+      const dayNames = Array.from({ length: 7 }, (_, i) => t(`dayNames.short.${i}`));
       
       // Add separator when month changes
       if (lastMonth && lastMonth !== currentMonth) {

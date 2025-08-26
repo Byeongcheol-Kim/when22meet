@@ -1,0 +1,9 @@
+# Allow all web crawlers
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://when22meet.vercel.app/sitemap.xml
+
+# Crawl-delay for responsible crawling
+Crawl-delay: 1
