@@ -19,6 +19,22 @@ export async function POST(
       );
     }
 
+    // Validate participant name length and characters
+    if (participantName.length > 50) {
+      return NextResponse.json(
+        { error: 'Participant name is too long (max 50 characters)' },
+        { status: 400 }
+      );
+    }
+    
+    // Prevent Redis key injection
+    if (participantName.includes(':') || participantName.includes('*')) {
+      return NextResponse.json(
+        { error: 'Invalid characters in participant name' },
+        { status: 400 }
+      );
+    }
+
     // Check if meeting exists and update participants list
     const meetingData = await redis.get(`meeting:${id}`);
     if (!meetingData) {

@@ -27,12 +27,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "언제만나 팀" }],
   metadataBase: new URL('https://when22meet.vercel.app'),
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/icon', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon', sizes: '180x180', type: 'image/png' },
+    ],
+    shortcut: '/favicon.svg',
+  },
   alternates: {
     canonical: '/',
-    languages: {
-      'ko': '/ko',
-      'en': '/en',
-    },
   },
   robots: {
     index: true,
@@ -82,6 +88,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="alternate icon" href="/icon" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/apple-icon" sizes="180x180" />
         <StructuredData />
       </head>
       <body className={`${notoSansKr.variable} font-sans`}>

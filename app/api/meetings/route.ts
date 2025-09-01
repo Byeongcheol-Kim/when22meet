@@ -16,6 +16,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate title length
+    if (title.length > 100) {
+      return NextResponse.json(
+        { error: 'Title is too long (max 100 characters)' },
+        { status: 400 }
+      );
+    }
+
+    // Validate dates array length
+    if (dates.length > 365) {
+      return NextResponse.json(
+        { error: 'Too many dates selected (max 365)' },
+        { status: 400 }
+      );
+    }
+
     const meetingId = generateMeetingId();
     const meeting: Meeting = {
       id: meetingId,
