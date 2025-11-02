@@ -770,9 +770,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   item.rank === 2 ? 'bg-gray-300 text-gray-700' :
                   'bg-orange-400 text-orange-900'
                 }`}
-                title={`${item.rank}순위: ${dateStr} (${item.count}명)`}
+                title={`${item.rank}순위: ${dateStr} (${item.count}명 참석 가능)`}
               >
-                <span className="text-xs font-bold">{item.rank}</span>
+                <span className="text-xs font-bold">{item.count}명</span>
                 {isVisible ? (
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3" />
