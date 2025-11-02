@@ -34,7 +34,15 @@ export default function ParticipantsInput({
     const newParticipants = input
       .split(',')
       .map(name => name.trim())
-      .filter(name => name && !participants.includes(name));
+      .filter(name => {
+        if (!name) return false;
+        if (participants.includes(name)) return false;
+        if (name.length > 10) {
+          alert('참여자 이름은 10글자 이하여야 합니다.');
+          return false;
+        }
+        return true;
+      });
 
     if (newParticipants.length > 0) {
       onParticipantsChange([...participants, ...newParticipants]);
@@ -116,6 +124,7 @@ export default function ParticipantsInput({
           }}
           placeholder={displayPlaceholder}
           disabled={disabled}
+          maxLength={10}
           className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
         />
         <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />

@@ -111,6 +111,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       return;
     }
 
+    if (newParticipantName.trim().length > 10) {
+      alert('참여자 이름은 10글자 이하여야 합니다.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
@@ -505,6 +510,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     }
                   }}
                   placeholder={t('meeting.enterName')}
+                  maxLength={10}
                   className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
                   autoFocus
                 />
