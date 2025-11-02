@@ -107,11 +107,12 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
         </div>
       </div>
       
-      <div
-        ref={calendarRef}
-        className="h-96 overflow-y-auto border rounded-lg px-2 pb-2"
-        style={{ scrollbarWidth: 'thin' }}
-      >
+      <div className="border rounded-lg overflow-hidden">
+        <div
+          ref={calendarRef}
+          className="h-96 overflow-y-auto px-2 pb-2"
+          style={{ scrollbarWidth: 'thin' }}
+        >
         {monthsData.map((monthData, monthIndex) => {
           const year = monthData.year;
           const month = monthData.month;
@@ -164,8 +165,9 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
             </div>
           );
         })}
+        </div>
       </div>
-      
+
       <div className="text-sm text-gray-700 text-center mt-3">
         {selectedDates.length > 0 
           ? t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())
