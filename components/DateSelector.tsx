@@ -107,9 +107,9 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
         </div>
       </div>
       
-      <div 
+      <div
         ref={calendarRef}
-        className="h-96 overflow-y-auto border rounded-lg p-2"
+        className="h-96 overflow-y-auto border rounded-lg px-2 pb-2"
         style={{ scrollbarWidth: 'thin' }}
       >
         {monthsData.map((monthData, monthIndex) => {
@@ -117,10 +117,10 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
           const month = monthData.month;
           const firstDay = new Date(year, month, 1).getDay();
           const daysInMonth = new Date(year, month + 1, 0).getDate();
-          
+
           return (
-            <div key={`${year}-${month}`} className="mb-6">
-              <h4 className="text-sm font-bold text-gray-900 mb-3 sticky top-0 bg-white py-1">
+            <div key={`${year}-${month}`} className={monthIndex > 0 ? 'mt-6' : ''}>
+              <h4 className="text-sm font-bold text-gray-900 mb-3 sticky top-0 bg-white py-2 z-10">
                 {monthData.displayName}
               </h4>
               <div className="grid grid-cols-7 gap-1 select-none">
