@@ -91,6 +91,16 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/icon" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-icon" sizes="180x180" />
+
+        {/* 카카오톡 메타태그 */}
+        <meta property="og:site_name" content="언제만나" />
+        <meta property="og:locale" content="ko_KR" />
+
+        {/* 네이버 블로그 메타태그 */}
+        <meta name="naver-site-verification" content="" />
+        <meta name="NaverBot" content="All" />
+        <meta name="Yeti" content="All" />
+
         <StructuredData />
       </head>
       <body className={`${notoSansKr.variable} font-sans`}>

@@ -1,7 +1,8 @@
 'use client';
 
-import { X, Github, Linkedin, Instagram } from 'lucide-react';
+import { X, Github, Linkedin, Instagram, HelpCircle } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
+import Link from 'next/link';
 
 interface AboutModalProps {
   onClose: () => void;
@@ -45,6 +46,13 @@ export default function AboutModal({ onClose }: AboutModalProps) {
               <li>{t('about.howTo.step3')}</li>
               <li>{t('about.howTo.step4')}</li>
             </ol>
+            <Link
+              href="/faq"
+              className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              <HelpCircle className="w-4 h-4" />
+              자주 묻는 질문 보기
+            </Link>
           </div>
           
           <div className="pt-4 border-t">

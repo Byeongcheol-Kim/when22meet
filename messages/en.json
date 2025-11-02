@@ -182,5 +182,54 @@
       "5": "Friday",
       "6": "Saturday"
     }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about When2Meet",
+    "backHome": "Back to Home",
+    "moreQuestions": "Have more questions?",
+    "tryService": "Try the service yourself to learn more.",
+    "questions": {
+      "q1": {
+        "question": "What is When2Meet?",
+        "answer": "When2Meet is a free scheduling service that makes it easy to coordinate group schedules. It can be used without login, allowing participants to mark their available dates to find the best meeting time."
+      },
+      "q2": {
+        "question": "Do I need to sign up?",
+        "answer": "No, you can use it immediately without sign-up or login. When you create a schedule, a link is generated that you can share to invite participants."
+      },
+      "q3": {
+        "question": "How long is data stored?",
+        "answer": "Schedule data is stored for 18 months before being automatically deleted. For long-term storage, we recommend taking screenshots or captures."
+      },
+      "q4": {
+        "question": "How can I select multiple dates at once?",
+        "answer": "You can drag your mouse on the calendar to select multiple dates at once. You can also use the \"Quick Selection\" buttons (Weekend, Weekday, Fri-Sat-Sun) to automatically select the corresponding dates."
+      },
+      "q5": {
+        "question": "Can I add participants later?",
+        "answer": "Yes, you can specify participants when creating the schedule, or add them anytime using the \"Add Participant\" button on the schedule screen."
+      },
+      "q6": {
+        "question": "How do I indicate my availability?",
+        "answer": "Click on each date to cycle through: Available (yellow) → Unavailable (gray) → Undecided (white). Select the state that represents your availability."
+      },
+      "q7": {
+        "question": "Can I easily see which dates work best for everyone?",
+        "answer": "Yes, the \"dates with the most available participants\" are automatically displayed at the top of the screen. It updates in real-time to help you easily identify the optimal meeting dates."
+      },
+      "q8": {
+        "question": "Can I use this on mobile?",
+        "answer": "Yes, it's optimized for mobile browsers. You can use it directly in your web browser without installing any app."
+      },
+      "q9": {
+        "question": "What happens when I lock the schedule?",
+        "answer": "Clicking the \"Finalize Schedule\" button locks everyone's availability so it can no longer be modified. This prevents accidental changes after the final decision is made."
+      },
+      "q10": {
+        "question": "What if I lose the link?",
+        "answer": "Unfortunately, if you lose the link, you cannot recover that schedule. Since there's no login system, we recommend saving the link in KakaoTalk, notes, or somewhere safe."
+      }
+    }
   }
 }
