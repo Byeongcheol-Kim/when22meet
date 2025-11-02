@@ -57,9 +57,15 @@ function HomeContent() {
 
 
   const handleTemplateSelect = (template: DateTemplate) => {
-    const dates = generateDatesFromTemplate(template, 2);
-    setSelectedDates(dates);
-    setSelectedTemplate(template);
+    // 이미 선택된 템플릿을 다시 클릭하면 날짜 해제
+    if (selectedTemplate === template) {
+      setSelectedDates([]);
+      setSelectedTemplate(null);
+    } else {
+      const dates = generateDatesFromTemplate(template, 2);
+      setSelectedDates(dates);
+      setSelectedTemplate(template);
+    }
   };
 
   const generateShareUrl = () => {
