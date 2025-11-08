@@ -1,33 +1,33 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <!-- Calendar background -->
-  <rect x="30" y="80" width="400" height="360" rx="24" fill="#FFC354"/>
+  <rect x="10" y="60" width="460" height="420" rx="28" fill="#FFC354"/>
 
   <!-- Binder rings -->
-  <circle cx="130" cy="40" r="26" fill="#FFC354"/>
-  <circle cx="256" cy="40" r="26" fill="#FFC354"/>
-  <circle cx="382" cy="40" r="26" fill="#FFC354"/>
+  <circle cx="125" cy="20" r="30" fill="#FFC354"/>
+  <circle cx="256" cy="20" r="30" fill="#FFC354"/>
+  <circle cx="387" cy="20" r="30" fill="#FFC354"/>
 
   <!-- Calendar top bar -->
-  <rect x="30" y="40" width="400" height="100" rx="24" fill="#FFC354"/>
-  <rect x="30" y="100" width="400" height="50" fill="#FFC354"/>
+  <rect x="10" y="20" width="460" height="110" rx="28" fill="#FFC354"/>
+  <rect x="10" y="90" width="460" height="55" fill="#FFC354"/>
 
   <!-- Grid cells background -->
-  <rect x="55" y="180" width="105" height="90" rx="10" fill="#4A5568"/>
-  <rect x="180" y="180" width="105" height="90" rx="10" fill="#4A5568"/>
-  <rect x="305" y="180" width="105" height="90" rx="10" fill="#4A5568"/>
-  <rect x="55" y="290" width="105" height="90" rx="10" fill="#4A5568"/>
-  <rect x="180" y="290" width="105" height="90" rx="10" fill="#4A5568"/>
-  <rect x="305" y="290" width="105" height="90" rx="10" fill="#4A5568"/>
+  <rect x="40" y="180" width="120" height="105" rx="12" fill="#4A5568"/>
+  <rect x="180" y="180" width="120" height="105" rx="12" fill="#4A5568"/>
+  <rect x="320" y="180" width="120" height="105" rx="12" fill="#4A5568"/>
+  <rect x="40" y="305" width="120" height="105" rx="12" fill="#4A5568"/>
+  <rect x="180" y="305" width="120" height="105" rx="12" fill="#4A5568"/>
+  <rect x="320" y="305" width="120" height="105" rx="12" fill="#4A5568"/>
 
   <!-- Marked dates (circles) -->
-  <circle cx="232.5" cy="225" r="32" fill="#FFC354"/>
-  <circle cx="357.5" cy="225" r="32" fill="#FFC354"/>
-  <circle cx="107.5" cy="335" r="32" fill="#FFC354"/>
+  <circle cx="240" cy="232.5" r="38" fill="#FFC354"/>
+  <circle cx="380" cy="232.5" r="38" fill="#FFC354"/>
+  <circle cx="100" cy="357.5" r="38" fill="#FFC354"/>
 
   <!-- Checkmark circle background -->
-  <circle cx="390" cy="410" r="100" fill="#4A5568"/>
-  <circle cx="390" cy="410" r="88" fill="#FFC354"/>
+  <circle cx="400" cy="430" r="110" fill="#4A5568"/>
+  <circle cx="400" cy="430" r="96" fill="#FFC354"/>
 
   <!-- Checkmark -->
-  <path d="M340 410 L372 442 L440 374" stroke="#4A5568" stroke-width="24" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <path d="M345 430 L380 465 L455 390" stroke="#4A5568" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>
