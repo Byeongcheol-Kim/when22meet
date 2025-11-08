@@ -8,6 +8,7 @@ import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
+import MeetingStructuredData from '@/components/MeetingStructuredData';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -484,6 +485,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
+      {/* Structured Data for SEO */}
+      {meeting && (
+        <MeetingStructuredData
+          meeting={meeting}
+          participantCount={availabilities.length}
+          topDate={topDates[0] ? { date: topDates[0].date, count: topDates[0].count } : undefined}
+        />
+      )}
       {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
       <div className="flex-shrink-0 bg-gray-50">
         <div className="flex">

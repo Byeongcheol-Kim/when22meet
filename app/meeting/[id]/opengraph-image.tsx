@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 import redis from '@/lib/redis';
-import { Meeting } from '@/lib/types';
+import { Meeting, StoredAvailability } from '@/lib/types';
 
 export const runtime = 'edge';
 export const alt = '언제만나? - 일정 조율';
@@ -11,67 +11,171 @@ export const size = {
 
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: { id: string } }) {
+export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   try {
-    const meetingData = await redis.get(`meeting:${params.id}`);
+    const { id } = await params;
+    const meetingData = await redis.get(`meeting:${id}`);
     const meeting = meetingData as Meeting | null;
-    
-    const title = meeting?.title || '새로운 일정';
-    const dateCount = meeting?.dates?.length || 0;
-    
+
+    if (!meeting) {
+      throw new Error('Meeting not found');
+    }
+
+    const title = meeting.title || '새로운 일정';
+    const dateCount = meeting.dates?.length || 0;
+
+    // Get all availabilities
+    const availabilityKeys = await redis.keys(`availability:${id}:*`);
+    const availabilities: { availableDates: string[] }[] = [];
+
+    for (const key of availabilityKeys) {
+      const data = await redis.get(key);
+      if (data) {
+        const parsedData = data as StoredAvailability | string[];
+
+        if (Array.isArray(parsedData)) {
+          availabilities.push({
+            availableDates: parsedData,
+          });
+        } else {
+          availabilities.push({
+            availableDates: parsedData.dates || [],
+          });
+        }
+      }
+    }
+
+    // Calculate top dates
+    const dateScores: { [date: string]: number } = {};
+
+    meeting.dates.forEach((date: string) => {
+      let count = 0;
+      availabilities.forEach((availability: { availableDates: string[] }) => {
+        if (availability.availableDates.includes(date)) {
+          count++;
+        }
+      });
+      dateScores[date] = count;
+    });
+
+    const topDates = Object.entries(dateScores)
+      .sort((a, b) => b[1] - a[1])
+      .filter(([, count]) => count > 0)
+      .slice(0, 3);
+
+    const participantCount = availabilities.length;
+
+    const formatDate = (dateString: string) => {
+      const date = new Date(dateString + 'T00:00:00');
+      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
+      return `${date.getMonth() + 1}/${date.getDate()}(${dayNames[date.getDay()]})`;
+    };
+
+    const description = `${participantCount}명 참여 중 · ${dateCount}개 날짜`;
+    const medals = ['🥇', '🥈', '🥉'];
+
+    // Pre-calculate all text to avoid conditional rendering in JSX
+    const rank1 = topDates[0] ? `${medals[0]} ${formatDate(topDates[0][0])} (${topDates[0][1]}명)` : null;
+    const rank2 = topDates[1] ? `${medals[1]} ${formatDate(topDates[1][0])} (${topDates[1][1]}명)` : null;
+    const rank3 = topDates[2] ? `${medals[2]} ${formatDate(topDates[2][0])} (${topDates[2][1]}명)` : null;
+    const hasTopDates = topDates.length > 0;
+
     return new ImageResponse(
       (
         <div
           style={{
-            fontSize: 48,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             width: '100%',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
+            backgroundColor: 'white',
+            padding: 60,
+            justifyContent: 'space-between',
           }}
         >
-          <div style={{ fontSize: 36, marginBottom: 20, opacity: 0.9 }}>언제만나?</div>
-          <div style={{ fontSize: 64, fontWeight: 'bold', marginBottom: 20 }}>{title}</div>
-          <div style={{ fontSize: 32, opacity: 0.9 }}>
-            {dateCount}개의 날짜 중에서 선택
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
+            <div style={{ fontSize: 48, fontWeight: 700, color: 'black', marginBottom: 60 }}>
+              언제만나?
+            </div>
+            <div style={{ fontSize: 56, fontWeight: 700, color: 'black', marginBottom: 20 }}>
+              {title}
+            </div>
+            <div style={{ fontSize: 36, color: '#6B7280' }}>
+              {description}
+            </div>
           </div>
-          <div style={{ fontSize: 28, marginTop: 40, opacity: 0.8 }}>
-            간편한 일정 조율 서비스
-          </div>
+
+          {hasTopDates ? (
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: '#FFC354',
+                padding: 40,
+              }}
+            >
+              {rank1 && (
+                <div style={{ fontSize: 42, fontWeight: 700, color: 'black', marginBottom: rank2 ? 15 : 0 }}>
+                  {rank1}
+                </div>
+              )}
+              {rank2 && (
+                <div style={{ fontSize: 42, fontWeight: 700, color: 'black', marginBottom: rank3 ? 15 : 0 }}>
+                  {rank2}
+                </div>
+              )}
+              {rank3 && (
+                <div style={{ fontSize: 42, fontWeight: 700, color: 'black' }}>
+                  {rank3}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div
+              style={{
+                backgroundColor: '#F3F4F6',
+                padding: 40,
+                fontSize: 40,
+                color: '#6B7280',
+              }}
+            >
+              아직 참여자가 일정을 입력하지 않았어요
+            </div>
+          )}
         </div>
       ),
-      {
-        ...size,
-      }
+      { ...size }
     );
-  } catch {
+  } catch (error) {
+    console.error('Error generating OG image:', error);
     // Default image on error
     return new ImageResponse(
       (
         <div
           style={{
-            fontSize: 48,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             width: '100%',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            color: 'white',
+            backgroundColor: '#FFC354',
           }}
         >
-          <div style={{ fontSize: 64, fontWeight: 'bold', marginBottom: 20 }}>언제만나?</div>
-          <div style={{ fontSize: 32 }}>간편한 일정 조율 서비스</div>
+          <div style={{ fontSize: 80, fontWeight: 700, color: 'black' }}>
+            언제만나?
+          </div>
+          <div style={{ fontSize: 40, color: 'black', marginTop: 20 }}>
+            간편한 일정 조율 서비스
+          </div>
         </div>
       ),
-      {
-        ...size,
-      }
+      { ...size }
     );
   }
 }

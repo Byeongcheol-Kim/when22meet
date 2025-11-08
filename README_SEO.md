@@ -12,14 +12,25 @@
    - 주요 페이지 포함
 
 3. **구조화된 데이터 (Schema.org)**
-   - WebApplication 스키마 적용
+   - WebApplication 스키마 적용 (logo 속성 수정 완료)
    - 서비스 정보 및 기능 명시
+   - 미팅별 Event 스키마 추가 (JSON-LD)
 
 4. **메타태그 최적화**
    - 상세한 설명과 키워드 추가
    - Open Graph 태그 개선
    - Twitter Card 태그 추가
    - robots 메타태그로 인덱싱 허용
+
+5. **동적 OG 이미지 생성** ⭐ NEW
+   - 미팅별 동적 Open Graph 이미지 생성
+   - 1순위 날짜와 참석 가능 인원 표시
+   - 카카오톡 미리보기 최적화
+
+6. **미팅별 동적 메타데이터** ⭐ NEW
+   - 각 미팅마다 고유한 title/description
+   - 1순위 날짜 정보 자동 포함
+   - 검색 엔진 최적화된 키워드 생성
 
 ## 📋 추가로 필요한 작업
 
@@ -72,9 +83,26 @@
 - [ ] Google Search Console 등록 및 인증
 - [ ] 사이트맵 제출
 - [ ] robots.txt 접근 가능 확인 (`https://when22meet.vercel.app/robots.txt`)
-- [ ] Open Graph 이미지 업로드
+- [x] Open Graph 이미지 동적 생성 (완료)
 - [ ] PageSpeed Insights 테스트
 - [ ] 모바일 친화성 테스트
+- [x] Schema.org 구조화된 데이터 검증 (완료)
+- [x] 카카오톡 미리보기 테스트 (완료)
+
+## 🧪 테스트 방법
+
+### 1. OG 이미지 미리보기
+미팅을 생성한 후 다음 방법으로 테스트:
+- **카카오톡**: 링크를 보내서 미리보기 확인
+- **온라인 도구**: https://www.opengraph.xyz/ 에서 미팅 URL 입력
+
+### 2. 구조화된 데이터 검증
+- **Rich Results Test**: https://search.google.com/test/rich-results
+- **Schema Validator**: https://validator.schema.org/
+
+### 3. 메타데이터 확인
+- 브라우저 개발자 도구 → Elements → `<head>` 태그 확인
+- `curl -I https://when22meet.vercel.app/meeting/[id]/opengraph-image` 로 이미지 생성 확인
 
 ## 📊 모니터링
 
