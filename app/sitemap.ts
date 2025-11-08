@@ -1,21 +1,18 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://when22meet.vercel.app';
-
-  // Use a fixed date for lastModified to prevent frequent changes
-  const lastModified = new Date('2025-11-08');
+  const baseUrl = 'https://when22meet.vercel.app';
 
   return [
     {
       url: baseUrl,
-      lastModified,
+      lastModified: new Date('2024-11-08'),
       changeFrequency: 'weekly' as const,
       priority: 1.0,
     },
     {
       url: `${baseUrl}/faq`,
-      lastModified,
+      lastModified: new Date('2024-11-08'),
       changeFrequency: 'monthly' as const,
       priority: 0.8,
     },

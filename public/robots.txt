@@ -5,5 +5,10 @@ Allow: /
 # Sitemap location
 Sitemap: https://when22meet.vercel.app/sitemap.xml
 
-# Crawl-delay for responsible crawling
-Crawl-delay: 1
+# Google-specific settings
+User-agent: Googlebot
+Allow: /
+
+# Naver-specific settings
+User-agent: Yeti
+Allow: /
