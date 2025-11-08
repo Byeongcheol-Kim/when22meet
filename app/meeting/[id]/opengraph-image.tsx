@@ -2,7 +2,8 @@ import { ImageResponse } from 'next/og';
 import redis from '@/lib/redis';
 import { Meeting, StoredAvailability } from '@/lib/types';
 
-export const runtime = 'edge';
+// Remove edge runtime due to Turbopack compatibility issue
+// export const runtime = 'edge';
 export const alt = '언제만나? - 일정 조율';
 export const size = {
   width: 1200,

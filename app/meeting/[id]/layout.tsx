@@ -67,14 +67,17 @@ export async function generateMetadata({
     const participantCount = availabilities.length;
     const dateCount = meeting.dates?.length || 0;
 
-    let description = `${meeting.title} - ${participantCount}명 참여 중 · ${dateCount}개 날짜`;
+    let description = '';
 
     if (topDates.length > 0) {
       const medals = ['🥇', '🥈', '🥉'];
       const topDatesText = topDates
-        .map(([date, count], index) => `${medals[index]} ${formatDate(date)} (${count}명)`)
-        .join(', ');
-      description += ` | 가능한 날짜: ${topDatesText}`;
+        .slice(0, 2) // Top 2만 표시 (길이 제한)
+        .map(([date, count], index) => `${medals[index]} ${formatDate(date)} ${count}명`)
+        .join(' | ');
+      description = `${topDatesText} - ${meeting.title} (${participantCount}명 참여)`;
+    } else {
+      description = `${meeting.title} - ${participantCount}명 참여 중 · ${dateCount}개 날짜`;
     }
 
     const title = `${meeting.title} | 언제만나?`;
