@@ -301,10 +301,36 @@ function HomeContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">
-      <div className="text-lg">Loading...</div>
-    </div>}>
-      <HomeContent />
-    </Suspense>
+    <>
+      <Suspense fallback={<div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-lg">Loading...</div>
+      </div>}>
+        <HomeContent />
+      </Suspense>
+
+      {/* SEO Content - Hidden but accessible to search engines */}
+      <div className="sr-only">
+        <h2>약속일정 잡기 앱 - 언제만나</h2>
+        <p>
+          언제만나는 약속일정 잡기, 모임 시간 정하기, 회의 시간 조율이 쉬운 무료 일정 조율 앱입니다.
+          팀 미팅, 그룹 모임, 단체 약속의 최적 시간을 찾는데 최적화된 스케줄링 서비스입니다.
+        </p>
+        <h3>주요 기능</h3>
+        <ul>
+          <li>로그인 없이 바로 사용 가능한 일정 조율</li>
+          <li>드래그로 여러 날짜 쉽게 선택</li>
+          <li>실시간 동기화로 팀원들과 함께 일정 조율</li>
+          <li>모바일 최적화로 언제 어디서나 약속 잡기</li>
+          <li>무료 스케줄링 서비스</li>
+        </ul>
+        <h3>이런 분들께 추천합니다</h3>
+        <ul>
+          <li>팀 미팅 일정을 조율하고 싶은 직장인</li>
+          <li>모임 시간을 정하고 싶은 동호회, 스터디 그룹</li>
+          <li>회의 시간을 찾고 있는 프로젝트 팀</li>
+          <li>단체 약속 시간을 조율하고 싶은 모든 분</li>
+        </ul>
+      </div>
+    </>
   );
 }

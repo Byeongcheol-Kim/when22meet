@@ -9,41 +9,54 @@
 
 2. **sitemap.xml 자동 생성**
    - `/app/sitemap.ts` 파일로 동적 생성
-   - 주요 페이지 포함
+   - 주요 페이지 포함 (홈, FAQ)
+   - 고정 날짜로 변경하여 안정성 개선
 
-3. **구조화된 데이터 (Schema.org)**
-   - WebApplication 스키마 적용 (logo 속성 수정 완료)
-   - 서비스 정보 및 기능 명시
+3. **구조화된 데이터 (Schema.org)** ⭐ 업데이트
+   - WebApplication 스키마 적용
+   - "약속일정 잡기 앱" 등 타겟 키워드 포함
+   - aggregateRating, keywords 필드 추가
+   - ProductivityApplication으로 카테고리 변경
    - 미팅별 Event 스키마 추가 (JSON-LD)
 
-4. **메타태그 최적화**
-   - 상세한 설명과 키워드 추가
+4. **메타태그 최적화** ⭐ 업데이트
+   - **title**: "언제만나 | 약속일정 잡기 앱 - 간편한 일정 조율 서비스"
+   - **description**: 타겟 키워드 포함 (약속일정 잡기, 모임 시간 정하기 등)
+   - **keywords**: 25개 이상의 관련 키워드 추가
+     - 약속일정 잡기 앱, 모임 시간 정하기 앱, 일정 조율 서비스
+     - 회의 시간 정하기, 팀 미팅 일정, 그룹 일정 조율 등
    - Open Graph 태그 개선
    - Twitter Card 태그 추가
-   - robots 메타태그로 인덱싱 허용
 
-5. **동적 OG 이미지 생성** ⭐ NEW
-   - 미팅별 동적 Open Graph 이미지 생성
-   - 1순위 날짜와 참석 가능 인원 표시
+5. **동적 OG 이미지 생성** ⭐ 업데이트
+   - **홈페이지**: PNG 파일 사용 (언어별 - ko/en)
+   - **단축 URL**: PNG 파일 사용 (언어별)
+   - **FAQ**: PNG 파일 사용 (언어별)
+   - **미팅 페이지**: 동적 생성 (Top 3 날짜 표시)
    - 카카오톡 미리보기 최적화
 
-6. **미팅별 동적 메타데이터** ⭐ NEW
+6. **미팅별 동적 메타데이터**
    - 각 미팅마다 고유한 title/description
    - 1순위 날짜 정보 자동 포함
    - 검색 엔진 최적화된 키워드 생성
 
+7. **SEO 콘텐츠 추가** ⭐ NEW
+   - 홈페이지에 스크린 리더 전용 SEO 텍스트 추가
+   - 타겟 키워드가 자연스럽게 포함된 구조화된 콘텐츠
+   - H2, H3 태그로 계층 구조 명확히
+   - 사용 사례 및 기능 설명 포함
+
 ## 📋 추가로 필요한 작업
 
-### 1. Google Search Console 등록
-1. [Google Search Console](https://search.google.com/search-console) 접속
-2. 도메인 추가 (when22meet.vercel.app)
-3. 소유권 확인
-   - HTML 태그 방법 추천
-   - 받은 인증 코드를 `layout.tsx`의 `verification.google`에 입력
+### 1. Google Search Console 등록 ✅ (완료)
+- Google 소유권 인증 코드 이미 등록됨
+- 인증 코드: `1XQBJXV6W21_4jf-kkmySkt9kV-CgsMVEku97b-Q34M`
 
 ### 2. 사이트맵 제출
 1. Google Search Console에서 좌측 메뉴 '사이트맵' 클릭
-2. `https://when22meet.vercel.app/sitemap.xml` 입력 후 제출
+2. `sitemap.xml` 입력 후 제출
+3. **중요**: 첫 제출 후 24-48시간 대기 (Google 크롤링 시간 필요)
+4. 오류가 나면 며칠 후 다시 확인 (초기에 오류가 자주 발생함)
 
 ### 3. 페이지 속도 최적화
 - [PageSpeed Insights](https://pagespeed.web.dev/) 에서 테스트
