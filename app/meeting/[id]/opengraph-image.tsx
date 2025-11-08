@@ -72,7 +72,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       return `${date.getMonth() + 1}/${date.getDate()}(${dayNames[date.getDay()]})`;
     };
 
-    const description = `${participantCount}명 참여 중 · ${dateCount}개 날짜`;
     const medals = ['🥇', '🥈', '🥉'];
 
     // Pre-calculate all text to avoid conditional rendering in JSX
@@ -89,49 +88,32 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: 'white',
-            padding: 60,
-            justifyContent: 'space-between',
+            backgroundColor: '#FFC354',
+            padding: 80,
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div style={{ fontSize: 48, fontWeight: 700, color: 'black', marginBottom: 60 }}>
-              언제만나?
-            </div>
-            <div style={{ fontSize: 56, fontWeight: 700, color: 'black', marginBottom: 20 }}>
-              {title}
-            </div>
-            <div style={{ fontSize: 36, color: '#6B7280' }}>
-              {description}
-            </div>
-          </div>
-
           {hasTopDates ? (
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: '#FFC354',
-                padding: 40,
+                width: '100%',
               }}
             >
               {rank1 && (
-                <div style={{ fontSize: 42, fontWeight: 700, color: 'black', marginBottom: rank2 ? 15 : 0 }}>
+                <div style={{ fontSize: 72, fontWeight: 700, color: 'black', marginBottom: rank2 ? 30 : 0 }}>
                   {rank1}
                 </div>
               )}
               {rank2 && (
-                <div style={{ fontSize: 42, fontWeight: 700, color: 'black', marginBottom: rank3 ? 15 : 0 }}>
+                <div style={{ fontSize: 72, fontWeight: 700, color: 'black', marginBottom: rank3 ? 30 : 0 }}>
                   {rank2}
                 </div>
               )}
               {rank3 && (
-                <div style={{ fontSize: 42, fontWeight: 700, color: 'black' }}>
+                <div style={{ fontSize: 72, fontWeight: 700, color: 'black' }}>
                   {rank3}
                 </div>
               )}
@@ -139,13 +121,17 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           ) : (
             <div
               style={{
-                backgroundColor: '#F3F4F6',
-                padding: 40,
-                fontSize: 40,
-                color: '#6B7280',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
               }}
             >
-              아직 참여자가 일정을 입력하지 않았어요
+              <div style={{ fontSize: 80, fontWeight: 700, color: 'black', marginBottom: 40 }}>
+                언제만나?
+              </div>
+              <div style={{ fontSize: 48, color: 'black' }}>
+                {title}
+              </div>
             </div>
           )}
         </div>
