@@ -8,6 +8,7 @@ import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
 import ShareModal from '@/components/ShareModal';
 import EditMeetingModal from '@/components/EditMeetingModal';
+import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
@@ -47,6 +48,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [editingParticipants, setEditingParticipants] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showNewMeetingConfirm, setShowNewMeetingConfirm] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -872,7 +874,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             
             <button
               onClick={() => {
-                router.push('/');
+                setShowNewMeetingConfirm(true);
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
@@ -946,6 +948,26 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           onClose={() => setToastMessage('')}
         />
       )}
+
+      {/* New Meeting Confirm Modal */}
+      <ConfirmModal
+        isOpen={showNewMeetingConfirm}
+        onClose={() => setShowNewMeetingConfirm(false)}
+        onConfirm={() => {
+          // 현재 참여자 목록을 가져와서 새 미팅으로 전달
+          const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
+          const url = new URL('/', window.location.origin);
+          if (currentParticipants.length > 0) {
+            url.searchParams.set('participants', currentParticipants.join(','));
+          }
+          router.push(url.pathname + url.search);
+        }}
+        title="새 약속 만들기"
+        message="현재 참여자로 새 약속을 만드시겠습니까? (참여자 목록이 자동으로 입력됩니다)"
+        confirmText="새 약속 만들기"
+        cancelText="취소"
+        type="info"
+      />
 
     </div>
   );
