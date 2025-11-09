@@ -38,7 +38,7 @@ export default function ParticipantsInput({
         if (!name) return false;
         if (participants.includes(name)) return false;
         if (name.length > 10) {
-          alert('참여자 이름은 10글자 이하여야 합니다.');
+          alert(t('landing.participants.nameTooLong'));
           return false;
         }
         return true;

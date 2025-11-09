@@ -30,7 +30,8 @@
     "participants": {
       "label": "참여자 (선택사항)",
       "placeholder": "이름을 입력하고 Enter 또는 쉼표로 구분",
-      "count": "%count%명의 참여자가 추가됨"
+      "count": "%count%명의 참여자가 추가됨",
+      "nameTooLong": "참여자 이름은 10글자 이하여야 합니다."
     },
     "dateSelection": {
       "title": "날짜 선택",
@@ -110,9 +111,20 @@
     "alerts": {
       "notFound": "미팅을 찾을 수 없습니다.",
       "updateFailed": "상태 업데이트에 실패했습니다. 다시 시도해주세요.",
-      "networkError": "네트워크 오류가 발생했습니다. 다시 시도해주세요."
+      "networkError": "네트워크 오류가 발생했습니다. 다시 시도해주세요.",
+      "enterName": "이름을 입력해주세요.",
+      "nameTooLong": "참여자 이름은 10글자 이하여야 합니다.",
+      "addParticipantFailed": "참가자 추가에 실패했습니다.",
+      "selectDates": "날짜를 선택해주세요.",
+      "enterTitle": "약속 이름을 입력해주세요.",
+      "updateScheduleFailed": "일정 수정에 실패했습니다."
     },
+    "topDatesLabel": "{rank}순위: {date} ({count}명 참석 가능)",
+    "peopleCount": "{count}명",
     "redirecting": "리다이렉트 중...",
+    "shortUrl": {
+      "redirecting": "리다이렉트 중..."
+    },
     "share": {
       "title": "공유하기",
       "link": {
@@ -143,6 +155,7 @@
     "freeService": "광고 없는 무료 서비스입니다",
     "supportMessage": "도움이 되셨다면 커피 한 잔 부탁드려요!",
     "supportButton": "후원하기",
+    "viewFAQ": "자주 묻는 질문 보기",
     "features": {
       "title": "주요 기능",
       "dragSelect": "드래그로 여러 날짜 선택",

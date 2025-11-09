@@ -51,7 +51,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
               className="mt-3 inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
               <HelpCircle className="w-4 h-4" />
-              자주 묻는 질문 보기
+              {t('about.viewFAQ')}
             </Link>
           </div>
           

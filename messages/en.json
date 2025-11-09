@@ -30,7 +30,8 @@
     "participants": {
       "label": "Participants (Optional)",
       "placeholder": "Enter names separated by Enter or comma",
-      "count": "%count% participant(s) added"
+      "count": "%count% participant(s) added",
+      "nameTooLong": "Participant name must be 10 characters or less."
     },
     "dateSelection": {
       "title": "Select Dates",
@@ -110,9 +111,20 @@
     "alerts": {
       "notFound": "Meeting not found.",
       "updateFailed": "Failed to update status. Please try again.",
-      "networkError": "A network error occurred. Please try again."
+      "networkError": "A network error occurred. Please try again.",
+      "enterName": "Please enter a name.",
+      "nameTooLong": "Participant name must be 10 characters or less.",
+      "addParticipantFailed": "Failed to add participant.",
+      "selectDates": "Please select dates.",
+      "enterTitle": "Please enter a meeting title.",
+      "updateScheduleFailed": "Failed to update schedule."
     },
+    "topDatesLabel": "#{rank}: {date} ({count} available)",
+    "peopleCount": "{count} people",
     "redirecting": "Redirecting...",
+    "shortUrl": {
+      "redirecting": "Redirecting..."
+    },
     "share": {
       "title": "Share",
       "link": {
@@ -143,6 +155,7 @@
     "freeService": "Free service without ads",
     "supportMessage": "If you found this helpful, buy us a coffee!",
     "supportButton": "Support",
+    "viewFAQ": "View FAQ",
     "features": {
       "title": "Key Features",
       "dragSelect": "Select multiple dates by dragging",

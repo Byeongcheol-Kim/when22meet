@@ -103,7 +103,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
     } catch (error) {
       console.error('Error fetching meeting:', error);
-      alert('미팅을 찾을 수 없습니다.');
+      alert(t('meeting.alerts.notFound'));
       router.push('/');
     } finally {
       setIsLoading(false);
@@ -112,12 +112,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   const handleAddParticipant = async () => {
     if (!newParticipantName.trim()) {
-      alert('이름을 입력해주세요.');
+      alert(t('meeting.alerts.enterName'));
       return;
     }
 
     if (newParticipantName.trim().length > 10) {
-      alert('참여자 이름은 10글자 이하여야 합니다.');
+      alert(t('meeting.alerts.nameTooLong'));
       return;
     }
 
@@ -139,7 +139,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
     } catch (error) {
       console.error('Error adding participant:', error);
-      alert('참가자 추가에 실패했습니다.');
+      alert(t('meeting.alerts.addParticipantFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -213,14 +213,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       if (!response.ok) {
         // Rollback on error, but preserve lock state
         await fetchMeetingData(true);
-        alert('상태 업데이트에 실패했습니다. 다시 시도해주세요.');
+        alert(t('meeting.alerts.updateFailed'));
       }
       // Success - keep optimistic update
     } catch (error) {
       console.error('Error updating status:', error);
       // Rollback on error, but preserve lock state
       await fetchMeetingData(true);
-      alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      alert(t('meeting.alerts.networkError'));
     }
   };
 
@@ -302,12 +302,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   // Schedule update handler
   const handleUpdateDates = async () => {
     if (!meeting || editingDates.length === 0) {
-      alert('날짜를 선택해주세요.');
+      alert(t('meeting.alerts.selectDates'));
       return;
     }
 
     if (!editingTitle.trim()) {
-      alert('약속 이름을 입력해주세요.');
+      alert(t('meeting.alerts.enterTitle'));
       return;
     }
 
@@ -332,7 +332,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
     } catch (error) {
       console.error('Error updating dates:', error);
-      alert('일정 수정에 실패했습니다.');
+      alert(t('meeting.alerts.updateScheduleFailed'));
     } finally {
       setIsUpdating(false);
     }
@@ -846,9 +846,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   item.rank === 2 ? 'bg-gray-300 text-gray-700' :
                   'bg-orange-400 text-orange-900'
                 }`}
-                title={`${item.rank}순위: ${dateStr} (${item.count}명 참석 가능)`}
+                title={t('meeting.topDatesLabel')
+                  .replace('{rank}', String(item.rank))
+                  .replace('{date}', dateStr)
+                  .replace('{count}', String(item.count))}
               >
-                <span className="text-xs font-bold">{item.count}명</span>
+                <span className="text-xs font-bold">
+                  {t('meeting.peopleCount').replace('{count}', String(item.count))}
+                </span>
                 {isVisible ? (
                   <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="3" />
