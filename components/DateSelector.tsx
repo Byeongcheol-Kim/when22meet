@@ -172,7 +172,7 @@ const DateSelector = forwardRef<DateSelectorRef, DateSelectorProps>(({ selectedD
                       onMouseDown={() => handleMouseDown(date, isDisabled)}
                       onMouseEnter={() => handleMouseEnter(date, isDisabled)}
                       disabled={isDisabled}
-                      className={`aspect-square rounded-full flex flex-col items-center justify-center text-sm transition-all ${
+                      className={`aspect-square rounded-full flex flex-col items-center justify-center text-sm transition-all relative ${
                         isSelected
                           ? `${DATE_SELECTOR_COLORS.selected.bg} ${DATE_SELECTOR_COLORS.selected.text} font-medium`
                           : isDisabled
@@ -183,11 +183,13 @@ const DateSelector = forwardRef<DateSelectorRef, DateSelectorProps>(({ selectedD
                       }`}
                     >
                       {isToday && !isDisabled && (
-                        <span className="bg-black text-white text-[9px] px-1 py-0.5 rounded leading-none font-medium mb-0.5">
+                        <span className="absolute top-1 bg-black text-white text-[9px] px-1 py-0.5 rounded leading-none font-medium">
                           {todayLabel}
                         </span>
                       )}
-                      {day}
+                      <span className={isToday && !isDisabled ? 'mt-1' : ''}>
+                        {day}
+                      </span>
                     </button>
                   );
                 })}
