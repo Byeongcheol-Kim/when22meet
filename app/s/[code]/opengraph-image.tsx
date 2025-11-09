@@ -10,7 +10,7 @@ export const size = {
 
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: Promise<{ code: string }> }) {
+export default async function Image() {
   // Get language from request headers
   const headersList = await headers();
   const acceptLanguage = headersList.get('accept-language') || '';

@@ -23,7 +23,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     }
 
     const title = meeting.title || '새로운 일정';
-    const dateCount = meeting.dates?.length || 0;
 
     // Get all availabilities
     const availabilityKeys = await redis.keys(`availability:${id}:*`);
@@ -63,8 +62,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       .sort((a, b) => b[1] - a[1])
       .filter(([, count]) => count > 0)
       .slice(0, 3);
-
-    const participantCount = availabilities.length;
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');
