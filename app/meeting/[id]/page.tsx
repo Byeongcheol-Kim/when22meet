@@ -36,6 +36,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [currentMonth, setCurrentMonth] = useState('');
   const [lockedParticipants, setLockedParticipants] = useState<Set<string>>(new Set());
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [participantOrder, setParticipantOrder] = useState<string[]>([]);
   const [datePositions, setDatePositions] = useState<{[date: string]: number}>({});
   const [scrollTop, setScrollTop] = useState(0);
   const [clientHeight, setClientHeight] = useState(0);
@@ -59,9 +60,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
   
-  // Set initial lock state only (on first load only)
+  // Set initial lock state and participant order (on first load only)
   useEffect(() => {
-    if (isInitialLoad && availabilities.length > 0) {
+    if (isInitialLoad && availabilities.length > 0 && meeting) {
       const locked = new Set<string>();
       availabilities.forEach(a => {
         if (a.isLocked) {
@@ -69,9 +70,35 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         }
       });
       setLockedParticipants(locked);
+
+      // 초기 로드 시에만 참석자 순서 정렬하여 저장
+      const sortedParticipants = Array.from(new Set(availabilities.map(a => a.participantName)))
+        .map(name => {
+          const availability = availabilities.find(a => a.participantName === name);
+          const isLocked = locked.has(name);
+
+          // 미정 개수 계산
+          const totalDates = meeting?.dates.length || 0;
+          const availableCount = availability?.availableDates.length || 0;
+          const unavailableCount = availability?.unavailableDates?.length || 0;
+          const undecidedCount = totalDates - availableCount - unavailableCount;
+
+          return { name, isLocked, undecidedCount };
+        })
+        .sort((a, b) => {
+          // 1. 확정 여부로 먼저 정렬 (미확정이 앞에)
+          if (a.isLocked !== b.isLocked) {
+            return a.isLocked ? 1 : -1;
+          }
+          // 2. 미정이 많은 순으로 정렬
+          return b.undecidedCount - a.undecidedCount;
+        })
+        .map(p => p.name);
+
+      setParticipantOrder(sortedParticipants);
       setIsInitialLoad(false);
     }
-  }, [availabilities, isInitialLoad]);
+  }, [availabilities, isInitialLoad, meeting]);
   
   // Set initial month
   useEffect(() => {
@@ -395,29 +422,22 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   // Generate grid data
   const buildGridData = () => {
-    // Sort participants: 미정이 많은 순 → 확정된 참여자는 맨 우측
-    const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)))
-      .map(name => {
-        const availability = availabilities.find(a => a.participantName === name);
-        const isLocked = lockedParticipants.has(name);
+    // 초기 로드 후에는 저장된 순서 사용, 아직 순서가 없으면 기본 순서 사용
+    let allParticipants: string[];
 
-        // 미정 개수 계산 (전체 날짜 - 참여 - 불참)
-        const totalDates = meeting?.dates.length || 0;
-        const availableCount = availability?.availableDates.length || 0;
-        const unavailableCount = availability?.unavailableDates?.length || 0;
-        const undecidedCount = totalDates - availableCount - unavailableCount;
+    if (participantOrder.length > 0) {
+      // 저장된 순서 사용 (초기 정렬 유지)
+      const currentParticipants = new Set(availabilities.map(a => a.participantName));
 
-        return { name, isLocked, undecidedCount };
-      })
-      .sort((a, b) => {
-        // 1. 확정 여부로 먼저 정렬 (미확정이 앞에)
-        if (a.isLocked !== b.isLocked) {
-          return a.isLocked ? 1 : -1;
-        }
-        // 2. 미정이 많은 순으로 정렬
-        return b.undecidedCount - a.undecidedCount;
-      })
-      .map(p => p.name);
+      // 기존 순서 유지 + 새로 추가된 참석자는 맨 뒤에
+      allParticipants = [
+        ...participantOrder.filter(name => currentParticipants.has(name)),
+        ...Array.from(currentParticipants).filter(name => !participantOrder.includes(name))
+      ];
+    } else {
+      // 초기 로드 전: 기본 순서 사용 (입력 순서)
+      allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
+    }
 
     const gridData: GridCell[][] = [];
     
