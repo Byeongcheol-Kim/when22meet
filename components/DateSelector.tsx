@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { formatDateToString, isPastDate, getDayName, getMonthDisplayName } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
 import { DATE_SELECTOR_COLORS } from '@/lib/constants/colors';
@@ -12,12 +12,32 @@ interface DateSelectorProps {
   title?: string;
 }
 
-export default function DateSelector({ selectedDates, onDatesChange, disabled = false, title }: DateSelectorProps) {
+export interface DateSelectorRef {
+  scrollToToday: () => void;
+}
+
+const DateSelector = forwardRef<DateSelectorRef, DateSelectorProps>(({ selectedDates, onDatesChange, disabled = false, title }, ref) => {
   const { locale } = useTranslation();
   const todayLabel = locale === 'ko' ? '오늘' : 'Today';
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    scrollToToday: () => {
+      if (calendarRef.current) {
+        const today = new Date();
+        const todayString = formatDateToString(today);
+        const todayElement = calendarRef.current.querySelector(`[data-date="${todayString}"]`);
+        if (todayElement) {
+          todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          // 오늘이 없으면 맨 위로
+          calendarRef.current.scrollTop = 0;
+        }
+      }
+    }
+  }));
   
   // Locale-based day names
   const localeCode = locale === 'ko' ? 'ko-KR' : 'en-US';
@@ -148,6 +168,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                   return (
                     <button
                       key={day}
+                      data-date={date}
                       onMouseDown={() => handleMouseDown(date, isDisabled)}
                       onMouseEnter={() => handleMouseEnter(date, isDisabled)}
                       disabled={isDisabled}
@@ -178,4 +199,8 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
       </div>
     </div>
   );
-}
+});
+
+DateSelector.displayName = 'DateSelector';
+
+export default DateSelector;

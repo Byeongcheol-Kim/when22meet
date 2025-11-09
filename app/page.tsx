@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { Info, Link2, Calendar } from 'lucide-react';
@@ -81,6 +81,7 @@ function HomeContent() {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const router = useRouter();
   const searchParams = useSearchParams();
+  const dateSelectorRef = useRef<{ scrollToToday: () => void }>(null);
 
   // Read template settings from URL parameters
   useEffect(() => {
@@ -124,6 +125,10 @@ function HomeContent() {
       const dates = generateDatesFromTemplate(template, 2);
       setSelectedDates(dates);
       setSelectedTemplate(template);
+      // 오늘 날짜로 스크롤
+      setTimeout(() => {
+        dateSelectorRef.current?.scrollToToday();
+      }, 100);
     }
   };
 
@@ -332,6 +337,7 @@ function HomeContent() {
 
               {/* Calendar */}
               <DateSelector
+                ref={dateSelectorRef}
                 selectedDates={selectedDates}
                 onDatesChange={(dates) => {
                   setSelectedDates(dates);
