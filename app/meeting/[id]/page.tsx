@@ -12,7 +12,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
-import { STATUS_COLORS, DATE_COLUMN_COLORS, TOP_DATES_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor } from '@/lib/constants/colors';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
