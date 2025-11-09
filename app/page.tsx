@@ -10,6 +10,7 @@ import Toast from '@/components/Toast';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
+import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS, INPUT_COLORS } from '@/lib/constants/colors';
 
 function SEOContent() {
   const { locale } = useTranslation();
@@ -234,7 +235,7 @@ function HomeContent() {
             <h1 className="text-xl font-bold">{t('landing.title')}</h1>
             <button
               onClick={() => setShowHelpModal(true)}
-              className="p-1 text-gray-500 hover:text-gray-700 transition-colors"
+              className={`p-1 ${TEXT_COLORS.muted} hover:${TEXT_COLORS.secondary} transition-colors`}
               title={t('about.title')}
             >
               <Info className="w-5 h-5" />
@@ -255,7 +256,7 @@ function HomeContent() {
               placeholder={t('landing.participants.placeholder')}
               countText={t('landing.participants.count').replace('%count%', participants.length.toString())}
             />
-            <p className="text-sm text-gray-700">
+            <p className={`text-sm ${TEXT_COLORS.secondary}`}>
               {t('landing.dateSelection.description')}
             </p>
           </div>
@@ -263,16 +264,16 @@ function HomeContent() {
 
         {/* Date template selection */}
         <div className="mb-4">
-          <label className="text-sm text-gray-800 font-medium block mb-2">
+          <label className={`text-sm ${INPUT_COLORS.label} font-medium block mb-2`}>
             {t('landing.dateSelection.quickSelection')}
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => handleTemplateSelect('weekend')}
               className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'weekend' 
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                selectedTemplate === 'weekend'
+                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -281,9 +282,9 @@ function HomeContent() {
             <button
               onClick={() => handleTemplateSelect('weekday')}
               className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'weekday' 
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                selectedTemplate === 'weekday'
+                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -292,9 +293,9 @@ function HomeContent() {
             <button
               onClick={() => handleTemplateSelect('fri-sat-sun')}
               className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'fri-sat-sun' 
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                selectedTemplate === 'fri-sat-sun'
+                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -303,9 +304,9 @@ function HomeContent() {
             <button
               onClick={() => handleTemplateSelect('full')}
               className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'full' 
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                selectedTemplate === 'full'
+                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
               }`}
             >
               <Calendar className="w-4 h-4 inline mr-1" />
@@ -329,16 +330,16 @@ function HomeContent() {
           <button
             onClick={handleCreateMeeting}
             disabled={isCreating || !title || selectedDates.length === 0}
-            className="w-full py-4 bg-blue-500 text-white rounded-xl font-semibold disabled:bg-gray-300 transition-colors"
+            className={`w-full py-4 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-xl font-semibold disabled:bg-gray-300 ${BUTTON_COLORS.primary.hover} transition-colors`}
           >
             {isCreating ? t('landing.creating') : t('landing.createMeeting')}
           </button>
-          
+
           {/* Template URL share button */}
           {(title || participants.length > 0 || selectedTemplate) && (
             <button
               onClick={handleCopyShareUrl}
-              className="w-full py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+              className={`w-full py-3 ${BUTTON_COLORS.gray.bg} ${BUTTON_COLORS.gray.text} rounded-xl font-medium ${BUTTON_COLORS.gray.hover} transition-colors flex items-center justify-center gap-2`}
             >
               <Link2 className="w-4 h-4" />
               {t('landing.shareTemplate')}

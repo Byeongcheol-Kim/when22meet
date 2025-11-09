@@ -188,6 +188,154 @@ export function getTopDateClasses(rank: 1 | 2 | 3, variant: 'badge' | 'indicator
 }
 
 /**
+ * 날짜 선택기 색상
+ */
+export const DATE_SELECTOR_COLORS = {
+  selected: {
+    bg: 'bg-blue-500',
+    text: 'text-white',
+    border: 'border-blue-500',
+  },
+  today: {
+    bg: 'bg-blue-100',
+    text: 'text-blue-600',
+    hover: 'hover:bg-blue-200',
+  },
+  disabled: {
+    text: 'text-gray-300',
+    cursor: 'cursor-not-allowed',
+  },
+  default: {
+    bg: 'bg-white',
+    text: 'text-gray-900',
+    hover: 'hover:bg-gray-50',
+    border: 'border-gray-300',
+  },
+  header: {
+    text: 'text-gray-900',
+    bg: 'bg-white',
+  },
+  count: {
+    text: 'text-gray-700',
+  },
+} as const;
+
+/**
+ * 입력 필드 색상
+ */
+export const INPUT_COLORS = {
+  label: 'text-gray-800',
+  border: 'border-gray-300',
+  focus: 'focus:border-blue-500',
+  disabled: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-500',
+  },
+  count: 'text-gray-500',
+  text: 'text-gray-900',
+} as const;
+
+/**
+ * 링크 색상
+ */
+export const LINK_COLORS = {
+  primary: {
+    text: 'text-blue-600',
+    hover: 'hover:text-blue-700',
+  },
+  github: {
+    text: 'text-gray-700',
+    hover: 'hover:text-gray-900',
+  },
+  instagram: {
+    text: 'text-gray-700',
+    hover: 'hover:text-pink-600',
+  },
+  linkedin: {
+    text: 'text-gray-700',
+    hover: 'hover:text-blue-600',
+  },
+} as const;
+
+/**
+ * 후원 영역 색상
+ */
+export const SUPPORT_COLORS = {
+  bg: 'bg-yellow-50',
+  text: 'text-gray-900',
+  description: 'text-gray-800',
+  button: {
+    bg: 'bg-yellow-400',
+    hover: 'hover:bg-yellow-500',
+    text: 'text-gray-800',
+  },
+} as const;
+
+/**
+ * FAB 버튼 & 미팅 페이지 추가 색상
+ */
+export const MEETING_PAGE_COLORS = {
+  addParticipant: {
+    bg: 'bg-gray-600',
+    hover: 'hover:bg-gray-700',
+    text: 'text-white',
+    disabled: 'disabled:bg-gray-300',
+  },
+  monthSelector: {
+    text: 'text-gray-600',
+    bg: 'bg-gray-50',
+    hover: 'hover:bg-gray-100',
+    border: 'border-gray-200',
+  },
+  participantHeader: {
+    locked: 'bg-gray-50',
+    unlocked: 'bg-white',
+  },
+  monthSeparator: {
+    bg: 'bg-gray-50',
+  },
+  title: 'text-gray-800',
+} as const;
+
+/**
+ * 템플릿 버튼 색상 (홈페이지)
+ */
+export const TEMPLATE_BUTTON_COLORS = {
+  selected: {
+    bg: 'bg-blue-500',
+    text: 'text-white',
+    border: 'border-blue-500',
+  },
+  default: {
+    bg: 'bg-white',
+    text: 'text-gray-700',
+    border: 'border-gray-300',
+    hover: 'hover:bg-gray-50',
+  },
+} as const;
+
+/**
+ * 일반 텍스트 색상
+ */
+export const TEXT_COLORS = {
+  primary: 'text-gray-900',
+  secondary: 'text-gray-700',
+  tertiary: 'text-gray-600',
+  muted: 'text-gray-500',
+  disabled: 'text-gray-400',
+  info: 'text-gray-800',
+} as const;
+
+/**
+ * 배경 색상
+ */
+export const BG_COLORS = {
+  page: 'bg-white',
+  section: 'bg-gray-50',
+  hover: 'hover:bg-gray-100',
+} as const;
+
+/**
  * 헬퍼 함수: 요일별 색상 가져오기
  */
 export function getDayOfWeekColor(day: number, isHighlighted: boolean = false) {

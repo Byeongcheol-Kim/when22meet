@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { formatDateToString, isPastDate, getDayName, getMonthDisplayName } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
+import { DATE_SELECTOR_COLORS } from '@/lib/constants/colors';
 
 interface DateSelectorProps {
   selectedDates: string[];
@@ -102,7 +103,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
         <h3 className="text-lg font-bold mb-2">{displayTitle}</h3>
         <div className="grid grid-cols-7 gap-1 text-center sticky top-0 bg-white z-10 pb-1">
           {dayNames.map((day, index) => (
-            <div key={index} className="text-sm font-bold text-gray-900 py-1">{day}</div>
+            <div key={index} className={`text-sm font-bold ${DATE_SELECTOR_COLORS.header.text} py-1`}>{day}</div>
           ))}
         </div>
       </div>
@@ -121,7 +122,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
 
           return (
             <div key={`${year}-${month}`} className={monthIndex > 0 ? 'mt-6' : ''}>
-              <h4 className="text-sm font-bold text-gray-900 mb-3 sticky top-0 bg-white py-2 z-10">
+              <h4 className={`text-sm font-bold ${DATE_SELECTOR_COLORS.header.text} mb-3 sticky top-0 ${DATE_SELECTOR_COLORS.header.bg} py-2 z-10`}>
                 {monthData.displayName}
               </h4>
               <div className="grid grid-cols-7 gap-1 select-none">
@@ -149,12 +150,12 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                       disabled={isDisabled}
                       className={`aspect-square rounded-full flex items-center justify-center text-sm transition-all ${
                         isSelected
-                          ? 'bg-blue-500 text-white font-medium'
+                          ? `${DATE_SELECTOR_COLORS.selected.bg} ${DATE_SELECTOR_COLORS.selected.text} font-medium`
                           : isDisabled
-                          ? 'text-gray-300 cursor-not-allowed'
+                          ? `${DATE_SELECTOR_COLORS.disabled.text} ${DATE_SELECTOR_COLORS.disabled.cursor}`
                           : isToday
-                          ? 'bg-blue-100 text-blue-600 font-medium hover:bg-blue-200'
-                          : 'text-gray-900 hover:bg-gray-50'
+                          ? `${DATE_SELECTOR_COLORS.today.bg} ${DATE_SELECTOR_COLORS.today.text} font-medium ${DATE_SELECTOR_COLORS.today.hover}`
+                          : `${DATE_SELECTOR_COLORS.default.text} ${DATE_SELECTOR_COLORS.default.hover}`
                       }`}
                     >
                       {day}
@@ -168,7 +169,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
         </div>
       </div>
 
-      <div className="text-sm text-gray-700 text-center mt-3">
+      <div className={`text-sm ${DATE_SELECTOR_COLORS.count.text} text-center mt-3`}>
         {selectedDates.length > 0 
           ? t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())
           : t('landing.dateSelection.selectDates')}

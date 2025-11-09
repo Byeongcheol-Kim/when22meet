@@ -3,6 +3,7 @@
 import { useState, KeyboardEvent } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
+import { INPUT_COLORS, TEXT_COLORS } from '@/lib/constants/colors';
 
 interface ParticipantsInputProps {
   participants: string[];
