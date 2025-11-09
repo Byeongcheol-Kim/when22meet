@@ -59,6 +59,7 @@
     "defaultTitle": "Meeting",
     "participantCount": " people",
     "enterName": "Enter name",
+    "createNew": "New",
     "addParticipant": {
       "placeholder": "Enter name",
       "button": "Add",
@@ -143,8 +144,8 @@
     },
     "newMeeting": {
       "title": "Create New Meeting",
-      "message": "Create a new meeting with current participants? (Participant list will be auto-filled)",
-      "confirm": "Create New Meeting"
+      "message": "Create a new meeting with current participants. (Opens in new tab)",
+      "confirm": "Create"
     }
   },
   "about": {

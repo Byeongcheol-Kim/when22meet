@@ -59,6 +59,7 @@
     "defaultTitle": "약속",
     "participantCount": "명",
     "enterName": "이름 입력",
+    "createNew": "새 약속",
     "addParticipant": {
       "placeholder": "이름 입력",
       "button": "추가",
@@ -143,8 +144,8 @@
     },
     "newMeeting": {
       "title": "새 약속 만들기",
-      "message": "현재 참여자로 새 약속을 만드시겠습니까? (참여자 목록이 자동으로 입력됩니다)",
-      "confirm": "새 약속 만들기"
+      "message": "현재 참여자로 새 약속을 만듭니다. (새 탭에서 열립니다)",
+      "confirm": "만들기"
     }
   },
   "about": {

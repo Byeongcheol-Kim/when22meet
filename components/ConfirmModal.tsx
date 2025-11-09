@@ -7,12 +7,14 @@ import { MODAL_COLORS, BUTTON_COLORS } from '@/lib/constants/colors';
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
   title: string;
   message: string;
   confirmText?: string;
   cancelText?: string;
   type?: 'warning' | 'danger' | 'info';
+  confirmLink?: string;
+  confirmLinkNewTab?: boolean;
 }
 
 export default function ConfirmModal({
@@ -24,6 +26,8 @@ export default function ConfirmModal({
   confirmText,
   cancelText,
   type = 'warning',
+  confirmLink,
+  confirmLinkNewTab = false,
 }: ConfirmModalProps) {
   const { t } = useTranslation();
 
@@ -83,15 +87,27 @@ export default function ConfirmModal({
             >
               {finalCancelText}
             </button>
-            <button
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              className={`flex-1 py-3 text-white rounded-xl font-semibold transition-colors ${getConfirmButtonStyle()}`}
-            >
-              {finalConfirmText}
-            </button>
+            {confirmLink ? (
+              <a
+                href={confirmLink}
+                target={confirmLinkNewTab ? '_blank' : '_self'}
+                rel={confirmLinkNewTab ? 'noopener noreferrer' : undefined}
+                onClick={onClose}
+                className={`flex-1 py-3 text-gray-800 rounded-xl font-semibold transition-colors text-center ${getConfirmButtonStyle()}`}
+              >
+                {finalConfirmText}
+              </a>
+            ) : (
+              <button
+                onClick={() => {
+                  onConfirm?.();
+                  onClose();
+                }}
+                className={`flex-1 py-3 text-white rounded-xl font-semibold transition-colors ${getConfirmButtonStyle()}`}
+              >
+                {finalConfirmText}
+              </button>
+            )}
           </div>
         </div>
       </div>

@@ -618,7 +618,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 </button>
               </>
             ) : (
-              <button 
+              <button
                 onClick={() => setShowAddInput(true)}
                 className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
               >
@@ -993,18 +993,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       <ConfirmModal
         isOpen={showNewMeetingConfirm}
         onClose={() => setShowNewMeetingConfirm(false)}
-        onConfirm={() => {
-          // 현재 참여자 목록을 가져와서 새 미팅으로 전달
-          const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
-          const url = new URL('/', window.location.origin);
-          if (currentParticipants.length > 0) {
-            url.searchParams.set('participants', currentParticipants.join(','));
-          }
-          router.push(url.pathname + url.search);
-        }}
         title={t('meeting.newMeeting.title')}
         message={t('meeting.newMeeting.message')}
         confirmText={t('meeting.newMeeting.confirm')}
+        confirmLink={(() => {
+          const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
+          if (currentParticipants.length > 0) {
+            return `/?participants=${encodeURIComponent(currentParticipants.join(','))}`;
+          }
+          return '/';
+        })()}
+        confirmLinkNewTab={true}
         type="info"
       />
 
