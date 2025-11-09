@@ -46,8 +46,15 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   };
 
   return (
-    <div className="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 animate-slide-down">
-      <div className={`${getStyles()} px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-md`}>
+    <div
+      className="fixed bottom-20 z-50"
+      style={{
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: 'fit-content',
+      }}
+    >
+      <div className={`${getStyles()} px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 min-w-[300px] max-w-md mx-4 animate-slide-up-toast`}>
         {getIcon()}
         <span className="font-medium">{message}</span>
         <button

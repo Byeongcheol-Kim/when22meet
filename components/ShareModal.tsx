@@ -10,8 +10,9 @@ interface ShareModalProps {
 
 export default function ShareModal({ onClose, onShareLink, onShareTemplate }: ShareModalProps) {
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in">
+    <div className="fixed inset-0 bg-black/30 z-50">
+      <div className="absolute inset-0 flex items-center justify-center px-4">
+        <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-900">공유하기</h2>
@@ -58,10 +59,11 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
               </div>
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900">약속 템플릿 복사</h3>
-                <p className="text-sm text-gray-600">같은 참가자와 약속 이름으로 새 약속을 만드는 템플릿 링크를 만듭니다</p>
+                <p className="text-sm text-gray-600">같은 참가자의 템플릿 링크를 만듭니다</p>
               </div>
             </div>
           </button>
+        </div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 import { useEffect, useState, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Meeting, Availability } from '@/lib/types';
-import { Plus, PlusCircle, Info, X, Menu, Calendar } from 'lucide-react';
+import { Plus, PlusCircle, Info, X, Menu, Calendar, Link } from 'lucide-react';
 import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
 import ShareModal from '@/components/ShareModal';
