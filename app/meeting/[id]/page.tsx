@@ -761,16 +761,25 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 const dateObj = new Date(cell.date + 'T00:00:00');
                 const dayNumber = String(dateObj.getDate()).padStart(2, '0');
                 const dayOfWeek = cell.content?.split(' ')[1];
-                
+                const day = dateObj.getDay(); // 0: 일요일, 6: 토요일
+
+                // 요일별 색상
+                const getDayColor = () => {
+                  if (highlightedDate === cell.date) return 'text-black';
+                  if (day === 0) return 'text-red-400'; // 일요일: 빨간색
+                  if (day === 6) return 'text-blue-400'; // 토요일: 파란색
+                  return 'text-white'; // 평일: 흰색
+                };
+
                 // Check if this date is in TOP 3
                 const topDateInfo = topDates.find(td => td.date === cell.date);
-                
+
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className={`px-2 py-1.5 relative transition-all duration-300 ${
-                      highlightedDate === cell.date 
-                        ? 'bg-yellow-500 shadow-lg scale-105 z-20' 
+                      highlightedDate === cell.date
+                        ? 'bg-yellow-500 shadow-lg scale-105 z-20'
                         : 'bg-black'
                     }`}
                     style={{ position: 'sticky', left: 0, zIndex: highlightedDate === cell.date ? 20 : 10 }}
@@ -778,8 +787,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     data-month={cell.month}
                   >
                     <div className="flex flex-col items-end justify-center">
-                      <span className={`text-[10px] ${highlightedDate === cell.date ? 'text-black' : 'text-white'}`}>{dayOfWeek}</span>
-                      <span className={`text-lg font-black leading-tight ${highlightedDate === cell.date ? 'text-black' : 'text-white'}`}>{dayNumber}</span>
+                      <span className={`text-[10px] ${getDayColor()}`}>{dayOfWeek}</span>
+                      <span className={`text-lg font-black leading-tight ${getDayColor()}`}>{dayNumber}</span>
                     </div>
                     {topDateInfo && (
                       <div className={`absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
