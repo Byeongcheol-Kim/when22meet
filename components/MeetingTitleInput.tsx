@@ -24,7 +24,7 @@ export default function MeetingTitleInput({
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    if (newValue.length <= 10) {
+    if (newValue.length <= 20) {
       onChange(newValue);
     }
   };
@@ -33,7 +33,7 @@ export default function MeetingTitleInput({
     <div>
       <label className="text-sm text-gray-800 font-medium block mb-2">
         {displayLabel}
-        <span className="ml-2 text-xs text-gray-500">({value.length}/10)</span>
+        <span className="ml-2 text-xs text-gray-500">({value.length}/20)</span>
       </label>
       <input
         type="text"
@@ -41,7 +41,7 @@ export default function MeetingTitleInput({
         onChange={handleChange}
         placeholder={displayPlaceholder}
         disabled={disabled}
-        maxLength={10}
+        maxLength={20}
         className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#FFC354] disabled:bg-gray-100 disabled:text-gray-500"
       />
     </div>
