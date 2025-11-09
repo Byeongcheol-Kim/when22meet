@@ -82,9 +82,19 @@ export async function generateMetadata({
 
     const title = `${meeting.title} | 언제만나?`;
 
+    const meetingUrl = `/meeting/${id}`;
+
     return {
       title,
       description,
+      alternates: {
+        canonical: meetingUrl,
+        languages: {
+          'ko': meetingUrl,
+          'en': meetingUrl,
+          'x-default': meetingUrl,
+        },
+      },
       openGraph: {
         title,
         description,

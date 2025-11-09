@@ -45,6 +45,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: '/',
+    languages: {
+      'ko': '/',
+      'en': '/',
+      'x-default': '/',
+    },
   },
   robots: {
     index: true,

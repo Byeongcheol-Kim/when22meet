@@ -46,6 +46,14 @@
    - H2, H3 태그로 계층 구조 명확히
    - 사용 사례 및 기능 설명 포함
 
+8. **다국어 SEO 구현** ⭐ NEW (URL 변경 없이)
+   - `/lib/utils/i18n.ts`: 다국어 SEO 유틸리티 생성
+   - StructuredData.tsx: 언어별 동적 생성
+   - MeetingStructuredData.tsx: 언어별 동적 생성
+   - FAQSchema.tsx: 언어별 동적 생성 (번역 파일 활용)
+   - hreflang 태그 추가 (ko, en, x-default)
+   - 언어별 메타데이터 제공
+
 ## 📋 추가로 필요한 작업
 
 ### 1. Google Search Console 등록 ✅ (완료)

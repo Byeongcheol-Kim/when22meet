@@ -1,6 +1,8 @@
 'use client';
 
 import { Meeting } from '@/lib/types';
+import { useTranslation } from '@/lib/useTranslation';
+import { getLocalizedMeetingDescription, getLocalizedOrganizationName } from '@/lib/utils/i18n';
 
 interface MeetingStructuredDataProps {
   meeting: Meeting;
@@ -16,6 +18,8 @@ export default function MeetingStructuredData({
   participantCount,
   topDate,
 }: MeetingStructuredDataProps) {
+  const { locale } = useTranslation();
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString + 'T00:00:00');
     return date.toISOString();
@@ -25,12 +29,12 @@ export default function MeetingStructuredData({
     '@context': 'https://schema.org',
     '@type': 'Event',
     name: meeting.title,
-    description: `${participantCount}명이 참여하는 일정 조율. ${meeting.dates.length}개의 날짜 중 선택`,
+    description: getLocalizedMeetingDescription(locale, participantCount, meeting.dates.length),
     eventStatus: 'https://schema.org/EventScheduled',
     eventAttendanceMode: 'https://schema.org/MixedEventAttendanceMode',
     organizer: {
       '@type': 'Organization',
-      name: '언제만나',
+      name: getLocalizedOrganizationName(locale),
       url: 'https://when22meet.vercel.app',
     },
     ...(topDate && {
