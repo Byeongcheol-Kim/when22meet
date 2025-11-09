@@ -71,7 +71,15 @@ export default function FAQPage() {
 
         <div className="mt-8 text-center text-sm text-gray-600">
           <p className="font-medium">{t('faq.moreQuestions')}</p>
-          <p className="mt-1">{t('faq.tryService')}</p>
+          <p className="mt-1">
+            {t('faq.contactEmail')}{' '}
+            <a
+              href="mailto:benchely.kim@gmail.com"
+              className="text-orange-600 hover:text-orange-700 font-medium underline transition-colors"
+            >
+              benchely.kim@gmail.com
+            </a>
+          </p>
         </div>
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Github, Linkedin, Instagram, HelpCircle, Mail } from 'lucide-react';
+import { X, Github, Linkedin, Instagram, Mail } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import { MODAL_COLORS, TEXT_COLORS, LINK_COLORS, SUPPORT_COLORS } from '@/lib/constants/colors';
@@ -47,13 +47,6 @@ export default function AboutModal({ onClose }: AboutModalProps) {
               <li>{t('about.howTo.step3')}</li>
               <li>{t('about.howTo.step4')}</li>
             </ol>
-            <Link
-              href="/faq"
-              className="mt-3 inline-flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
-            >
-              <HelpCircle className="w-4 h-4" />
-              {t('about.viewFAQ')}
-            </Link>
           </div>
           
           <div className="pt-4 border-t">
@@ -127,6 +120,17 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                     <Instagram className="w-4 h-4" />
                   </a>
                 </div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <Link
+                  href="/faq"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-semibold text-gray-900"
+                >
+                  <span className="bg-orange-400 text-orange-900 px-2 py-0.5 rounded text-xs font-bold">{t('about.viewFAQ')}</span>
+                </Link>
               </div>
             </div>
           </div>
