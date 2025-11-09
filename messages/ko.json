@@ -28,7 +28,7 @@
       "placeholder": "예: 팀 회의, 친구 모임, 스터디"
     },
     "participants": {
-      "label": "참여자 (선택사항)",
+      "label": "참여자",
       "placeholder": "이름을 입력하고 Enter 또는 쉼표로 구분",
       "count": "%count%명의 참여자가 추가됨",
       "nameTooLong": "참여자 이름은 10글자 이하여야 합니다."

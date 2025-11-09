@@ -20,15 +20,15 @@
   "landing": {
     "splash": {
       "title": "Simple Scheduling Service",
-      "subtitle": "When2Meet?"
+      "subtitle": "When22Meet?"
     },
-    "title": "When2Meet!",
+    "title": "When22Meet!",
     "meetingTitle": {
       "label": "Meeting Title",
       "placeholder": "e.g., Team Meeting, Friend Gathering, Study Group"
     },
     "participants": {
-      "label": "Participants (Optional)",
+      "label": "Participants",
       "placeholder": "Enter names separated by Enter or comma",
       "count": "%count% participant(s) added",
       "nameTooLong": "Participant name must be 10 characters or less."
@@ -153,7 +153,7 @@
     }
   },
   "about": {
-    "title": "When2Meet?",
+    "title": "When22Meet?",
     "description": "The easiest and fastest scheduling service",
     "serviceIntro": "About",
     "creators": "Creators",
@@ -226,14 +226,14 @@
   },
   "faq": {
     "title": "Frequently Asked Questions",
-    "subtitle": "Find answers to common questions about When2Meet",
+    "subtitle": "Find answers to common questions about When22Meet",
     "backHome": "Back to Home",
     "moreQuestions": "Have more questions?",
     "tryService": "Try the service yourself to learn more.",
     "questions": {
       "q1": {
-        "question": "What is When2Meet?",
-        "answer": "When2Meet is a free scheduling service that makes it easy to coordinate group schedules. It can be used without login, allowing participants to mark their available dates to find the best meeting time."
+        "question": "What is When22Meet?",
+        "answer": "When22Meet is a free scheduling service that makes it easy to coordinate group schedules. It can be used without login, allowing participants to mark their available dates to find the best meeting time."
       },
       "q2": {
         "question": "Do I need to sign up?",

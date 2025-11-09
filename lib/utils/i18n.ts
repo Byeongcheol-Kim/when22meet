@@ -51,7 +51,7 @@ export function getLocalizedMetadata(locale: Locale) {
       ],
     },
     en: {
-      title: 'When2Meet | Schedule Coordination App - Simple Meeting Scheduler',
+      title: 'When22Meet | Schedule Coordination App - Simple Meeting Scheduler',
       description: 'Easy meeting scheduling app for coordinating group schedules. No login required, drag to select multiple dates, real-time sync. Perfect for team meetings and group events.',
       keywords: [
         'meeting scheduler', 'schedule coordination', 'group scheduling app',
@@ -71,7 +71,7 @@ export function getLocalizedStructuredData(locale: Locale) {
   const data = {
     ko: {
       name: '언제만나 - 약속일정 잡기 앱',
-      alternateName: ['When2Meet', '언제만나', '약속일정 앱'],
+      alternateName: ['When22Meet', '언제만나', '약속일정 앱'],
       description: '약속일정 잡기, 모임 시간 정하기가 쉬운 무료 일정 조율 앱. 로그인 없이 바로 사용 가능한 스케줄링 서비스',
       keywords: '약속일정 잡기 앱, 모임 시간 정하기, 일정 조율 서비스, 회의 시간 정하기, 팀 미팅 일정, 그룹 일정 조율',
       featureList: [
@@ -86,8 +86,8 @@ export function getLocalizedStructuredData(locale: Locale) {
       organizationName: '언제만나 팀',
     },
     en: {
-      name: 'When2Meet - Schedule Coordination App',
-      alternateName: ['When2Meet', 'Schedule Coordination', 'Meeting Scheduler'],
+      name: 'When22Meet - Schedule Coordination App',
+      alternateName: ['When22Meet', 'Schedule Coordination', 'Meeting Scheduler'],
       description: 'Easy meeting scheduling app for coordinating group schedules. Free scheduling service with no login required',
       keywords: 'meeting scheduler, schedule coordination, group scheduling app, team meeting planner, availability poll, meeting time finder',
       featureList: [
@@ -99,7 +99,7 @@ export function getLocalizedStructuredData(locale: Locale) {
         'Team meeting management',
         'Availability voting',
       ],
-      organizationName: 'When2Meet Team',
+      organizationName: 'When22Meet Team',
     },
   };
 
@@ -149,5 +149,5 @@ export function getLocalizedMeetingDescription(locale: Locale, participantCount:
  * 언어별 조직명 가져오기
  */
 export function getLocalizedOrganizationName(locale: Locale) {
-  return locale === 'ko' ? '언제만나' : 'When2Meet';
+  return locale === 'ko' ? '언제만나' : 'When22Meet';
 }

@@ -10,7 +10,7 @@ import Toast from '@/components/Toast';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
-import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS, INPUT_COLORS } from '@/lib/constants/colors';
+import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS } from '@/lib/constants/colors';
 
 function SEOContent() {
   const { locale } = useTranslation();
@@ -44,9 +44,9 @@ function SEOContent() {
 
   return (
     <div className="sr-only">
-      <h2>Meeting Scheduler App - When2Meet</h2>
+      <h2>Meeting Scheduler App - When22Meet</h2>
       <p>
-        When2Meet is a free schedule coordination app that makes it easy to set meeting times and coordinate group schedules.
+        When22Meet is a free schedule coordination app that makes it easy to set meeting times and coordinate group schedules.
         An optimized scheduling service for finding the best time for team meetings, group gatherings, and group appointments.
       </p>
       <h3>Key Features</h3>
@@ -267,73 +267,77 @@ function HomeContent() {
               placeholder={t('landing.participants.placeholder')}
               countText={t('landing.participants.count').replace('%count%', participants.length.toString())}
             />
-            <p className={`text-sm ${TEXT_COLORS.secondary}`}>
-              {t('landing.dateSelection.description')}
-            </p>
-          </div>
-        </div>
-
-        {/* Date template selection */}
-        <div className="mb-4">
-          <label className={`text-sm ${INPUT_COLORS.label} font-medium block mb-2`}>
-            {t('landing.dateSelection.quickSelection')}
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={() => handleTemplateSelect('weekend')}
-              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'weekend'
-                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-              }`}
-            >
-              <Calendar className="w-4 h-4 inline mr-1" />
-              {t('landing.dateSelection.templates.weekend')}
-            </button>
-            <button
-              onClick={() => handleTemplateSelect('weekday')}
-              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'weekday'
-                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-              }`}
-            >
-              <Calendar className="w-4 h-4 inline mr-1" />
-              {t('landing.dateSelection.templates.weekday')}
-            </button>
-            <button
-              onClick={() => handleTemplateSelect('fri-sat-sun')}
-              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'fri-sat-sun'
-                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-              }`}
-            >
-              <Calendar className="w-4 h-4 inline mr-1" />
-              {t('landing.dateSelection.templates.friSatSun')}
-            </button>
-            <button
-              onClick={() => handleTemplateSelect('full')}
-              className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                selectedTemplate === 'full'
-                  ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                  : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-              }`}
-            >
-              <Calendar className="w-4 h-4 inline mr-1" />
-              {t('landing.dateSelection.templates.full')}
-            </button>
           </div>
         </div>
 
         <div className="mb-8">
-          <DateSelector 
+          {/* Date Selection Title with Count */}
+          <div className="flex items-baseline gap-2 mb-4">
+            <h3 className="text-lg font-bold text-gray-800">{t('landing.dateSelection.title')}</h3>
+            {selectedDates.length > 0 && (
+              <span className="text-sm text-gray-600">
+                {t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())}
+              </span>
+            )}
+          </div>
+
+          {/* Quick Date Selection */}
+          <div className="mb-4">
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleTemplateSelect('weekend')}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  selectedTemplate === 'weekend'
+                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                }`}
+              >
+                <Calendar className="w-4 h-4 inline mr-1" />
+                {t('landing.dateSelection.templates.weekend')}
+              </button>
+              <button
+                onClick={() => handleTemplateSelect('weekday')}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  selectedTemplate === 'weekday'
+                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                }`}
+              >
+                <Calendar className="w-4 h-4 inline mr-1" />
+                {t('landing.dateSelection.templates.weekday')}
+              </button>
+              <button
+                onClick={() => handleTemplateSelect('fri-sat-sun')}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  selectedTemplate === 'fri-sat-sun'
+                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                }`}
+              >
+                <Calendar className="w-4 h-4 inline mr-1" />
+                {t('landing.dateSelection.templates.friSatSun')}
+              </button>
+              <button
+                onClick={() => handleTemplateSelect('full')}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  selectedTemplate === 'full'
+                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                }`}
+              >
+                <Calendar className="w-4 h-4 inline mr-1" />
+                {t('landing.dateSelection.templates.full')}
+              </button>
+            </div>
+          </div>
+
+          {/* Calendar */}
+          <DateSelector
             selectedDates={selectedDates}
             onDatesChange={(dates) => {
               setSelectedDates(dates);
               setSelectedTemplate(null); // Clear template on manual selection
             }}
-            title={t('landing.dateSelection.title')}
           />
         </div>
 

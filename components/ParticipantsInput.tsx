@@ -82,21 +82,28 @@ export default function ParticipantsInput({
 
   return (
     <div>
-      <label className="text-sm text-gray-800 font-medium block mb-2">{displayLabel}</label>
-      
+      <div className="flex items-baseline gap-2 mb-4">
+        <label className="text-lg font-bold text-gray-800">{displayLabel}</label>
+        {participants.length > 0 && countText && (
+          <span className="text-sm text-gray-600">
+            {countText}
+          </span>
+        )}
+      </div>
+
       {/* 참여자 칩스 표시 */}
       {participants.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-3">
           {participants.map((participant, index) => (
             <div
               key={index}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFC354] text-gray-800 rounded-full text-sm font-medium"
             >
               <span>{participant}</span>
               {!disabled && (
                 <button
                   onClick={() => removeParticipant(participant)}
-                  className="hover:bg-yellow-200 rounded-full p-0.5 transition-colors"
+                  className="hover:bg-[#FFD580] rounded-full p-0.5 transition-colors"
                   type="button"
                 >
                   <X className="w-3 h-3" />
@@ -129,12 +136,6 @@ export default function ParticipantsInput({
         />
         <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />
       </div>
-
-      {participants.length > 0 && countText && (
-        <p className="text-xs text-gray-700 mt-2">
-          {countText}
-        </p>
-      )}
     </div>
   );
 }

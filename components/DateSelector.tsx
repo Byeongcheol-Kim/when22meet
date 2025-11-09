@@ -13,7 +13,7 @@ interface DateSelectorProps {
 }
 
 export default function DateSelector({ selectedDates, onDatesChange, disabled = false, title }: DateSelectorProps) {
-  const { t, locale } = useTranslation();
+  const { locale } = useTranslation();
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -21,7 +21,6 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
   // Locale-based day names
   const localeCode = locale === 'ko' ? 'ko-KR' : 'en-US';
   const dayNames = Array.from({ length: 7 }, (_, i) => getDayName(i, localeCode));
-  const displayTitle = title || t('landing.dateSelection.selectDates');
 
   const handleDateToggle = (date: string) => {
     if (disabled) return;
@@ -99,7 +98,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
 
   return (
     <div>
-      <h3 className="text-lg font-bold mb-4">{displayTitle}</h3>
+      {title && <h3 className="text-lg font-bold mb-4">{title}</h3>}
 
       <div className="border rounded-lg overflow-hidden">
         <div className="grid grid-cols-7 gap-1 text-center bg-black py-2">
@@ -170,12 +169,6 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
           );
         })}
         </div>
-      </div>
-
-      <div className={`text-sm ${DATE_SELECTOR_COLORS.count.text} text-center mt-3`}>
-        {selectedDates.length > 0 
-          ? t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())
-          : t('landing.dateSelection.selectDates')}
       </div>
     </div>
   );
