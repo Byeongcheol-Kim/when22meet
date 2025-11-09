@@ -8,20 +8,20 @@
  */
 export const STATUS_COLORS = {
   available: {
-    bg: 'bg-green-100',
-    text: 'text-green-800',
-    border: 'border-green-200',
-    hover: 'hover:border-green-400',
+    bg: 'bg-[#FFC354]',
+    text: 'text-gray-800',
+    border: 'border-[#FFC354]',
+    hover: 'hover:border-[#FFD580]',
   },
   unavailable: {
-    bg: 'bg-red-50',
-    text: 'text-red-700',
-    border: 'border-red-200',
-    hover: 'hover:border-red-400',
+    bg: 'bg-[#6B7280]',
+    text: 'text-white',
+    border: 'border-[#6B7280]',
+    hover: 'hover:border-gray-600',
   },
   undecided: {
     bg: 'bg-gray-50',
-    text: 'text-gray-500',
+    text: 'text-gray-400',
     border: 'border-gray-200',
     hover: 'hover:border-gray-400',
   },
@@ -31,53 +31,53 @@ export const STATUS_COLORS = {
  * 날짜 열 색상 (왼쪽 고정 영역)
  */
 export const DATE_COLUMN_COLORS = {
-  bg: 'bg-blue-50',
+  bg: 'bg-black',
   header: {
-    bg: 'bg-blue-50',
-    year: 'text-gray-700',
-    month: 'text-gray-800',
+    bg: 'bg-black',
+    year: 'text-white',
+    month: 'text-white',
   },
-  weekday: 'text-gray-700',
-  saturday: 'text-blue-700',
-  sunday: 'text-red-600',
+  weekday: 'text-white',
+  saturday: 'text-blue-300',
+  sunday: 'text-red-300',
   highlighted: {
-    bg: 'bg-yellow-200',
-    text: 'text-gray-800',
+    bg: 'bg-yellow-500',
+    text: 'text-black',
   },
 } as const;
 
 /**
- * Top 날짜 배지 색상
+ * Top 날짜 배지 색상 (금/은/동)
  */
 export const TOP_DATES_COLORS = {
   first: {
-    bg: 'bg-yellow-100',
-    text: 'text-yellow-800',
-    border: 'border-yellow-300',
+    bg: 'bg-yellow-400',
+    text: 'text-yellow-900',
+    border: 'border-yellow-400',
     indicator: {
-      bg: 'bg-yellow-200',
-      text: 'text-yellow-800',
-      border: 'border-yellow-300',
+      bg: 'bg-yellow-400',
+      text: 'text-yellow-900',
+      border: 'border-yellow-400',
     },
   },
   second: {
-    bg: 'bg-blue-100',
-    text: 'text-blue-800',
-    border: 'border-blue-300',
+    bg: 'bg-gray-300',
+    text: 'text-gray-700',
+    border: 'border-gray-300',
     indicator: {
-      bg: 'bg-blue-200',
-      text: 'text-blue-800',
-      border: 'border-blue-300',
+      bg: 'bg-gray-300',
+      text: 'text-gray-700',
+      border: 'border-gray-300',
     },
   },
   third: {
-    bg: 'bg-orange-100',
-    text: 'text-orange-800',
-    border: 'border-orange-300',
+    bg: 'bg-orange-400',
+    text: 'text-orange-900',
+    border: 'border-orange-400',
     indicator: {
-      bg: 'bg-orange-200',
-      text: 'text-orange-800',
-      border: 'border-orange-300',
+      bg: 'bg-orange-400',
+      text: 'text-orange-900',
+      border: 'border-orange-400',
     },
   },
 } as const;
@@ -165,7 +165,8 @@ export const SHARE_MODAL_COLORS = {
  */
 export function getStatusClasses(status: 'available' | 'unavailable' | 'undecided', isEditable: boolean = true) {
   const colors = STATUS_COLORS[status];
-  const baseClasses = `${colors.bg} ${colors.text} ${colors.border}`;
+  const borderClass = status === 'undecided' ? `border ${colors.border}` : '';
+  const baseClasses = `${colors.bg} ${colors.text} ${borderClass}`;
   const interactiveClasses = isEditable
     ? `cursor-pointer hover:shadow-md hover:scale-105 ${colors.hover}`
     : 'cursor-default opacity-60';
