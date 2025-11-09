@@ -561,7 +561,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   if (!meeting) return null;
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="h-screen bg-white flex flex-col overflow-hidden">
       {/* Structured Data for SEO */}
       {meeting && (
         <MeetingStructuredData
