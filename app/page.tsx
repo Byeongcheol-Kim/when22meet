@@ -271,14 +271,14 @@ function HomeContent() {
             {/* Date Selection */}
             <div>
               {/* Date Selection Title with Count */}
-              <div className="flex items-baseline gap-2 mb-4">
-                <h3 className="text-lg font-bold text-gray-800">{t('landing.dateSelection.title')}</h3>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">
+                {t('landing.dateSelection.title')}
                 {selectedDates.length > 0 && (
-                  <span className="text-sm text-gray-600">
+                  <span className="ml-2 text-xs font-normal bg-orange-400 text-orange-900 px-2 py-0.5 rounded">
                     {t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())}
                   </span>
                 )}
-              </div>
+              </h3>
 
               {/* Quick Date Selection */}
               <div className="mb-4">

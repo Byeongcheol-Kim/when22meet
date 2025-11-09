@@ -82,14 +82,14 @@ export default function ParticipantsInput({
 
   return (
     <div>
-      <div className="flex items-baseline gap-2 mb-4">
-        <label className="text-lg font-bold text-gray-800">{displayLabel}</label>
+      <label className="text-lg font-bold text-gray-800 block mb-4">
+        {displayLabel}
         {participants.length > 0 && countText && (
-          <span className="text-sm text-gray-600">
+          <span className="ml-2 text-xs font-normal bg-gray-300 text-gray-700 px-2 py-0.5 rounded">
             {countText}
           </span>
         )}
-      </div>
+      </label>
 
       {/* 참여자 칩스 표시 */}
       {participants.length > 0 && (

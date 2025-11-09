@@ -30,14 +30,14 @@
     "participants": {
       "label": "Participants",
       "placeholder": "Enter names separated by Enter or comma",
-      "count": "%count% participant(s) added",
+      "count": "%count% participant(s)",
       "nameTooLong": "Participant name must be 10 characters or less."
     },
     "dateSelection": {
       "title": "Select Dates",
       "selectDates": "Select dates",
       "description": "Select available dates below. You can drag to select multiple dates at once.",
-      "selectedCount": "%count% date(s) selected",
+      "selectedCount": "%count% date(s)",
       "quickSelection": "Quick Date Selection",
       "templates": {
         "weekend": "Weekends (Sat, Sun)",

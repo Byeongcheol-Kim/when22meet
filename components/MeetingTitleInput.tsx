@@ -33,7 +33,9 @@ export default function MeetingTitleInput({
     <div>
       <label className="text-lg font-bold text-gray-800 block mb-4">
         {displayLabel}
-        <span className="ml-2 text-xs text-gray-500 font-normal">({value.length}/20)</span>
+        <span className="ml-2 text-xs font-normal bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded">
+          ({value.length}/20)
+        </span>
       </label>
       <input
         type="text"

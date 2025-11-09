@@ -30,14 +30,14 @@
     "participants": {
       "label": "참여자",
       "placeholder": "이름을 입력하고 Enter 또는 쉼표로 구분",
-      "count": "%count%명의 참여자가 추가됨",
+      "count": "%count%명",
       "nameTooLong": "참여자 이름은 10글자 이하여야 합니다."
     },
     "dateSelection": {
       "title": "날짜 선택",
       "selectDates": "날짜를 선택해주세요",
       "description": "아래에서 가능한 날짜들을 선택해주세요. 드래그로 여러 날짜를 한번에 선택할 수 있습니다.",
-      "selectedCount": "%count%개의 날짜가 선택됨",
+      "selectedCount": "%count%개",
       "quickSelection": "빠른 날짜 선택",
       "templates": {
         "weekend": "주말 (토, 일)",
