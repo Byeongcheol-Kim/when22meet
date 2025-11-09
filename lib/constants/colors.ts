@@ -213,8 +213,11 @@ export const DATE_SELECTOR_COLORS = {
     border: 'border-gray-300',
   },
   header: {
-    text: 'text-gray-900',
-    bg: 'bg-white',
+    bg: 'bg-black',
+    text: 'text-white',
+    weekday: 'text-white',
+    saturday: 'text-blue-300',
+    sunday: 'text-red-300',
   },
   count: {
     text: 'text-gray-700',

@@ -99,16 +99,19 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
 
   return (
     <div>
-      <div className="mb-4">
-        <h3 className="text-lg font-bold mb-2">{displayTitle}</h3>
-        <div className="grid grid-cols-7 gap-1 text-center sticky top-0 bg-white z-10 pb-1">
-          {dayNames.map((day, index) => (
-            <div key={index} className={`text-sm font-bold ${DATE_SELECTOR_COLORS.header.text} py-1`}>{day}</div>
-          ))}
-        </div>
-      </div>
-      
+      <h3 className="text-lg font-bold mb-4">{displayTitle}</h3>
+
       <div className="border rounded-lg overflow-hidden">
+        <div className="grid grid-cols-7 gap-1 text-center bg-black py-2">
+          {dayNames.map((day, index) => {
+            const dayColor = index === 0 ? DATE_SELECTOR_COLORS.header.sunday :
+                           index === 6 ? DATE_SELECTOR_COLORS.header.saturday :
+                           DATE_SELECTOR_COLORS.header.weekday;
+            return (
+              <div key={index} className={`text-sm font-bold ${dayColor}`}>{day}</div>
+            );
+          })}
+        </div>
         <div
           ref={calendarRef}
           className="h-96 overflow-y-auto px-2 pb-2"
@@ -121,8 +124,8 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
           const daysInMonth = new Date(year, month + 1, 0).getDate();
 
           return (
-            <div key={`${year}-${month}`} className={monthIndex > 0 ? 'mt-6' : ''}>
-              <h4 className={`text-sm font-bold ${DATE_SELECTOR_COLORS.header.text} mb-3 sticky top-0 ${DATE_SELECTOR_COLORS.header.bg} py-2 z-10`}>
+            <div key={`${year}-${month}`} className={monthIndex > 0 ? 'mt-6' : 'mt-2'}>
+              <h4 className="text-sm font-bold text-gray-900 mb-3 sticky top-0 bg-white py-2 z-10">
                 {monthData.displayName}
               </h4>
               <div className="grid grid-cols-7 gap-1 select-none">
