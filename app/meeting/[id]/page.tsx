@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use, useRef } from 'react';
+import { useEffect, useState, use, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { Meeting, Availability } from '@/lib/types';
 import { Plus, PlusCircle, Info, X, Menu, Pencil, Link } from 'lucide-react';
@@ -410,37 +410,27 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     setToastType('success');
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t('common.loading')}</div>
-      </div>
-    );
-  }
-
-  if (!meeting) return null;
-
-  // Generate grid data
-  const buildGridData = () => {
-    // 초기 로드 후에는 저장된 순서 사용, 아직 순서가 없으면 기본 순서 사용
-    let allParticipants: string[];
-
+  // participantOrder가 있으면 그것 사용, 없으면 availabilities에서 추출
+  const allParticipants = useMemo(() => {
     if (participantOrder.length > 0) {
-      // 저장된 순서 사용 (초기 정렬 유지)
       const currentParticipants = new Set(availabilities.map(a => a.participantName));
+      const orderSet = new Set(participantOrder);
 
-      // 기존 순서 유지 + 새로 추가된 참석자는 맨 뒤에
-      allParticipants = [
+      return [
         ...participantOrder.filter(name => currentParticipants.has(name)),
-        ...Array.from(currentParticipants).filter(name => !participantOrder.includes(name))
+        ...Array.from(currentParticipants).filter(name => !orderSet.has(name))
       ];
-    } else {
-      // 초기 로드 전: 기본 순서 사용 (입력 순서)
-      allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
     }
+    return Array.from(new Set(availabilities.map(a => a.participantName)));
+  }, [availabilities, participantOrder]);
 
-    const gridData: GridCell[][] = [];
-    
+  // useMemo로 불필요한 재계산 방지
+  const gridData = useMemo(() => {
+    if (!meeting) return [];
+
+    const participants = allParticipants;
+    const result: GridCell[][] = [];
+
     // Use first date's month as default
     let defaultYear = '';
     let defaultMonth = '';
@@ -449,22 +439,22 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       defaultYear = String(firstDate.getFullYear());
       defaultMonth = String(firstDate.getMonth() + 1).padStart(2, '0');
     }
-    
+
     // Parse current month
     const [currentYear, currentMonthOnly] = currentMonth ? currentMonth.split('.') : [defaultYear, defaultMonth];
-    
+
     // Generate header row
     const headerRow: GridCell[] = [
       { type: 'header-corner', content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}` }
     ];
-    
+
     // Add participant headers
-    allParticipants.forEach(name => {
+    participants.forEach(name => {
       headerRow.push({ type: 'header-participant', content: name, participant: name });
     });
-    
-    gridData.push(headerRow);
-    
+
+    result.push(headerRow);
+
     // Generate rows by date
     let lastMonth = '';
     meeting.dates.forEach((date) => {
@@ -472,7 +462,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
       // Use short day names from translation
       const dayNames = Array.from({ length: 7 }, (_, i) => t(`dayNames.short.${i}`));
-      
+
       // Add separator when month changes
       if (lastMonth && lastMonth !== currentMonth) {
         const [year, month] = currentMonth.split('.');
@@ -480,28 +470,28 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           { type: 'month-separator', content: `${year}\n${month}`, month: currentMonth }
         ];
         // Add empty cells for participants
-        for (let i = 0; i < allParticipants.length; i++) {
+        for (let i = 0; i < participants.length; i++) {
           separatorRow.push({ type: 'month-separator' });
         }
-        gridData.push(separatorRow);
+        result.push(separatorRow);
       }
       lastMonth = currentMonth;
-      
+
       // Generate date row
       const dateRow: GridCell[] = [
-        { 
-          type: 'date', 
+        {
+          type: 'date',
           content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
           date: date,
           month: currentMonth
         }
       ];
-      
+
       // Add each participant's status
-      allParticipants.forEach(name => {
+      participants.forEach(name => {
         const availability = availabilities.find(a => a.participantName === name);
         let status: ParticipantStatus;
-        
+
         if (!availability) {
           // Newly added participant
           status = 'undecided';
@@ -515,7 +505,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           // Undecided (not selected yet)
           status = 'undecided';
         }
-        
+
         dateRow.push({
           type: 'status',
           status,
@@ -523,22 +513,19 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           date: date
         });
       });
-      
-      gridData.push(dateRow);
-    });
-    
-    return gridData;
-  };
 
-  const gridData = buildGridData();
-  const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
+      result.push(dateRow);
+    });
+
+    return result;
+  }, [meeting, availabilities, allParticipants, currentMonth, t]);
   
-  // Calculate TOP 3 dates with most participants
-  const calculateTopDates = () => {
+  // useMemo로 Top 3 날짜 계산 최적화 (meeting, availabilities 변경 시에만)
+  const topDates = useMemo(() => {
     if (!meeting || availabilities.length === 0) return [];
-    
+
     const dateScores: { [date: string]: number } = {};
-    
+
     // Calculate number of available people for each date
     meeting.dates.forEach(date => {
       let count = 0;
@@ -549,7 +536,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       });
       dateScores[date] = count;
     });
-    
+
     // Sort by score and extract TOP 3
     return Object.entries(dateScores)
       .sort((a, b) => b[1] - a[1])
@@ -560,9 +547,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         count,
         rank: index + 1
       }));
-  };
-  
-  const topDates = calculateTopDates();
+  }, [meeting, availabilities]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">{t('common.loading')}</div>
+      </div>
+    );
+  }
+
+  if (!meeting) return null;
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
