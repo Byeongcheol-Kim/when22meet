@@ -48,7 +48,7 @@ export default function FAQPage() {
                   </div>
                   <div className="ml-4 flex-shrink-0 mt-1">
                     {openIndex === index ? (
-                      <ChevronUp className="w-5 h-5 text-blue-500" />
+                      <ChevronUp className="w-5 h-5 text-yellow-600" />
                     ) : (
                       <ChevronDown className="w-5 h-5 text-gray-400" />
                     )}
@@ -62,7 +62,7 @@ export default function FAQPage() {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFC354] text-gray-800 rounded-lg hover:bg-[#FFD580] transition-colors font-medium"
           >
             <Home className="w-5 h-5" />
             {t('faq.backHome')}

@@ -597,7 +597,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   }}
                   placeholder={t('meeting.enterName')}
                   maxLength={10}
-                  className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-100"
+                  className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-[#FFC354] focus:ring-1 focus:ring-yellow-100"
                   autoFocus
                 />
                 <button

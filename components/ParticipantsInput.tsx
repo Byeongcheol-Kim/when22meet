@@ -91,13 +91,13 @@ export default function ParticipantsInput({
           {participants.map((participant, index) => (
             <div
               key={index}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm"
+              className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm"
             >
               <span>{participant}</span>
               {!disabled && (
                 <button
                   onClick={() => removeParticipant(participant)}
-                  className="hover:bg-blue-200 rounded-full p-0.5 transition-colors"
+                  className="hover:bg-yellow-200 rounded-full p-0.5 transition-colors"
                   type="button"
                 >
                   <X className="w-3 h-3" />
@@ -126,7 +126,7 @@ export default function ParticipantsInput({
           placeholder={displayPlaceholder}
           disabled={disabled}
           maxLength={10}
-          className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+          className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-[#FFC354] disabled:bg-gray-50 disabled:text-gray-500"
         />
         <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />
       </div>

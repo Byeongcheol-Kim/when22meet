@@ -101,9 +101,9 @@ export const MODAL_COLORS = {
  */
 export const BUTTON_COLORS = {
   primary: {
-    bg: 'bg-blue-500',
-    text: 'text-white',
-    hover: 'hover:bg-blue-600',
+    bg: 'bg-[#FFC354]',
+    text: 'text-gray-800',
+    hover: 'hover:bg-[#FFD580]',
   },
   secondary: {
     bg: 'bg-gray-200',
@@ -193,14 +193,14 @@ export function getTopDateClasses(rank: 1 | 2 | 3, variant: 'badge' | 'indicator
  */
 export const DATE_SELECTOR_COLORS = {
   selected: {
-    bg: 'bg-blue-500',
-    text: 'text-white',
-    border: 'border-blue-500',
+    bg: 'bg-[#FFC354]',
+    text: 'text-gray-800',
+    border: 'border-[#FFC354]',
   },
   today: {
-    bg: 'bg-blue-100',
-    text: 'text-blue-600',
-    hover: 'hover:bg-blue-200',
+    bg: 'bg-yellow-100',
+    text: 'text-yellow-800',
+    hover: 'hover:bg-yellow-200',
   },
   disabled: {
     text: 'text-gray-300',
@@ -303,9 +303,9 @@ export const MEETING_PAGE_COLORS = {
  */
 export const TEMPLATE_BUTTON_COLORS = {
   selected: {
-    bg: 'bg-blue-500',
-    text: 'text-white',
-    border: 'border-blue-500',
+    bg: 'bg-[#FFC354]',
+    text: 'text-gray-800',
+    border: 'border-[#FFC354]',
   },
   default: {
     bg: 'bg-white',

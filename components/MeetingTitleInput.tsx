@@ -42,7 +42,7 @@ export default function MeetingTitleInput({
         placeholder={displayPlaceholder}
         disabled={disabled}
         maxLength={10}
-        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+        className="w-full px-4 py-3 border rounded-lg outline-none focus:border-[#FFC354] disabled:bg-gray-100 disabled:text-gray-500"
       />
     </div>
   );
