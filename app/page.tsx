@@ -10,7 +10,7 @@ import Toast from '@/components/Toast';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
-import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS } from '@/lib/constants/colors';
+import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS, SECTION_BADGE_COLORS } from '@/lib/constants/colors';
 
 function SEOContent() {
   const { locale } = useTranslation();
@@ -274,7 +274,7 @@ function HomeContent() {
               <h3 className="text-lg font-bold text-gray-800 mb-4">
                 {t('landing.dateSelection.title')}
                 {selectedDates.length > 0 && (
-                  <span className="ml-2 text-xs font-normal bg-orange-400 text-orange-900 px-2 py-0.5 rounded">
+                  <span className={`ml-2 text-xs font-normal ${SECTION_BADGE_COLORS.dates.bg} ${SECTION_BADGE_COLORS.dates.text} px-2 py-0.5 rounded`}>
                     {t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())}
                   </span>
                 )}

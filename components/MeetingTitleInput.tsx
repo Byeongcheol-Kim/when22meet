@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslation } from '@/lib/useTranslation';
+import { SECTION_BADGE_COLORS } from '@/lib/constants/colors';
 
 interface MeetingTitleInputProps {
   value: string;
@@ -33,7 +34,7 @@ export default function MeetingTitleInput({
     <div>
       <label className="text-lg font-bold text-gray-800 block mb-4">
         {displayLabel}
-        <span className="ml-2 text-xs font-normal bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded">
+        <span className={`ml-2 text-xs font-normal ${SECTION_BADGE_COLORS.title.bg} ${SECTION_BADGE_COLORS.title.text} px-2 py-0.5 rounded`}>
           ({value.length}/20)
         </span>
       </label>

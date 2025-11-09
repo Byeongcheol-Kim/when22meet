@@ -3,6 +3,7 @@
 import { useState, KeyboardEvent } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
+import { SECTION_BADGE_COLORS } from '@/lib/constants/colors';
 
 interface ParticipantsInputProps {
   participants: string[];
@@ -85,7 +86,7 @@ export default function ParticipantsInput({
       <label className="text-lg font-bold text-gray-800 block mb-4">
         {displayLabel}
         {participants.length > 0 && countText && (
-          <span className="ml-2 text-xs font-normal bg-gray-300 text-gray-700 px-2 py-0.5 rounded">
+          <span className={`ml-2 text-xs font-normal ${SECTION_BADGE_COLORS.participants.bg} ${SECTION_BADGE_COLORS.participants.text} px-2 py-0.5 rounded`}>
             {countText}
           </span>
         )}

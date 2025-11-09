@@ -225,6 +225,24 @@ export const DATE_SELECTOR_COLORS = {
 } as const;
 
 /**
+ * 섹션 헤더 배지 색상 (메인 페이지)
+ */
+export const SECTION_BADGE_COLORS = {
+  title: {
+    bg: 'bg-yellow-400',
+    text: 'text-yellow-900',
+  },
+  participants: {
+    bg: 'bg-gray-300',
+    text: 'text-gray-700',
+  },
+  dates: {
+    bg: 'bg-orange-400',
+    text: 'text-orange-900',
+  },
+} as const;
+
+/**
  * 입력 필드 색상
  */
 export const INPUT_COLORS = {
