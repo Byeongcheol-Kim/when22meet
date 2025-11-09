@@ -9,6 +9,8 @@ import AboutModal from '@/components/AboutModal';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
+import ShareModal from '@/components/ShareModal';
+import Toast from '@/components/Toast';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -40,13 +42,15 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [clientHeight, setClientHeight] = useState(0);
   const [highlightedDate, setHighlightedDate] = useState<string | null>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
   const [showFabMenu, setShowFabMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingDates, setEditingDates] = useState<string[]>([]);
   const [editingTitle, setEditingTitle] = useState('');
   const [editingParticipants, setEditingParticipants] = useState<string[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -344,6 +348,29 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       setEditingParticipants(currentParticipants);
     }
   }, [showEditModal, meeting, availabilities]);
+
+  // Share handlers
+  const handleShareLink = () => {
+    const meetingUrl = `${window.location.origin}/meeting/${resolvedParams.id}`;
+    navigator.clipboard.writeText(meetingUrl);
+    setToastMessage('약속 링크가 복사되었습니다!');
+    setToastType('success');
+  };
+
+  const handleShareTemplate = () => {
+    if (!meeting) return;
+
+    const participants = Array.from(new Set(availabilities.map(a => a.participantName)));
+    const templateUrl = new URL('/', window.location.origin);
+    templateUrl.searchParams.set('title', meeting.title);
+    if (participants.length > 0) {
+      templateUrl.searchParams.set('participants', participants.join(','));
+    }
+
+    navigator.clipboard.writeText(templateUrl.toString());
+    setToastMessage('약속 템플릿이 복사되었습니다!');
+    setToastType('success');
+  };
 
   if (isLoading) {
     return (
@@ -811,17 +838,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       <div className="fixed bottom-6 right-6 z-40">
         {/* 확장된 메뉴 */}
         {showFabMenu && (
-          <div className="absolute bottom-14 right-0 flex flex-col gap-2 mb-2">
+          <div className="absolute bottom-14 right-1 flex flex-col gap-2 mb-2">
             <button
               onClick={() => {
-                const meetingUrl = `${window.location.origin}/meeting/${resolvedParams.id}`;
-                navigator.clipboard.writeText(meetingUrl);
-                setCopiedLink(true);
-                setTimeout(() => setCopiedLink(false), 2000);
+                setShowShareModal(true);
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title={copiedLink ? '복사됨!' : '링크 복사'}
+              title="공유하기"
             >
               <Link className="w-5 h-5 text-gray-600" />
             </button>
@@ -878,7 +902,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
       {/* 일정 수정 모달 */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
           <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">{t('meeting.edit.title')}</h2>
@@ -936,6 +960,24 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       {/* About Modal */}
       {showCreatorModal && (
         <AboutModal onClose={() => setShowCreatorModal(false)} />
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <ShareModal
+          onClose={() => setShowShareModal(false)}
+          onShareLink={handleShareLink}
+          onShareTemplate={handleShareTemplate}
+        />
+      )}
+
+      {/* Toast */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage('')}
+        />
       )}
 
     </div>
