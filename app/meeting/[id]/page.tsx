@@ -964,6 +964,10 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         isUpdating={isUpdating}
         onUpdate={handleUpdateDates}
         onShareTemplate={handleShareTemplateFromEditModal}
+        onShowToast={(message, type) => {
+          setToastMessage(message);
+          setToastType(type);
+        }}
       />
 
       {/* About Modal */}

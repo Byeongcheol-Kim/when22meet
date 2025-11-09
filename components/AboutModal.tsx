@@ -49,7 +49,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
             </ol>
             <Link
               href="/faq"
-              className={`mt-3 inline-flex items-center gap-2 text-sm ${LINK_COLORS.primary.text} ${LINK_COLORS.primary.hover} font-medium`}
+              className="mt-3 inline-flex items-center gap-2 text-sm text-orange-600 hover:text-orange-700 font-medium transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
               {t('about.viewFAQ')}

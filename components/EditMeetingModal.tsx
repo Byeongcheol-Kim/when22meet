@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Link } from 'lucide-react';
+import { X } from 'lucide-react';
 import DateSelector from '@/components/DateSelector';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
@@ -18,7 +18,8 @@ interface EditMeetingModalProps {
   setDates: (value: string[]) => void;
   isUpdating: boolean;
   onUpdate: () => void;
-  onShareTemplate: () => void;
+  onShareTemplate?: () => void;
+  onShowToast?: (message: string, type: 'warning' | 'error' | 'success' | 'info') => void;
 }
 
 export default function EditMeetingModal({
@@ -32,9 +33,25 @@ export default function EditMeetingModal({
   setDates,
   isUpdating,
   onUpdate,
-  onShareTemplate,
+  onShowToast,
 }: EditMeetingModalProps) {
   const { t } = useTranslation();
+
+  const handleUpdate = () => {
+    if (!title) {
+      onShowToast?.(t('landing.alerts.titleRequired'), 'warning');
+      return;
+    }
+    if (dates.length === 0) {
+      onShowToast?.(t('landing.alerts.datesRequired'), 'warning');
+      return;
+    }
+    if (participants.length === 0) {
+      onShowToast?.(t('landing.alerts.participantsRequired'), 'warning');
+      return;
+    }
+    onUpdate();
+  };
 
   if (!isOpen) return null;
 
@@ -51,40 +68,38 @@ export default function EditMeetingModal({
           </button>
         </div>
 
-        <div className="mb-4">
+        <div className="space-y-4">
           <MeetingTitleInput
             value={title}
             onChange={setTitle}
             disabled={isUpdating}
           />
-        </div>
 
-        <div className="mb-4">
           <ParticipantsInput
             participants={participants}
             onParticipantsChange={setParticipants}
             disabled={isUpdating}
             label={t('meeting.edit.manageParticipants')}
             placeholder={t('meeting.edit.participantPlaceholder')}
+            countText={participants.length > 0 ? t('landing.participants.count').replace('%count%', participants.length.toString()) : undefined}
           />
+
+          <div>
+            <h3 className="text-lg font-bold text-gray-800 mb-4">
+              {t('meeting.edit.dateSelection')}
+              {dates.length > 0 && (
+                <span className="ml-2 text-xs font-normal bg-orange-400 text-orange-900 px-2 py-0.5 rounded">
+                  {t('landing.dateSelection.selectedCount').replace('%count%', dates.length.toString())}
+                </span>
+              )}
+            </h3>
+            <DateSelector
+              selectedDates={dates}
+              onDatesChange={setDates}
+              disabled={isUpdating}
+            />
+          </div>
         </div>
-
-        <DateSelector
-          selectedDates={dates}
-          onDatesChange={setDates}
-          disabled={isUpdating}
-        />
-
-        {/* 템플릿 URL 공유 버튼 */}
-        {(title || participants.length > 0) && (
-          <button
-            onClick={onShareTemplate}
-            className={`w-full py-2 mt-4 ${BUTTON_COLORS.gray.bg} ${BUTTON_COLORS.gray.text} rounded-xl font-medium ${BUTTON_COLORS.gray.hover} transition-colors flex items-center justify-center gap-2`}
-          >
-            <Link className="w-4 h-4" />
-            {t('meeting.edit.shareTemplate')}
-          </button>
-        )}
 
         <div className="flex gap-2 mt-6">
           <button
@@ -94,9 +109,13 @@ export default function EditMeetingModal({
             {t('common.cancel')}
           </button>
           <button
-            onClick={onUpdate}
-            disabled={isUpdating || dates.length === 0}
-            className={`flex-1 py-3 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-xl font-semibold disabled:bg-gray-300 ${BUTTON_COLORS.primary.hover} transition-colors`}
+            onClick={handleUpdate}
+            disabled={isUpdating}
+            className={`flex-1 py-3 ${
+              !title || dates.length === 0 || participants.length === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : `${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} ${BUTTON_COLORS.primary.hover}`
+            } rounded-xl font-semibold transition-colors`}
           >
             {isUpdating ? t('meeting.edit.updating') : t('meeting.edit.updateComplete')}
           </button>

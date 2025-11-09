@@ -151,12 +151,12 @@ export const SHARE_MODAL_COLORS = {
   link: {
     bg: 'bg-yellow-50',
     hover: 'hover:bg-yellow-100',
-    icon: 'bg-yellow-500',
+    icon: 'bg-[#FFC354]',
   },
   template: {
-    bg: 'bg-blue-50',
-    hover: 'hover:bg-blue-100',
-    icon: 'bg-blue-500',
+    bg: 'bg-gray-50',
+    hover: 'hover:bg-gray-100',
+    icon: 'bg-gray-500',
   },
 } as const;
 
