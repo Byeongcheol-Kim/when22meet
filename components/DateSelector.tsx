@@ -14,6 +14,7 @@ interface DateSelectorProps {
 
 export default function DateSelector({ selectedDates, onDatesChange, disabled = false, title }: DateSelectorProps) {
   const { locale } = useTranslation();
+  const todayLabel = locale === 'ko' ? '오늘' : 'Today';
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -150,7 +151,7 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                       onMouseDown={() => handleMouseDown(date, isDisabled)}
                       onMouseEnter={() => handleMouseEnter(date, isDisabled)}
                       disabled={isDisabled}
-                      className={`aspect-square rounded-full flex items-center justify-center text-sm transition-all ${
+                      className={`aspect-square rounded-full flex flex-col items-center justify-center text-sm transition-all ${
                         isSelected
                           ? `${DATE_SELECTOR_COLORS.selected.bg} ${DATE_SELECTOR_COLORS.selected.text} font-medium`
                           : isDisabled
@@ -160,6 +161,11 @@ export default function DateSelector({ selectedDates, onDatesChange, disabled = 
                           : `${DATE_SELECTOR_COLORS.default.text} ${DATE_SELECTOR_COLORS.default.hover}`
                       }`}
                     >
+                      {isToday && !isDisabled && (
+                        <span className="bg-black text-white text-[9px] px-1 py-0.5 rounded leading-none font-medium mb-0.5">
+                          {todayLabel}
+                        </span>
+                      )}
                       {day}
                     </button>
                   );
