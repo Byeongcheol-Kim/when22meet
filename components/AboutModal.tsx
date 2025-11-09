@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Github, Linkedin, Instagram, HelpCircle } from 'lucide-react';
+import { X, Github, Linkedin, Instagram, HelpCircle, Mail } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import { MODAL_COLORS, TEXT_COLORS, LINK_COLORS, SUPPORT_COLORS } from '@/lib/constants/colors';
@@ -57,11 +57,22 @@ export default function AboutModal({ onClose }: AboutModalProps) {
           </div>
           
           <div className="pt-4 border-t">
-            <p className={`text-sm ${TEXT_COLORS.secondary} mb-3`}>{t('about.creators')}</p>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold">{t('about.creators')}</h3>
+              <a
+                href="https://buymeacoffee.com/benchleykim"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`px-3 py-1.5 ${SUPPORT_COLORS.button.bg} ${SUPPORT_COLORS.button.hover} ${SUPPORT_COLORS.button.text} text-xs font-semibold rounded-md transition-all hover:scale-105 flex items-center gap-1`}
+              >
+                <span>☕</span>
+                <span>{t('about.supportButton')}</span>
+              </a>
+            </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-semibold ${TEXT_COLORS.primary}`}>
-                  {t('about.team.designer.name')} - {t('about.team.designer.role')}
+                  {t('about.team.designer.name')} - <span className="bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded text-xs font-bold">{t('about.team.designer.role')}</span>
                 </span>
                 <div className="flex gap-2">
                   <a
@@ -75,24 +86,31 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                   </a>
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-semibold ${TEXT_COLORS.primary}`}>
-                  {t('about.team.developer.name')} - {t('about.team.developer.role')}
+                  {t('about.team.developer.name')} - <span className="bg-gray-300 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">{t('about.team.developer.role')}</span>
                 </span>
                 <div className="flex gap-2">
-                  <a 
+                  <a
+                    href="mailto:benchely.kim@gmail.com"
+                    className={`${LINK_COLORS.github.text} ${LINK_COLORS.github.hover} transition-colors`}
+                    title="Email"
+                  >
+                    <Mail className="w-4 h-4" />
+                  </a>
+                  <a
                     href="https://github.com/Byeongcheol-Kim/graphchat"
-                    target="_blank" 
+                    target="_blank"
                     rel="noopener noreferrer"
                     className={`${LINK_COLORS.github.text} ${LINK_COLORS.github.hover} transition-colors`}
                     title="GitHub"
                   >
                     <Github className="w-4 h-4" />
                   </a>
-                  <a 
+                  <a
                     href="https://www.linkedin.com/in/byeongcheol-kim-a477a7263/"
-                    target="_blank" 
+                    target="_blank"
                     rel="noopener noreferrer"
                     className={`${LINK_COLORS.linkedin.text} ${LINK_COLORS.linkedin.hover} transition-colors`}
                     title="LinkedIn"
@@ -110,28 +128,6 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                   </a>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <div className={`pt-4 border-t ${SUPPORT_COLORS.bg} -mx-6 -mb-6 px-6 py-3 rounded-b-xl`}>
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <p className="text-xs text-gray-900 font-medium">
-                  💙 {t('about.freeService')}
-                </p>
-                <p className="text-xs text-gray-800 mt-0.5">
-                  {t('about.supportMessage')}
-                </p>
-              </div>
-              <a 
-                href="https://buymeacoffee.com/benchleykim"
-                target="_blank" 
-                rel="noopener noreferrer"
-                className={`ml-3 px-3 py-1.5 ${SUPPORT_COLORS.button.bg} ${SUPPORT_COLORS.button.hover} ${SUPPORT_COLORS.button.text} text-xs font-semibold rounded-md transition-all hover:scale-105 flex items-center gap-1`}
-              >
-                <span>☕</span>
-                <span>{t('about.supportButton')}</span>
-              </a>
             </div>
           </div>
         </div>
