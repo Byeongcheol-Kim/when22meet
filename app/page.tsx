@@ -3,9 +3,10 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
-import { Info, Link2, Calendar, Check } from 'lucide-react';
+import { Info, Link2, Calendar } from 'lucide-react';
 import DateSelector from '@/components/DateSelector';
 import AboutModal from '@/components/AboutModal';
+import Toast from '@/components/Toast';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
@@ -19,7 +20,8 @@ function HomeContent() {
   const [isCreating, setIsCreating] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<DateTemplate | null>(null);
-  const [showShareUrl, setShowShareUrl] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -92,32 +94,32 @@ function HomeContent() {
   const handleCopyShareUrl = async () => {
     try {
       const url = generateShareUrl();
-      
+
       // Call URL shortening API
       const response = await fetch('/api/shorten', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url })
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         navigator.clipboard.writeText(data.shortUrl);
-        setShowShareUrl(true);
-        setTimeout(() => setShowShareUrl(false), 1500);
+        setToastMessage('템플릿 링크가 복사되었습니다!');
+        setToastType('success');
       } else {
         // Copy original URL if shortening fails
         navigator.clipboard.writeText(url);
-        setShowShareUrl(true);
-        setTimeout(() => setShowShareUrl(false), 1500);
+        setToastMessage('템플릿 링크가 복사되었습니다!');
+        setToastType('success');
       }
     } catch (error) {
       console.error('Error copying URL:', error);
       // Copy original URL on error
       const url = generateShareUrl();
       navigator.clipboard.writeText(url);
-      setShowShareUrl(true);
-      setTimeout(() => setShowShareUrl(false), 1500);
+      setToastMessage('템플릿 링크가 복사되었습니다!');
+      setToastType('success');
     }
   };
 
@@ -284,9 +286,6 @@ function HomeContent() {
             >
               <Link2 className="w-4 h-4" />
               {t('landing.shareTemplate')}
-              {showShareUrl && (
-                <Check className="w-4 h-4 text-green-500 ml-1" />
-              )}
             </button>
           )}
         </div>
@@ -294,6 +293,15 @@ function HomeContent() {
 
       {showHelpModal && (
         <AboutModal onClose={() => setShowHelpModal(false)} />
+      )}
+
+      {/* Toast */}
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          onClose={() => setToastMessage('')}
+        />
       )}
     </div>
   );

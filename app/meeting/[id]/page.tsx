@@ -3,13 +3,11 @@
 import { useEffect, useState, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Meeting, Availability } from '@/lib/types';
-import { Plus, Link, PlusCircle, Info, X, Menu, Calendar } from 'lucide-react';
-import DateSelector from '@/components/DateSelector';
+import { Plus, PlusCircle, Info, X, Menu, Calendar } from 'lucide-react';
 import AboutModal from '@/components/AboutModal';
-import MeetingTitleInput from '@/components/MeetingTitleInput';
-import ParticipantsInput from '@/components/ParticipantsInput';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
 import ShareModal from '@/components/ShareModal';
+import EditMeetingModal from '@/components/EditMeetingModal';
 import Toast from '@/components/Toast';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
@@ -369,6 +367,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
     navigator.clipboard.writeText(templateUrl.toString());
     setToastMessage('약속 템플릿이 복사되었습니다!');
+    setToastType('success');
+  };
+
+  const handleShareTemplateFromEditModal = async () => {
+    const templateUrl = new URL('/', window.location.origin);
+    templateUrl.searchParams.set('title', editingTitle);
+    if (editingParticipants.length > 0) {
+      templateUrl.searchParams.set('participants', editingParticipants.join(','));
+    }
+    await navigator.clipboard.writeText(templateUrl.toString());
+    setToastMessage('템플릿 링크가 복사되었습니다!');
     setToastType('success');
   };
 
@@ -901,61 +910,19 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       </div>
 
       {/* 일정 수정 모달 */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">{t('meeting.edit.title')}</h2>
-              <button 
-                onClick={() => setShowEditModal(false)}
-                className="text-gray-500 hover:text-gray-700 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="mb-4">
-              <MeetingTitleInput 
-                value={editingTitle}
-                onChange={setEditingTitle}
-                disabled={isUpdating}
-              />
-            </div>
-            
-            <div className="mb-4">
-              <ParticipantsInput
-                participants={editingParticipants}
-                onParticipantsChange={setEditingParticipants}
-                disabled={isUpdating}
-                label={t('meeting.edit.manageParticipants')}
-                placeholder={t('meeting.edit.participantPlaceholder')}
-              />
-            </div>
-            
-            <DateSelector 
-              selectedDates={editingDates}
-              onDatesChange={setEditingDates}
-              disabled={isUpdating}
-            />
-            
-            <div className="flex gap-2 mt-6">
-              <button
-                onClick={() => setShowEditModal(false)}
-                className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleUpdateDates}
-                disabled={isUpdating || editingDates.length === 0}
-                className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-semibold disabled:bg-gray-300 transition-colors"
-              >
-                {isUpdating ? t('meeting.edit.updating') : t('meeting.edit.updateComplete')}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditMeetingModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title={editingTitle}
+        setTitle={setEditingTitle}
+        participants={editingParticipants}
+        setParticipants={setEditingParticipants}
+        dates={editingDates}
+        setDates={setEditingDates}
+        isUpdating={isUpdating}
+        onUpdate={handleUpdateDates}
+        onShareTemplate={handleShareTemplateFromEditModal}
+      />
 
       {/* About Modal */}
       {showCreatorModal && (
