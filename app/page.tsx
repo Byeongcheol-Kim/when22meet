@@ -254,7 +254,7 @@ function HomeContent() {
           </div>
           
           <div className="space-y-4">
-            <MeetingTitleInput 
+            <MeetingTitleInput
               value={title}
               onChange={setTitle}
               label={t('landing.meetingTitle.label')}
@@ -267,78 +267,79 @@ function HomeContent() {
               placeholder={t('landing.participants.placeholder')}
               countText={t('landing.participants.count').replace('%count%', participants.length.toString())}
             />
-          </div>
-        </div>
 
-        <div className="mb-8">
-          {/* Date Selection Title with Count */}
-          <div className="flex items-baseline gap-2 mb-4">
-            <h3 className="text-lg font-bold text-gray-800">{t('landing.dateSelection.title')}</h3>
-            {selectedDates.length > 0 && (
-              <span className="text-sm text-gray-600">
-                {t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())}
-              </span>
-            )}
-          </div>
+            {/* Date Selection */}
+            <div>
+              {/* Date Selection Title with Count */}
+              <div className="flex items-baseline gap-2 mb-4">
+                <h3 className="text-lg font-bold text-gray-800">{t('landing.dateSelection.title')}</h3>
+                {selectedDates.length > 0 && (
+                  <span className="text-sm text-gray-600">
+                    {t('landing.dateSelection.selectedCount').replace('%count%', selectedDates.length.toString())}
+                  </span>
+                )}
+              </div>
 
-          {/* Quick Date Selection */}
-          <div className="mb-4">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => handleTemplateSelect('weekend')}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  selectedTemplate === 'weekend'
-                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-                }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {t('landing.dateSelection.templates.weekend')}
-              </button>
-              <button
-                onClick={() => handleTemplateSelect('weekday')}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  selectedTemplate === 'weekday'
-                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-                }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {t('landing.dateSelection.templates.weekday')}
-              </button>
-              <button
-                onClick={() => handleTemplateSelect('fri-sat-sun')}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  selectedTemplate === 'fri-sat-sun'
-                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-                }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {t('landing.dateSelection.templates.friSatSun')}
-              </button>
-              <button
-                onClick={() => handleTemplateSelect('full')}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  selectedTemplate === 'full'
-                    ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
-                    : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
-                }`}
-              >
-                <Calendar className="w-4 h-4 inline mr-1" />
-                {t('landing.dateSelection.templates.full')}
-              </button>
+              {/* Quick Date Selection */}
+              <div className="mb-4">
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => handleTemplateSelect('weekend')}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                      selectedTemplate === 'weekend'
+                        ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                        : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    {t('landing.dateSelection.templates.weekend')}
+                  </button>
+                  <button
+                    onClick={() => handleTemplateSelect('weekday')}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                      selectedTemplate === 'weekday'
+                        ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                        : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    {t('landing.dateSelection.templates.weekday')}
+                  </button>
+                  <button
+                    onClick={() => handleTemplateSelect('fri-sat-sun')}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                      selectedTemplate === 'fri-sat-sun'
+                        ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                        : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    {t('landing.dateSelection.templates.friSatSun')}
+                  </button>
+                  <button
+                    onClick={() => handleTemplateSelect('full')}
+                    className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                      selectedTemplate === 'full'
+                        ? `${TEMPLATE_BUTTON_COLORS.selected.bg} ${TEMPLATE_BUTTON_COLORS.selected.text} ${TEMPLATE_BUTTON_COLORS.selected.border}`
+                        : `${TEMPLATE_BUTTON_COLORS.default.bg} ${TEMPLATE_BUTTON_COLORS.default.text} ${TEMPLATE_BUTTON_COLORS.default.border} ${TEMPLATE_BUTTON_COLORS.default.hover}`
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4 inline mr-1" />
+                    {t('landing.dateSelection.templates.full')}
+                  </button>
+                </div>
+              </div>
+
+              {/* Calendar */}
+              <DateSelector
+                selectedDates={selectedDates}
+                onDatesChange={(dates) => {
+                  setSelectedDates(dates);
+                  setSelectedTemplate(null); // Clear template on manual selection
+                }}
+              />
             </div>
           </div>
-
-          {/* Calendar */}
-          <DateSelector
-            selectedDates={selectedDates}
-            onDatesChange={(dates) => {
-              setSelectedDates(dates);
-              setSelectedTemplate(null); // Clear template on manual selection
-            }}
-          />
         </div>
 
         <div className="space-y-3">
