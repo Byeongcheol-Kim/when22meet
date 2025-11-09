@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Check, X, Info, AlertCircle } from 'lucide-react';
+import { TOAST_COLORS } from '@/lib/constants/colors';
 
 interface ToastProps {
   message: string;
@@ -33,16 +34,8 @@ export default function Toast({ message, type = 'success', onClose, duration = 3
   };
 
   const getStyles = () => {
-    switch (type) {
-      case 'success':
-        return 'bg-green-500 text-white';
-      case 'error':
-        return 'bg-red-500 text-white';
-      case 'warning':
-        return 'bg-yellow-500 text-white';
-      case 'info':
-        return 'bg-blue-500 text-white';
-    }
+    const colors = TOAST_COLORS[type];
+    return `${colors.bg} ${colors.text}`;
   };
 
   return (

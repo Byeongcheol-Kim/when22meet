@@ -12,6 +12,7 @@ import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
 import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
+import { STATUS_COLORS, DATE_COLUMN_COLORS, TOP_DATES_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor } from '@/lib/constants/colors';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -572,7 +573,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
       <div className="flex-shrink-0 bg-gray-50">
         <div className="flex">
-          <div className="bg-black" style={{ minWidth: '50px', maxWidth: 'min-content' }}></div>
+          <div className={DATE_COLUMN_COLORS.bg} style={{ minWidth: '50px', maxWidth: 'min-content' }}></div>
           <div className="flex-1 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-base font-bold text-gray-800">
@@ -657,12 +658,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   return (
                     <div
                       key={`${rowIndex}-${colIndex}`}
-                      className="px-2 py-1 bg-black"
+                      className={`px-2 py-1 ${DATE_COLUMN_COLORS.bg}`}
                       style={{ position: 'sticky', left: 0, zIndex: 10 }}
                     >
                       <div className="flex flex-col items-end justify-center">
-                        <span className="text-xs font-medium text-yellow-400">{cell.content?.split('\n')[0]}</span>
-                        <span className="text-sm font-bold text-yellow-400">{cell.content?.split('\n')[1]}</span>
+                        <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>{cell.content?.split('\n')[0]}</span>
+                        <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>{cell.content?.split('\n')[1]}</span>
                       </div>
                     </div>
                   );
@@ -681,12 +682,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-1 bg-black"
+                    className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}
                     style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
                   >
                     <div className="flex flex-col items-end justify-center">
-                      <span className="text-xs font-medium text-yellow-400">{cell.content?.split('\n')[0]}</span>
-                      <span className="text-sm font-bold text-yellow-400">{cell.content?.split('\n')[1]}</span>
+                      <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>{cell.content?.split('\n')[0]}</span>
+                      <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>{cell.content?.split('\n')[1]}</span>
                     </div>
                   </div>
                 );
@@ -764,12 +765,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 const day = dateObj.getDay(); // 0: 일요일, 6: 토요일
 
                 // 요일별 색상
-                const getDayColor = () => {
-                  if (highlightedDate === cell.date) return 'text-black';
-                  if (day === 0) return 'text-red-400'; // 일요일: 빨간색
-                  if (day === 6) return 'text-blue-400'; // 토요일: 파란색
-                  return 'text-white'; // 평일: 흰색
-                };
+                const dayColor = getDayOfWeekColor(day, highlightedDate === cell.date);
 
                 // Check if this date is in TOP 3
                 const topDateInfo = topDates.find(td => td.date === cell.date);
@@ -779,22 +775,20 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     key={`${rowIndex}-${colIndex}`}
                     className={`px-2 py-1.5 relative transition-all duration-300 ${
                       highlightedDate === cell.date
-                        ? 'bg-yellow-500 shadow-lg scale-105 z-20'
-                        : 'bg-black'
+                        ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg scale-105 z-20`
+                        : DATE_COLUMN_COLORS.bg
                     }`}
                     style={{ position: 'sticky', left: 0, zIndex: highlightedDate === cell.date ? 20 : 10 }}
                     data-date-row={cell.date}
                     data-month={cell.month}
                   >
                     <div className="flex flex-col items-end justify-center">
-                      <span className={`text-[10px] ${getDayColor()}`}>{dayOfWeek}</span>
-                      <span className={`text-lg font-black leading-tight ${getDayColor()}`}>{dayNumber}</span>
+                      <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+                      <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
                     </div>
                     {topDateInfo && (
                       <div className={`absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        topDateInfo.rank === 1 ? 'bg-yellow-400 text-yellow-900' :
-                        topDateInfo.rank === 2 ? 'bg-gray-300 text-gray-700' :
-                        'bg-orange-400 text-orange-900'
+                        getTopDateClasses(topDateInfo.rank as 1 | 2 | 3, 'indicator')
                       }`}>
                         {topDateInfo.rank}
                       </div>
@@ -819,13 +813,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                         }
                       }}
                       disabled={!isEditable}
-                      className={`
-                        w-full h-10 rounded-md flex items-center justify-center text-sm font-medium transition-all shadow-sm
-                        ${cell.status === 'available' ? 'bg-[#FFC354] text-gray-800' : 
-                          cell.status === 'unavailable' ? 'bg-[#6B7280] text-white' : 
-                          'bg-gray-50 text-gray-400 border border-gray-200'}
-                        ${isEditable ? 'cursor-pointer hover:shadow-md hover:scale-105' : 'cursor-default opacity-60'}
-                      `}
+                      className={`w-full h-10 rounded-md flex items-center justify-center text-sm font-medium transition-all ${
+                        getStatusClasses(cell.status!, isEditable)
+                      }`}
                     >
                       {cell.status === 'available' ? t('meeting.status.available') : 
                        cell.status === 'unavailable' ? t('meeting.status.unavailable') : t('meeting.status.undecided')}
@@ -865,10 +855,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     setHighlightedDate(item.date);
                   }
                 }}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg shadow-lg transition-all cursor-pointer hover:scale-110 ${
-                  item.rank === 1 ? 'bg-yellow-400 text-yellow-900' :
-                  item.rank === 2 ? 'bg-gray-300 text-gray-700' :
-                  'bg-orange-400 text-orange-900'
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg shadow-md transition-all cursor-pointer hover:scale-110 ${
+                  getTopDateClasses(item.rank as 1 | 2 | 3, 'badge')
                 }`}
                 title={t('meeting.topDatesLabel')
                   .replace('{rank}', String(item.rank))

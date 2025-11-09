@@ -2,6 +2,7 @@
 
 import { X, Link2, Copy } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
+import { SHARE_MODAL_COLORS, MODAL_COLORS } from '@/lib/constants/colors';
 
 interface ShareModalProps {
   onClose: () => void;
@@ -13,15 +14,15 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 bg-black/30 z-50">
+    <div className={`fixed inset-0 ${MODAL_COLORS.overlay} z-50`}>
       <div className="absolute inset-0 flex items-center justify-center px-4">
-        <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in">
+        <div className={`${MODAL_COLORS.background} rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in`}>
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">{t('meeting.share.title')}</h2>
+          <h2 className={`text-xl font-bold ${MODAL_COLORS.header}`}>{t('meeting.share.title')}</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className={`${MODAL_COLORS.close.text} ${MODAL_COLORS.close.hover} transition-colors`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -35,10 +36,10 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
               onShareLink();
               onClose();
             }}
-            className="w-full p-4 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors text-left group"
+            className={`w-full p-4 ${SHARE_MODAL_COLORS.link.bg} ${SHARE_MODAL_COLORS.link.hover} rounded-lg transition-colors text-left group`}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className={`w-10 h-10 ${SHARE_MODAL_COLORS.link.icon} rounded-full flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <Link2 className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
@@ -54,10 +55,10 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
               onShareTemplate();
               onClose();
             }}
-            className="w-full p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-left group"
+            className={`w-full p-4 ${SHARE_MODAL_COLORS.template.bg} ${SHARE_MODAL_COLORS.template.hover} rounded-lg transition-colors text-left group`}
           >
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className={`w-10 h-10 ${SHARE_MODAL_COLORS.template.icon} rounded-full flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <Copy className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">

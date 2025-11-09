@@ -2,6 +2,7 @@
 
 import { AlertCircle, X } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
+import { MODAL_COLORS, BUTTON_COLORS } from '@/lib/constants/colors';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -47,38 +48,38 @@ export default function ConfirmModal({
       case 'danger':
         return 'bg-red-500 hover:bg-red-600';
       case 'warning':
-        return 'bg-yellow-500 hover:bg-yellow-600';
+        return `${BUTTON_COLORS.yellow.bg} ${BUTTON_COLORS.yellow.hover}`;
       case 'info':
-        return 'bg-blue-500 hover:bg-blue-600';
+        return `${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.hover}`;
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 z-50">
+    <div className={`fixed inset-0 ${MODAL_COLORS.overlay} z-50`}>
       <div className="absolute inset-0 flex items-center justify-center px-4">
-        <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in">
+        <div className={`${MODAL_COLORS.background} rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in`}>
           {/* Header */}
           <div className="flex items-start gap-3 mb-4">
             <AlertCircle className={`w-6 h-6 ${getIconColor()} flex-shrink-0 mt-0.5`} />
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-gray-900">{title}</h2>
+              <h2 className={`text-lg font-bold ${MODAL_COLORS.header}`}>{title}</h2>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition-colors"
+              className={`${MODAL_COLORS.close.text} ${MODAL_COLORS.close.hover} transition-colors`}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Message */}
-          <p className="text-gray-700 mb-6 ml-9">{message}</p>
+          <p className={`${MODAL_COLORS.text} mb-6 ml-9`}>{message}</p>
 
           {/* Actions */}
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+              className={`flex-1 py-3 ${BUTTON_COLORS.secondary.bg} ${BUTTON_COLORS.secondary.text} rounded-xl font-semibold ${BUTTON_COLORS.secondary.hover} transition-colors`}
             >
               {finalCancelText}
             </button>

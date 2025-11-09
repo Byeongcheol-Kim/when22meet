@@ -5,6 +5,7 @@ import DateSelector from '@/components/DateSelector';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { useTranslation } from '@/lib/useTranslation';
+import { MODAL_COLORS, BUTTON_COLORS } from '@/lib/constants/colors';
 
 interface EditMeetingModalProps {
   isOpen: boolean;
@@ -38,13 +39,13 @@ export default function EditMeetingModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
-      <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto">
+    <div className={`fixed inset-0 ${MODAL_COLORS.overlay} flex items-center justify-center z-50 px-4`}>
+      <div className={`${MODAL_COLORS.background} rounded-xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto`}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">{t('meeting.edit.title')}</h2>
+          <h2 className={`text-xl font-bold ${MODAL_COLORS.header}`}>{t('meeting.edit.title')}</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className={`${MODAL_COLORS.close.text} ${MODAL_COLORS.close.hover} transition-colors`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -78,7 +79,7 @@ export default function EditMeetingModal({
         {(title || participants.length > 0) && (
           <button
             onClick={onShareTemplate}
-            className="w-full py-2 mt-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+            className={`w-full py-2 mt-4 ${BUTTON_COLORS.gray.bg} ${BUTTON_COLORS.gray.text} rounded-xl font-medium ${BUTTON_COLORS.gray.hover} transition-colors flex items-center justify-center gap-2`}
           >
             <Link className="w-4 h-4" />
             {t('meeting.edit.shareTemplate')}
@@ -88,14 +89,14 @@ export default function EditMeetingModal({
         <div className="flex gap-2 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
+            className={`flex-1 py-3 ${BUTTON_COLORS.secondary.bg} ${BUTTON_COLORS.secondary.text} rounded-xl font-semibold ${BUTTON_COLORS.secondary.hover} transition-colors`}
           >
             {t('common.cancel')}
           </button>
           <button
             onClick={onUpdate}
             disabled={isUpdating || dates.length === 0}
-            className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-semibold disabled:bg-gray-300 transition-colors"
+            className={`flex-1 py-3 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-xl font-semibold disabled:bg-gray-300 ${BUTTON_COLORS.primary.hover} transition-colors`}
           >
             {isUpdating ? t('meeting.edit.updating') : t('meeting.edit.updateComplete')}
           </button>
