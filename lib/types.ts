@@ -6,6 +6,7 @@ export interface Meeting {
   createdAt: string;
   expiresAt: string;
   updatedAt?: string;
+  locale?: string; // Language preference (ko or en)
 }
 
 export interface Availability {

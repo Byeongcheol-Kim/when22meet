@@ -7,7 +7,7 @@ import { Meeting } from '@/lib/types';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, dates, participants = [] } = body;
+    const { title, dates, participants = [], locale = 'ko' } = body;
 
     if (!title || !dates || dates.length === 0) {
       return NextResponse.json(
@@ -40,6 +40,7 @@ export async function POST(request: NextRequest) {
       participants: [], // Initially empty array
       createdAt: new Date().toISOString(),
       expiresAt: new Date(Date.now() + 18 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 18 months
+      locale, // Save user's language preference
     };
 
     // Save to Redis with 18-month TTL

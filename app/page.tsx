@@ -69,7 +69,7 @@ function SEOContent() {
 }
 
 function HomeContent() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const [showSplash, setShowSplash] = useState(true);
   const [title, setTitle] = useState('');
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
@@ -210,7 +210,8 @@ function HomeContent() {
         body: JSON.stringify({
           title,
           dates: selectedDates.sort(),
-          participants: participants
+          participants: participants,
+          locale, // Save user's language preference
         })
       });
 

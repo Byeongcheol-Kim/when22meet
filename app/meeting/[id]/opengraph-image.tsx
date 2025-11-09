@@ -12,9 +12,14 @@ export const size = {
 
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
+export default async function Image({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   try {
     const { id } = await params;
+
     const meetingData = await redis.get(`meeting:${id}`);
     const meeting = meetingData as Meeting | null;
 
@@ -22,7 +27,10 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       throw new Error('Meeting not found');
     }
 
-    const title = meeting.title || '새로운 일정';
+    // Use locale from meeting data (saved when meeting was created), default to Korean
+    const isKorean = !meeting.locale || meeting.locale === 'ko';
+
+    const title = meeting.title || (isKorean ? '새로운 일정' : 'New Meeting');
 
     // Get all availabilities
     const availabilityKeys = await redis.keys(`availability:${id}:*`);
@@ -65,16 +73,25 @@ export default async function Image({ params }: { params: Promise<{ id: string }
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');
-      const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-      return `${date.getMonth() + 1}/${date.getDate()}(${dayNames[date.getDay()]})`;
+      const dayNamesKo = ['일', '월', '화', '수', '목', '금', '토'];
+      const dayNamesEn = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const dayName = isKorean ? dayNamesKo[date.getDay()] : dayNamesEn[date.getDay()];
+      return `${month}/${day} (${dayName})`;
     };
+
+    const peopleText = isKorean ? '명' : 'people';
+    const brandText = isKorean ? '언제만나' : 'When22Meet';
+    const waitingText = isKorean ? '참여자를 기다리는 중...' : 'Waiting for participants...';
+    const shareText = isKorean ? '링크를 공유해보세요' : 'Share the link';
 
     const medals = ['🥇', '🥈', '🥉'];
 
     // Pre-calculate all text to avoid conditional rendering in JSX
-    const rank1 = topDates[0] ? `${medals[0]} ${formatDate(topDates[0][0])} (${topDates[0][1]}명)` : null;
-    const rank2 = topDates[1] ? `${medals[1]} ${formatDate(topDates[1][0])} (${topDates[1][1]}명)` : null;
-    const rank3 = topDates[2] ? `${medals[2]} ${formatDate(topDates[2][0])} (${topDates[2][1]}명)` : null;
+    const rank1 = topDates[0] ? `${medals[0]} ${formatDate(topDates[0][0])} - ${topDates[0][1]} ${peopleText}` : null;
+    const rank2 = topDates[1] ? `${medals[1]} ${formatDate(topDates[1][0])} - ${topDates[1][1]} ${peopleText}` : null;
+    const rank3 = topDates[2] ? `${medals[2]} ${formatDate(topDates[2][0])} - ${topDates[2][1]} ${peopleText}` : null;
     const hasTopDates = topDates.length > 0;
 
     return new ImageResponse(
@@ -85,32 +102,63 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            backgroundColor: '#FFC354',
+            backgroundColor: 'white',
             padding: 80,
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
           }}
         >
+          {/* Title */}
+          <div style={{ display: 'flex', fontSize: 60, fontWeight: 700, color: '#1F2937', marginBottom: 40 }}>
+            {title} - {brandText}
+          </div>
+
+          {/* Content */}
           {hasTopDates ? (
             <div
               style={{
                 display: 'flex',
                 flexDirection: 'column',
+                gap: 20,
                 width: '100%',
               }}
             >
               {rank1 && (
-                <div style={{ fontSize: 72, fontWeight: 700, color: 'black', marginBottom: rank2 ? 30 : 0 }}>
+                <div style={{
+                  display: 'flex',
+                  backgroundColor: '#FBBF24',
+                  color: '#78350F',
+                  padding: '10px 20px',
+                  borderRadius: 8,
+                  fontSize: 40,
+                  fontWeight: 700,
+                }}>
                   {rank1}
                 </div>
               )}
               {rank2 && (
-                <div style={{ fontSize: 72, fontWeight: 700, color: 'black', marginBottom: rank3 ? 30 : 0 }}>
+                <div style={{
+                  display: 'flex',
+                  backgroundColor: '#D1D5DB',
+                  color: '#374151',
+                  padding: '10px 20px',
+                  borderRadius: 8,
+                  fontSize: 40,
+                  fontWeight: 700,
+                }}>
                   {rank2}
                 </div>
               )}
               {rank3 && (
-                <div style={{ fontSize: 72, fontWeight: 700, color: 'black' }}>
+                <div style={{
+                  display: 'flex',
+                  backgroundColor: '#FB923C',
+                  color: '#7C2D12',
+                  padding: '10px 20px',
+                  borderRadius: 8,
+                  fontSize: 40,
+                  fontWeight: 700,
+                }}>
                   {rank3}
                 </div>
               )}
@@ -120,14 +168,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                alignItems: 'center',
               }}
             >
-              <div style={{ fontSize: 80, fontWeight: 700, color: 'black', marginBottom: 40 }}>
-                언제만나?
+              <div style={{ display: 'flex', fontSize: 48, color: '#6B7280', marginBottom: 20 }}>
+                {waitingText}
               </div>
-              <div style={{ fontSize: 48, color: 'black' }}>
-                {title}
+              <div style={{ display: 'flex', fontSize: 32, color: '#9CA3AF' }}>
+                {shareText}
               </div>
             </div>
           )}
@@ -137,7 +184,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     );
   } catch (error) {
     console.error('Error generating OG image:', error);
-    // Default image on error
+    // Default image on error (fallback to Korean)
     return new ImageResponse(
       (
         <div
@@ -148,13 +195,13 @@ export default async function Image({ params }: { params: Promise<{ id: string }
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            backgroundColor: '#FFC354',
+            backgroundColor: 'white',
           }}
         >
-          <div style={{ fontSize: 80, fontWeight: 700, color: 'black' }}>
+          <div style={{ display: 'flex', fontSize: 80, fontWeight: 700, color: '#1F2937' }}>
             언제만나?
           </div>
-          <div style={{ fontSize: 40, color: 'black', marginTop: 20 }}>
+          <div style={{ display: 'flex', fontSize: 40, color: '#6B7280', marginTop: 20 }}>
             간편한 일정 조율 서비스
           </div>
         </div>
