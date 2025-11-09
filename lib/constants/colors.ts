@@ -127,7 +127,7 @@ export const BUTTON_COLORS = {
  */
 export const TOAST_COLORS = {
   success: {
-    bg: 'bg-green-500',
+    bg: 'bg-orange-400',
     text: 'text-white',
   },
   error: {
