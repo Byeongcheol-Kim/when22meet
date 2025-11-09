@@ -3,7 +3,7 @@
 import { useEffect, useState, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Meeting, Availability } from '@/lib/types';
-import { Plus, PlusCircle, Info, X, Menu, Calendar, Link } from 'lucide-react';
+import { Plus, PlusCircle, Info, X, Menu, Pencil, Link } from 'lucide-react';
 import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
 import ShareModal from '@/components/ShareModal';
@@ -395,7 +395,30 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   // Generate grid data
   const buildGridData = () => {
-    const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
+    // Sort participants: 미정이 많은 순 → 확정된 참여자는 맨 우측
+    const allParticipants = Array.from(new Set(availabilities.map(a => a.participantName)))
+      .map(name => {
+        const availability = availabilities.find(a => a.participantName === name);
+        const isLocked = lockedParticipants.has(name);
+
+        // 미정 개수 계산 (전체 날짜 - 참여 - 불참)
+        const totalDates = meeting?.dates.length || 0;
+        const availableCount = availability?.availableDates.length || 0;
+        const unavailableCount = availability?.unavailableDates?.length || 0;
+        const undecidedCount = totalDates - availableCount - unavailableCount;
+
+        return { name, isLocked, undecidedCount };
+      })
+      .sort((a, b) => {
+        // 1. 확정 여부로 먼저 정렬 (미확정이 앞에)
+        if (a.isLocked !== b.isLocked) {
+          return a.isLocked ? 1 : -1;
+        }
+        // 2. 미정이 많은 순으로 정렬
+        return b.undecidedCount - a.undecidedCount;
+      })
+      .map(p => p.name);
+
     const gridData: GridCell[][] = [];
     
     // Use first date's month as default
@@ -869,7 +892,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
               title={t('meeting.edit.title')}
             >
-              <Calendar className="w-5 h-5 text-gray-600" />
+              <Pencil className="w-5 h-5 text-gray-600" />
             </button>
             
             <button
