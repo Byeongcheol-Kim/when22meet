@@ -96,13 +96,15 @@
       "updating": "Updating...",
       "updateComplete": "Update Complete",
       "updateSuccess": "Schedule has been updated.",
-      "updateFailed": "Failed to update schedule."
+      "updateFailed": "Failed to update schedule.",
+      "shareTemplate": "Share Template URL"
     },
     "fab": {
       "edit": "Edit Schedule",
       "newMeeting": "New Meeting",
       "info": "Info",
       "copyLink": "Copy Link",
+      "share": "Share",
       "linkCopied": "Link copied!"
     },
     "alerts": {
@@ -110,7 +112,28 @@
       "updateFailed": "Failed to update status. Please try again.",
       "networkError": "A network error occurred. Please try again."
     },
-    "redirecting": "Redirecting..."
+    "redirecting": "Redirecting...",
+    "share": {
+      "title": "Share",
+      "link": {
+        "title": "Copy Meeting Link",
+        "description": "Share this meeting page link"
+      },
+      "template": {
+        "title": "Copy Meeting Template",
+        "description": "Create a template link with same participants"
+      }
+    },
+    "toast": {
+      "linkCopied": "Meeting link copied!",
+      "templateCopied": "Meeting template copied!",
+      "shareTemplateCopied": "Template link copied!"
+    },
+    "newMeeting": {
+      "title": "Create New Meeting",
+      "message": "Create a new meeting with current participants? (Participant list will be auto-filled)",
+      "confirm": "Create New Meeting"
+    }
   },
   "about": {
     "title": "When2Meet?",

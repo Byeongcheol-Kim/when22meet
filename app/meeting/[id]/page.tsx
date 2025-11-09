@@ -353,7 +353,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const handleShareLink = () => {
     const meetingUrl = `${window.location.origin}/meeting/${resolvedParams.id}`;
     navigator.clipboard.writeText(meetingUrl);
-    setToastMessage('약속 링크가 복사되었습니다!');
+    setToastMessage(t('meeting.toast.linkCopied'));
     setToastType('success');
   };
 
@@ -368,7 +368,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
 
     navigator.clipboard.writeText(templateUrl.toString());
-    setToastMessage('약속 템플릿이 복사되었습니다!');
+    setToastMessage(t('meeting.toast.templateCopied'));
     setToastType('success');
   };
 
@@ -379,7 +379,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       templateUrl.searchParams.set('participants', editingParticipants.join(','));
     }
     await navigator.clipboard.writeText(templateUrl.toString());
-    setToastMessage('템플릿 링크가 복사되었습니다!');
+    setToastMessage(t('meeting.toast.shareTemplateCopied'));
     setToastType('success');
   };
 
@@ -879,7 +879,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 setShowFabMenu(false);
               }}
               className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title="공유하기"
+              title={t('meeting.fab.share')}
             >
               <Link className="w-5 h-5 text-gray-600" />
             </button>
@@ -985,10 +985,9 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           }
           router.push(url.pathname + url.search);
         }}
-        title="새 약속 만들기"
-        message="현재 참여자로 새 약속을 만드시겠습니까? (참여자 목록이 자동으로 입력됩니다)"
-        confirmText="새 약속 만들기"
-        cancelText="취소"
+        title={t('meeting.newMeeting.title')}
+        message={t('meeting.newMeeting.message')}
+        confirmText={t('meeting.newMeeting.confirm')}
         type="info"
       />
 

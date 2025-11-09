@@ -105,12 +105,12 @@ function HomeContent() {
       if (response.ok) {
         const data = await response.json();
         navigator.clipboard.writeText(data.shortUrl);
-        setToastMessage('템플릿 링크가 복사되었습니다!');
+        setToastMessage(t('meeting.toast.shareTemplateCopied'));
         setToastType('success');
       } else {
         // Copy original URL if shortening fails
         navigator.clipboard.writeText(url);
-        setToastMessage('템플릿 링크가 복사되었습니다!');
+        setToastMessage(t('meeting.toast.shareTemplateCopied'));
         setToastType('success');
       }
     } catch (error) {
@@ -118,7 +118,7 @@ function HomeContent() {
       // Copy original URL on error
       const url = generateShareUrl();
       navigator.clipboard.writeText(url);
-      setToastMessage('템플릿 링크가 복사되었습니다!');
+      setToastMessage(t('meeting.toast.shareTemplateCopied'));
       setToastType('success');
     }
   };

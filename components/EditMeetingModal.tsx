@@ -81,7 +81,7 @@ export default function EditMeetingModal({
             className="w-full py-2 mt-4 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
           >
             <Link className="w-4 h-4" />
-            템플릿 URL 공유
+            {t('meeting.edit.shareTemplate')}
           </button>
         )}
 

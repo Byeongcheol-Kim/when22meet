@@ -1,6 +1,7 @@
 'use client';
 
 import { AlertCircle, X } from 'lucide-react';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -19,10 +20,15 @@ export default function ConfirmModal({
   onConfirm,
   title,
   message,
-  confirmText = '확인',
-  cancelText = '취소',
+  confirmText,
+  cancelText,
   type = 'warning',
 }: ConfirmModalProps) {
+  const { t } = useTranslation();
+
+  // Use translated defaults if not provided
+  const finalConfirmText = confirmText || t('common.confirm');
+  const finalCancelText = cancelText || t('common.cancel');
   if (!isOpen) return null;
 
   const getIconColor = () => {
@@ -74,7 +80,7 @@ export default function ConfirmModal({
               onClick={onClose}
               className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-semibold hover:bg-gray-300 transition-colors"
             >
-              {cancelText}
+              {finalCancelText}
             </button>
             <button
               onClick={() => {
@@ -83,7 +89,7 @@ export default function ConfirmModal({
               }}
               className={`flex-1 py-3 text-white rounded-xl font-semibold transition-colors ${getConfirmButtonStyle()}`}
             >
-              {confirmText}
+              {finalConfirmText}
             </button>
           </div>
         </div>

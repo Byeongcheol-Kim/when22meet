@@ -1,6 +1,7 @@
 'use client';
 
 import { X, Link2, Copy } from 'lucide-react';
+import { useTranslation } from '@/lib/useTranslation';
 
 interface ShareModalProps {
   onClose: () => void;
@@ -9,13 +10,15 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ onClose, onShareLink, onShareTemplate }: ShareModalProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="fixed inset-0 bg-black/30 z-50">
       <div className="absolute inset-0 flex items-center justify-center px-4">
         <div className="bg-white rounded-xl p-6 max-w-sm w-full shadow-2xl animate-fade-in">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-900">공유하기</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('meeting.share.title')}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 transition-colors"
@@ -39,8 +42,8 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
                 <Link2 className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-gray-900">약속 링크 복사</h3>
-                <p className="text-sm text-gray-600">이 약속 페이지 링크를 공유합니다</p>
+                <h3 className="font-bold text-gray-900">{t('meeting.share.link.title')}</h3>
+                <p className="text-sm text-gray-600">{t('meeting.share.link.description')}</p>
               </div>
             </div>
           </button>
@@ -58,8 +61,8 @@ export default function ShareModal({ onClose, onShareLink, onShareTemplate }: Sh
                 <Copy className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="font-bold text-gray-900">약속 템플릿 복사</h3>
-                <p className="text-sm text-gray-600">같은 참가자의 템플릿 링크를 만듭니다</p>
+                <h3 className="font-bold text-gray-900">{t('meeting.share.template.title')}</h3>
+                <p className="text-sm text-gray-600">{t('meeting.share.template.description')}</p>
               </div>
             </div>
           </button>

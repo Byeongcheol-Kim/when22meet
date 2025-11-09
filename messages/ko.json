@@ -96,13 +96,15 @@
       "updating": "수정 중...",
       "updateComplete": "수정 완료",
       "updateSuccess": "일정이 수정되었습니다.",
-      "updateFailed": "일정 수정에 실패했습니다."
+      "updateFailed": "일정 수정에 실패했습니다.",
+      "shareTemplate": "템플릿 URL 공유"
     },
     "fab": {
       "edit": "일정 수정",
       "newMeeting": "새 약속",
       "info": "정보",
       "copyLink": "링크 복사",
+      "share": "공유하기",
       "linkCopied": "링크가 복사되었습니다!"
     },
     "alerts": {
@@ -110,7 +112,28 @@
       "updateFailed": "상태 업데이트에 실패했습니다. 다시 시도해주세요.",
       "networkError": "네트워크 오류가 발생했습니다. 다시 시도해주세요."
     },
-    "redirecting": "리다이렉트 중..."
+    "redirecting": "리다이렉트 중...",
+    "share": {
+      "title": "공유하기",
+      "link": {
+        "title": "약속 링크 복사",
+        "description": "이 약속 페이지 링크를 공유합니다"
+      },
+      "template": {
+        "title": "약속 템플릿 복사",
+        "description": "같은 참가자의 템플릿 링크를 만듭니다"
+      }
+    },
+    "toast": {
+      "linkCopied": "약속 링크가 복사되었습니다!",
+      "templateCopied": "약속 템플릿이 복사되었습니다!",
+      "shareTemplateCopied": "템플릿 링크가 복사되었습니다!"
+    },
+    "newMeeting": {
+      "title": "새 약속 만들기",
+      "message": "현재 참여자로 새 약속을 만드시겠습니까? (참여자 목록이 자동으로 입력됩니다)",
+      "confirm": "새 약속 만들기"
+    }
   },
   "about": {
     "title": "언제만나?",
