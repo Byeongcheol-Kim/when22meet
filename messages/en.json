@@ -51,7 +51,11 @@
     "shareTemplate": "Share Template URL",
     "alerts": {
       "selectRequired": "Please select a meeting title and dates.",
-      "createFailed": "Failed to create meeting."
+      "createFailed": "Failed to create meeting.",
+      "titleRequired": "Please enter a meeting title.",
+      "datesRequired": "Please select at least one date.",
+      "participantsRequired": "Please add at least one participant.",
+      "titleAndDatesRequired": "Please enter a meeting title and select dates."
     }
   },
   "meeting": {

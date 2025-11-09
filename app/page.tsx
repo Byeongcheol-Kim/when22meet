@@ -181,8 +181,19 @@ function HomeContent() {
   };
 
   const handleCreateMeeting = async () => {
-    if (!title || selectedDates.length === 0) {
-      alert(t('landing.alerts.selectRequired'));
+    if (!title) {
+      setToastMessage(t('landing.alerts.titleRequired'));
+      setToastType('warning');
+      return;
+    }
+    if (selectedDates.length === 0) {
+      setToastMessage(t('landing.alerts.datesRequired'));
+      setToastType('warning');
+      return;
+    }
+    if (participants.length === 0) {
+      setToastMessage(t('landing.alerts.participantsRequired'));
+      setToastType('warning');
       return;
     }
 
@@ -329,8 +340,12 @@ function HomeContent() {
         <div className="space-y-3">
           <button
             onClick={handleCreateMeeting}
-            disabled={isCreating || !title || selectedDates.length === 0}
-            className={`w-full py-4 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-xl font-semibold disabled:bg-gray-300 ${BUTTON_COLORS.primary.hover} transition-colors`}
+            disabled={isCreating}
+            className={`w-full py-4 ${
+              !title || selectedDates.length === 0 || participants.length === 0
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : `${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} ${BUTTON_COLORS.primary.hover}`
+            } rounded-xl font-semibold transition-colors`}
           >
             {isCreating ? t('landing.creating') : t('landing.createMeeting')}
           </button>

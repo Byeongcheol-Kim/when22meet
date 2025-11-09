@@ -51,7 +51,11 @@
     "shareTemplate": "템플릿 URL 공유",
     "alerts": {
       "selectRequired": "약속 이름과 날짜를 선택해주세요.",
-      "createFailed": "미팅 생성에 실패했습니다."
+      "createFailed": "미팅 생성에 실패했습니다.",
+      "titleRequired": "약속 이름을 입력해주세요.",
+      "datesRequired": "날짜를 선택해주세요.",
+      "participantsRequired": "참여자를 최소 1명 이상 추가해주세요.",
+      "titleAndDatesRequired": "약속 이름과 날짜를 입력해주세요."
     }
   },
   "meeting": {
