@@ -99,6 +99,7 @@
       "title": "일정 수정",
       "manageParticipants": "참여자 관리",
       "participantPlaceholder": "추가할 참여자 이름을 입력하세요",
+      "dateSelection": "날짜 선택",
       "updating": "수정 중...",
       "updateComplete": "수정 완료",
       "updateSuccess": "일정이 수정되었습니다.",
