@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use, useCallback, useRef } from 'react';
+import { useEffect, useState, use, useCallback, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
@@ -8,13 +8,15 @@ import ShareModal from '@/components/ShareModal';
 import EditMeetingModal from '@/components/EditMeetingModal';
 import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
+import ParticipantSelectModal from '@/components/ParticipantSelectModal';
 import { useTranslation } from '@/lib/useTranslation';
-import { DATE_COLUMN_COLORS } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS, CURRENT_USER_COLORS } from '@/lib/constants/colors';
 import { useMeetingData } from '@/hooks/useMeetingData';
 import { useMeetingActions } from '@/hooks/useMeetingActions';
 import { useMeetingGrid } from '@/hooks/useMeetingGrid';
 import { useScrollManager } from '@/hooks/useScrollManager';
 import { useToast } from '@/hooks/useToast';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import {
   DateCell,
   StatusCell,
@@ -24,9 +26,7 @@ import {
 } from '@/components/MeetingGrid/GridCell';
 import { FloatingActionButton } from '@/components/MeetingGrid/FloatingActionButton';
 import { TopDatesIndicator } from '@/components/MeetingGrid/TopDatesIndicator';
-import { AddParticipantInput } from '@/components/MeetingGrid/AddParticipantInput';
-
-type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
+import { Check, Pencil, Crown } from 'lucide-react';
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
   const { t } = useTranslation();
@@ -54,6 +54,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const {
     meeting,
     availabilities,
+    setAvailabilities,
     isLoading,
     lockedParticipants,
     setLockedParticipants,
@@ -64,6 +65,25 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     meetingId: resolvedParams.id,
     onError: handleMeetingError,
   });
+
+  // Current user management
+  const { currentUser, setCurrentUser, needsSelection, isUserSelected, isOrganizer } = useCurrentUser({
+    meetingId: resolvedParams.id,
+    participants: allParticipants,
+  });
+
+  // Derive editing state from lock status (locked = completed, unlocked = editing)
+  const isEditing = currentUser && !isOrganizer ? !lockedParticipants.has(currentUser) : true;
+
+  // Reorder participants to put current user first (for non-organizer)
+  const orderedParticipants = useMemo(() => {
+    if (!currentUser || isOrganizer || currentUser === '__organizer__') {
+      return allParticipants;
+    }
+    // Move current user to front
+    const filtered = allParticipants.filter((p) => p !== currentUser);
+    return [currentUser, ...filtered];
+  }, [allParticipants, currentUser, isOrganizer]);
 
   // Scroll management
   const {
@@ -81,28 +101,25 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     meeting,
     availabilities,
     availabilityMap,
-    allParticipants,
+    allParticipants: orderedParticipants,
     currentMonth,
     t,
   });
 
   // Meeting actions with useCallback
-  const { handleAddParticipant, handleStatusClick, handleToggleLock, handleUpdateMeeting } =
+  const { handleStatusClick, handleToggleLock, handleUpdateMeeting } =
     useMeetingActions({
       meetingId: resolvedParams.id,
       availabilities,
-      setAvailabilities: () => {}, // Will be handled differently
+      setAvailabilities,
       lockedParticipants,
       setLockedParticipants,
       fetchMeetingData,
-      onError: (message) => showToast(message, 'error'),
+      onError: (message) => showToastRef.current(message, 'error'),
       t,
     });
 
   // UI state
-  const [showAddInput, setShowAddInput] = useState(false);
-  const [newParticipantName, setNewParticipantName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
   const [showFabMenu, setShowFabMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -112,6 +129,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [isUpdating, setIsUpdating] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNewMeetingConfirm, setShowNewMeetingConfirm] = useState(false);
+  const [showParticipantSelectModal, setShowParticipantSelectModal] = useState(false);
 
   // Initial data fetch - only on mount
   useEffect(() => {
@@ -127,35 +145,6 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       setEditingParticipants(allParticipants);
     }
   }, [showEditModal, meeting, allParticipants]);
-
-  // Optimistic status update handler
-  const handleOptimisticStatusClick = useCallback(
-    async (participant: string, date: string, currentStatus: ParticipantStatus) => {
-      await handleStatusClick(participant, date, currentStatus);
-      await fetchMeetingData(true);
-    },
-    [handleStatusClick, fetchMeetingData]
-  );
-
-  // Add participant handler
-  const handleAddParticipantSubmit = useCallback(async () => {
-    if (!newParticipantName.trim()) {
-      showToastRef.current(tRef.current('meeting.alerts.enterName'), 'warning');
-      return;
-    }
-
-    if (newParticipantName.trim().length > 10) {
-      showToastRef.current(tRef.current('meeting.alerts.nameTooLong'), 'warning');
-      return;
-    }
-
-    setIsSubmitting(true);
-    const success = await handleAddParticipant(newParticipantName.trim());
-    if (success) {
-      setNewParticipantName('');
-    }
-    setIsSubmitting(false);
-  }, [newParticipantName, handleAddParticipant]);
 
   // Update meeting handler
   const handleUpdateDates = useCallback(async () => {
@@ -177,6 +166,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
     setIsUpdating(false);
   }, [meeting, editingDates, editingTitle, editingParticipants, handleUpdateMeeting]);
+
+  // Toggle editing/completed status for current user (uses lock mechanism)
+  const handleToggleEditingStatus = useCallback(() => {
+    if (!currentUser || isOrganizer) return;
+    handleToggleLock(currentUser);
+  }, [currentUser, isOrganizer, handleToggleLock]);
 
   // Share handlers
   const handleShareLink = useCallback(() => {
@@ -240,19 +235,48 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <AddParticipantInput
-                showInput={showAddInput}
-                inputValue={newParticipantName}
-                isSubmitting={isSubmitting}
-                onShowInput={() => setShowAddInput(true)}
-                onHideInput={() => {
-                  setShowAddInput(false);
-                  setNewParticipantName('');
-                }}
-                onInputChange={setNewParticipantName}
-                onSubmit={handleAddParticipantSubmit}
-                t={t}
-              />
+              {/* Current user indicator with editing/completed toggle */}
+              {isUserSelected && currentUser && (
+                <div className="flex items-center gap-1">
+                  {isOrganizer ? (
+                    <button
+                      onClick={() => setShowParticipantSelectModal(true)}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${CURRENT_USER_COLORS.organizer.button.text} ${CURRENT_USER_COLORS.organizer.button.bg} ${CURRENT_USER_COLORS.organizer.button.hover} border ${CURRENT_USER_COLORS.organizer.button.border}`}
+                    >
+                      <span>{t('meeting.selectParticipant.organizer')}</span>
+                      <Crown className="w-3.5 h-3.5" />
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setShowParticipantSelectModal(true)}
+                        className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                        title={t('meeting.selectParticipant.changeUser')}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={handleToggleEditingStatus}
+                        className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-md transition-colors ${
+                          isEditing
+                            ? `${CURRENT_USER_COLORS.editing.button.text} ${CURRENT_USER_COLORS.editing.button.bg} ${CURRENT_USER_COLORS.editing.button.hover} border ${CURRENT_USER_COLORS.editing.button.border} ${CURRENT_USER_COLORS.editing.button.shadow}`
+                            : `${CURRENT_USER_COLORS.completed.button.text} ${CURRENT_USER_COLORS.completed.button.bg} ${CURRENT_USER_COLORS.completed.button.hover} border ${CURRENT_USER_COLORS.completed.button.border}`
+                        }`}
+                        title={isEditing ? t('meeting.selectParticipant.clickToComplete') : t('meeting.selectParticipant.clickToEdit')}
+                      >
+                        <span>{currentUser}</span>
+                        {isEditing ? (
+                          <Pencil className="w-3.5 h-3.5" />
+                        ) : (
+                          <Check className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -272,7 +296,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
           <div
             className="meeting-grid-container"
             style={{
-              gridTemplateColumns: `minmax(50px, min-content) ${allParticipants.map(() => 'var(--col-width)').join(' ')}`,
+              gridTemplateColumns: `minmax(50px, min-content) ${orderedParticipants.map(() => 'var(--col-width)').join(' ')}`,
               ['--col-width' as string]: 'clamp(90px, 10vw, 120px)',
               position: 'relative',
               paddingBottom: '100px',
@@ -297,12 +321,15 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'header-participant') {
+                  const isCurrent = !isOrganizer && cell.participant === currentUser;
                   return (
                     <ParticipantHeader
                       key={key}
                       name={cell.content || ''}
                       isLocked={lockedParticipants.has(cell.participant || '')}
-                      onToggleLock={handleToggleLock}
+                      isCurrentUser={isCurrent}
+                      isCurrentUserEditing={isEditing}
+                      onToggleLock={isCurrent ? handleToggleEditingStatus : () => {}}
                     />
                   );
                 }
@@ -322,14 +349,25 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'status') {
+                  const isCurrent = !isOrganizer && cell.participant === currentUser;
+                  const participantIsLocked = lockedParticipants.has(cell.participant || '');
+
+                  // Determine if this cell is editable
+                  // Organizer: can edit if participant is not locked
+                  // Participant: can edit only own schedule if not locked and in editing mode
+                  const canEdit = isOrganizer
+                    ? !participantIsLocked
+                    : isCurrent && !participantIsLocked && isEditing;
+
                   return (
                     <StatusCell
                       key={key}
                       status={cell.status!}
                       participant={cell.participant || ''}
                       date={cell.date || ''}
-                      isLocked={lockedParticipants.has(cell.participant || '')}
-                      onStatusClick={handleOptimisticStatusClick}
+                      isLocked={!canEdit}
+                      isCurrentUser={isCurrent}
+                      onStatusClick={handleStatusClick}
                       t={t}
                     />
                   );
@@ -414,6 +452,18 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         }
         confirmLinkNewTab={true}
         type="info"
+      />
+
+      {/* Participant Selection Modal */}
+      <ParticipantSelectModal
+        isOpen={needsSelection || showParticipantSelectModal}
+        participants={allParticipants}
+        onSelect={(participant, role) => {
+          setCurrentUser(participant, role);
+          setShowParticipantSelectModal(false);
+        }}
+        onClose={() => setShowParticipantSelectModal(false)}
+        canClose={isUserSelected}
       />
 
       {/* Toast */}

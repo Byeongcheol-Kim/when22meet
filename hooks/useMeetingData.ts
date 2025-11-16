@@ -11,6 +11,7 @@ interface UseMeetingDataProps {
 interface UseMeetingDataReturn {
   meeting: Meeting | null;
   availabilities: Availability[];
+  setAvailabilities: React.Dispatch<React.SetStateAction<Availability[]>>;
   isLoading: boolean;
   lockedParticipants: Set<string>;
   setLockedParticipants: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -139,6 +140,7 @@ export function useMeetingData({
   return {
     meeting,
     availabilities,
+    setAvailabilities,
     isLoading,
     lockedParticipants,
     setLockedParticipants,

@@ -20,6 +20,7 @@ interface UseMeetingActionsProps {
 export function useMeetingActions({
   meetingId,
   availabilities,
+  setAvailabilities,
   lockedParticipants,
   setLockedParticipants,
   fetchMeetingData,
@@ -31,12 +32,14 @@ export function useMeetingActions({
   const lockedParticipantsRef = useRef(lockedParticipants);
   const onErrorRef = useRef(onError);
   const tRef = useRef(t);
+  const setAvailabilitiesRef = useRef(setAvailabilities);
 
   // Keep refs in sync
   availabilitiesRef.current = availabilities;
   lockedParticipantsRef.current = lockedParticipants;
   onErrorRef.current = onError;
   tRef.current = t;
+  setAvailabilitiesRef.current = setAvailabilities;
 
   const handleAddParticipant = useCallback(
     async (participantName: string) => {
@@ -49,6 +52,16 @@ export function useMeetingActions({
         onErrorRef.current?.(tRef.current('meeting.alerts.nameTooLong'));
         return false;
       }
+
+      // Optimistic update - add new participant immediately
+      const newAvailability: Availability = {
+        participantName: participantName.trim(),
+        availableDates: [],
+        unavailableDates: [],
+        timestamp: Date.now(),
+        isLocked: false,
+      };
+      setAvailabilitiesRef.current((prev) => [...prev, newAvailability]);
 
       try {
         const response = await fetch(
@@ -64,17 +77,24 @@ export function useMeetingActions({
         );
 
         if (response.ok) {
-          await fetchMeetingData(true);
           return true;
         }
+        // Rollback on error
+        setAvailabilitiesRef.current((prev) =>
+          prev.filter((a) => a.participantName !== participantName.trim())
+        );
         return false;
       } catch (error) {
         console.error('Error adding participant:', error);
+        // Rollback on error
+        setAvailabilitiesRef.current((prev) =>
+          prev.filter((a) => a.participantName !== participantName.trim())
+        );
         onErrorRef.current?.(tRef.current('meeting.alerts.addParticipantFailed'));
         return false;
       }
     },
-    [meetingId, fetchMeetingData]
+    [meetingId]
   );
 
   const handleStatusClick = useCallback(
@@ -98,13 +118,26 @@ export function useMeetingActions({
         (a) => a.participantName === participant
       );
       const currentAvailableDates = currentAvailability?.availableDates || [];
+      const currentUnavailableDates = currentAvailability?.unavailableDates || [];
 
-      // Calculate final dates for API
-      let newAvailableDates = [...currentAvailableDates];
-      newAvailableDates = newAvailableDates.filter((d) => d !== date);
+      // Calculate new dates
+      let newAvailableDates = currentAvailableDates.filter((d) => d !== date);
+      let newUnavailableDates = currentUnavailableDates.filter((d) => d !== date);
+
       if (newStatus === 'available') {
         newAvailableDates.push(date);
+      } else if (newStatus === 'unavailable') {
+        newUnavailableDates.push(date);
       }
+
+      // Optimistic update - update local state immediately
+      setAvailabilitiesRef.current((prev) =>
+        prev.map((a) =>
+          a.participantName === participant
+            ? { ...a, availableDates: newAvailableDates, unavailableDates: newUnavailableDates }
+            : a
+        )
+      );
 
       try {
         const response = await fetch(
@@ -123,10 +156,26 @@ export function useMeetingActions({
         );
 
         if (!response.ok) {
+          // Rollback on error
+          setAvailabilitiesRef.current((prev) =>
+            prev.map((a) =>
+              a.participantName === participant
+                ? { ...a, availableDates: currentAvailableDates, unavailableDates: currentUnavailableDates }
+                : a
+            )
+          );
           onErrorRef.current?.(tRef.current('meeting.alerts.updateFailed'));
         }
       } catch (error) {
         console.error('Error updating status:', error);
+        // Rollback on error
+        setAvailabilitiesRef.current((prev) =>
+          prev.map((a) =>
+            a.participantName === participant
+              ? { ...a, availableDates: currentAvailableDates, unavailableDates: currentUnavailableDates }
+              : a
+          )
+        );
         onErrorRef.current?.(tRef.current('meeting.alerts.networkError'));
       }
     },
@@ -171,15 +220,31 @@ export function useMeetingActions({
 
         if (!response.ok) {
           // Rollback on error
-          await fetchMeetingData();
+          setLockedParticipants((prev) => {
+            const newSet = new Set(prev);
+            if (newIsLocked) {
+              newSet.delete(participant);
+            } else {
+              newSet.add(participant);
+            }
+            return newSet;
+          });
         }
       } catch (error) {
         console.error('Error updating lock status:', error);
         // Rollback on error
-        await fetchMeetingData();
+        setLockedParticipants((prev) => {
+          const newSet = new Set(prev);
+          if (newIsLocked) {
+            newSet.delete(participant);
+          } else {
+            newSet.add(participant);
+          }
+          return newSet;
+        });
       }
     },
-    [meetingId, setLockedParticipants, fetchMeetingData]
+    [meetingId, setLockedParticipants]
   );
 
   const handleUpdateMeeting = useCallback(
@@ -206,6 +271,7 @@ export function useMeetingActions({
         });
 
         if (response.ok) {
+          // Fetch new data after major update (dates/participants change)
           await fetchMeetingData(true);
           return true;
         } else {

@@ -150,6 +150,24 @@
       "title": "Create New Meeting",
       "message": "Create a new meeting with current participants. (Opens in new tab)",
       "confirm": "Create"
+    },
+    "selectParticipant": {
+      "title": "Select Participant",
+      "description": "Please select your name from this meeting.\nYou can only edit the schedule of the selected person.",
+      "selected": "Selected",
+      "noParticipants": "No participants",
+      "confirm": "Confirm",
+      "changeUser": "Change User",
+      "currentUser": "Current: {name}",
+      "viewingAs": "Viewing as {name}",
+      "editingAs": "Editing",
+      "completedAs": "Done",
+      "clickToComplete": "Click to complete",
+      "clickToEdit": "Click to edit",
+      "organizer": "Organizer",
+      "participant": "Participant",
+      "organizerDescription": "",
+      "joinAsOrganizer": "Join as Organizer"
     }
   },
   "about": {

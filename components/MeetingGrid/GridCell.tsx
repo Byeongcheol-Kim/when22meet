@@ -1,7 +1,8 @@
 'use client';
 
 import { memo } from 'react';
-import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor, CURRENT_USER_COLORS } from '@/lib/constants/colors';
+import { Check, Pencil } from 'lucide-react';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -59,6 +60,7 @@ interface StatusCellProps {
   participant: string;
   date: string;
   isLocked: boolean;
+  isCurrentUser?: boolean;
   onStatusClick: (participant: string, date: string, status: ParticipantStatus) => void;
   t: (key: string) => string;
 }
@@ -68,13 +70,27 @@ export const StatusCell = memo(function StatusCell({
   participant,
   date,
   isLocked,
+  isCurrentUser = true,
   onStatusClick,
   t,
 }: StatusCellProps) {
   const isEditable = !isLocked;
+  const isCurrentUserEditing = isCurrentUser && !isLocked;
+
+  const getCellBackground = () => {
+    if (isCurrentUser && isCurrentUserEditing) {
+      const colors = CURRENT_USER_COLORS.editing.cell;
+      return `${colors.bg} ${colors.borderX}`;
+    }
+    if (isCurrentUser && !isCurrentUserEditing) {
+      const colors = CURRENT_USER_COLORS.completed.cell;
+      return `${colors.bg} ${colors.borderX}`;
+    }
+    return 'bg-white';
+  };
 
   return (
-    <div className="px-2 py-2 bg-white">
+    <div className={`px-2 py-2 ${getCellBackground()}`}>
       <button
         onClick={() => {
           if (isEditable) {
@@ -99,29 +115,58 @@ export const StatusCell = memo(function StatusCell({
 interface ParticipantHeaderProps {
   name: string;
   isLocked: boolean;
+  isCurrentUser?: boolean;
+  isCurrentUserEditing?: boolean;
   onToggleLock: (participant: string) => void;
 }
 
 export const ParticipantHeader = memo(function ParticipantHeader({
   name,
   isLocked,
+  isCurrentUser = false,
+  isCurrentUserEditing = true,
   onToggleLock,
 }: ParticipantHeaderProps) {
+  const getHeaderStyle = () => {
+    if (isCurrentUser) {
+      const colors = isCurrentUserEditing
+        ? CURRENT_USER_COLORS.editing.header
+        : CURRENT_USER_COLORS.completed.header;
+      return `${colors.bg} border-b-2 ${colors.border} ${colors.borderX}`;
+    }
+    return isLocked ? 'bg-gray-50' : 'bg-white';
+  };
+
+  const getTextStyle = () => {
+    if (isCurrentUser) {
+      const colors = isCurrentUserEditing
+        ? CURRENT_USER_COLORS.editing.header
+        : CURRENT_USER_COLORS.completed.header;
+      return `${colors.text} font-extrabold`;
+    }
+    return isLocked
+      ? 'text-gray-500'
+      : 'text-gray-800 hover:text-blue-500 transition-colors';
+  };
+
   return (
     <div
-      className={`px-2 py-1 text-center text-sm font-bold ${
-        isLocked ? 'bg-gray-50' : 'bg-white'
-      }`}
+      className={`px-2 py-1 text-center text-sm font-bold ${getHeaderStyle()}`}
       style={{ position: 'sticky', top: 0, zIndex: 20 }}
     >
       <button
         onClick={() => onToggleLock(name)}
-        className={`w-full ${
-          isLocked ? 'text-gray-500' : 'text-gray-800 hover:text-blue-500 transition-colors'
-        }`}
+        className={`w-full flex items-center justify-center gap-1 ${getTextStyle()}`}
       >
-        {name}
-        {isLocked && <span className="ml-1 text-xs">✓</span>}
+        <span>{name}</span>
+        {isCurrentUser && (
+          isCurrentUserEditing ? (
+            <Pencil className="w-3 h-3" />
+          ) : (
+            <Check className="w-3 h-3" />
+          )
+        )}
+        {isLocked && !isCurrentUser && <Check className="w-3 h-3 opacity-60" />}
       </button>
     </div>
   );

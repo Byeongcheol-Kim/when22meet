@@ -358,6 +358,72 @@ export const BG_COLORS = {
 } as const;
 
 /**
+ * 현재 사용자 상태 색상 (수정 중/완료)
+ */
+export const CURRENT_USER_COLORS = {
+  editing: {
+    header: {
+      bg: 'bg-amber-500',
+      text: 'text-amber-950',
+      border: 'border-amber-600',
+      borderX: 'border-x-2 border-x-amber-500',
+      hover: 'hover:bg-amber-600',
+    },
+    cell: {
+      bg: 'bg-amber-500/20',
+      borderX: 'border-x-2 border-amber-500',
+    },
+    button: {
+      bg: 'bg-amber-500',
+      text: 'text-amber-900',
+      border: 'border-amber-600',
+      hover: 'hover:bg-amber-600',
+      shadow: 'shadow-sm',
+    },
+  },
+  completed: {
+    header: {
+      bg: 'bg-gray-200',
+      text: 'text-gray-600',
+      border: 'border-gray-400',
+      borderX: 'border-x-2 border-x-gray-400',
+      hover: 'hover:bg-gray-300',
+    },
+    cell: {
+      bg: 'bg-gray-200/50',
+      borderX: 'border-x-2 border-gray-400',
+    },
+    button: {
+      bg: 'bg-gray-200',
+      text: 'text-gray-600',
+      border: 'border-gray-400',
+      hover: 'hover:bg-gray-300',
+    },
+  },
+  organizer: {
+    button: {
+      bg: 'bg-yellow-400',
+      text: 'text-yellow-900',
+      border: 'border-yellow-500',
+      hover: 'hover:bg-yellow-500',
+      dot: 'bg-yellow-600',
+    },
+    header: {
+      bg: 'bg-yellow-400',
+      text: 'text-yellow-900',
+      border: 'border-yellow-500',
+    },
+  },
+  participant: {
+    header: {
+      bg: 'bg-amber-500',
+      text: 'text-amber-900',
+      border: 'border-amber-600',
+    },
+  },
+} as const;
+
+/**
  * 헬퍼 함수: 요일별 색상 가져오기
  */
 export function getDayOfWeekColor(day: number, isHighlighted: boolean = false) {
