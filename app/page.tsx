@@ -221,7 +221,8 @@ function HomeContent() {
       }
     } catch (error) {
       console.error('Error creating meeting:', error);
-      alert(t('landing.alerts.createFailed'));
+      setToastMessage(t('landing.alerts.createFailed'));
+      setToastType('error');
     } finally {
       setIsCreating(false);
     }
@@ -272,6 +273,10 @@ function HomeContent() {
               label={t('landing.participants.label')}
               placeholder={t('landing.participants.placeholder')}
               countText={t('landing.participants.count').replace('%count%', participants.length.toString())}
+              onError={(message) => {
+                setToastMessage(message);
+                setToastType('warning');
+              }}
             />
 
             {/* Date Selection */}

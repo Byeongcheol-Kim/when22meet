@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import redis from '@/lib/redis';
-import { Meeting, StoredAvailability } from '@/lib/types';
+import { Meeting } from '@/lib/types';
+import {
+  fetchMeetingWithAvailabilities,
+  getMeetingParticipants,
+  saveMeeting,
+  saveAvailability,
+  deleteAvailability,
+} from '@/lib/utils/redis';
+import { REDIS_KEYS } from '@/lib/constants/config';
 
 // Get meeting details
 export async function GET(
@@ -9,54 +17,20 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const meetingData = await redis.get(`meeting:${id}`);
-    
-    if (!meetingData) {
+
+    // Use optimized bulk fetch (solves N+1 query problem)
+    const result = await fetchMeetingWithAvailabilities(id);
+
+    if (!result) {
       return NextResponse.json(
         { error: 'Meeting not found' },
         { status: 404 }
       );
     }
 
-    const meeting = meetingData as Meeting;
-    
-    // Get all availabilities for this meeting
-    const availabilityKeys = await redis.keys(`availability:${id}:*`);
-    const availabilities = [];
-    
-    for (const key of availabilityKeys) {
-      const data = await redis.get(key);
-      if (data) {
-        const participantName = key.split(':')[2];
-        const parsedData = data as StoredAvailability | string[];
-        
-        // Handle both old format (array) and new format (object with timestamp)
-        if (Array.isArray(parsedData)) {
-          availabilities.push({
-            participantName,
-            availableDates: parsedData,
-            unavailableDates: [],
-            timestamp: 0, // Old entries without timestamp
-            isLocked: false
-          });
-        } else {
-          availabilities.push({
-            participantName,
-            availableDates: parsedData.dates || [],
-            unavailableDates: parsedData.unavailableDates || [],
-            timestamp: parsedData.timestamp || 0,
-            isLocked: parsedData.isLocked || false
-          });
-        }
-      }
-    }
-    
-    // Sort by timestamp (newest first)
-    availabilities.sort((a, b) => b.timestamp - a.timestamp);
-
     return NextResponse.json({
-      meeting,
-      availabilities
+      meeting: result.meeting,
+      availabilities: result.availabilities
     });
   } catch (error) {
     console.error('Error fetching meeting:', error);
@@ -92,7 +66,7 @@ export async function PATCH(
     }
 
     // Get existing meeting
-    const meetingData = await redis.get(`meeting:${id}`);
+    const meetingData = await redis.get(REDIS_KEYS.meeting(id));
     if (!meetingData) {
       return NextResponse.json(
         { error: 'Meeting not found' },
@@ -101,7 +75,7 @@ export async function PATCH(
     }
 
     const meeting = meetingData as Meeting;
-    
+
     // Update fields
     if (title !== undefined) {
       meeting.title = title.trim();
@@ -109,42 +83,30 @@ export async function PATCH(
     meeting.dates = dates;
     meeting.updatedAt = new Date().toISOString();
 
-    // Save updated meeting with same TTL
-    await redis.setex(
-      `meeting:${id}`,
-      18 * 30 * 24 * 60 * 60, // 18 months
-      meeting
-    );
+    // Save updated meeting with centralized TTL
+    await saveMeeting(meeting);
 
     // Handle participant updates if provided
     if (participants !== undefined) {
-      // Get current availabilities
-      const availabilityKeys = await redis.keys(`availability:${id}:*`);
-      const currentParticipants = availabilityKeys.map((key: string) => 
-        key.replace(`availability:${id}:`, '')
-      );
+      // Get current participants using optimized method
+      const currentParticipants = await getMeetingParticipants(id);
 
       // Add new participants
       for (const participantName of participants) {
         if (!currentParticipants.includes(participantName)) {
-          const availability = {
-            participantName,
-            availableDates: [],
+          await saveAvailability(id, participantName, {
+            dates: [],
             unavailableDates: [],
-            isLocked: false
-          };
-          await redis.setex(
-            `availability:${id}:${participantName}`,
-            18 * 30 * 24 * 60 * 60, // 18 months
-            availability
-          );
+            timestamp: Date.now(),
+            isLocked: false,
+          });
         }
       }
 
       // Remove participants that are no longer in the list
       for (const currentParticipant of currentParticipants) {
         if (!participants.includes(currentParticipant)) {
-          await redis.del(`availability:${id}:${currentParticipant}`);
+          await deleteAvailability(id, currentParticipant);
         }
       }
     }

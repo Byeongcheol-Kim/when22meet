@@ -1,6 +1,8 @@
 import { ImageResponse } from 'next/og';
-import redis from '@/lib/redis';
-import { Meeting, StoredAvailability } from '@/lib/types';
+import {
+  fetchMeetingWithAvailabilities,
+  calculateTopDates,
+} from '@/lib/utils/redis';
 
 // Remove edge runtime due to Turbopack compatibility issue
 // export const runtime = 'edge';
@@ -20,56 +22,28 @@ export default async function Image({
   try {
     const { id } = await params;
 
-    const meetingData = await redis.get(`meeting:${id}`);
-    const meeting = meetingData as Meeting | null;
+    // Use optimized fetch (solves N+1 query problem)
+    const result = await fetchMeetingWithAvailabilities(id);
 
-    if (!meeting) {
+    if (!result) {
       throw new Error('Meeting not found');
     }
+
+    const { meeting, availabilities } = result;
 
     // Use locale from meeting data (saved when meeting was created), default to Korean
     const isKorean = !meeting.locale || meeting.locale === 'ko';
 
     const title = meeting.title || (isKorean ? '새로운 일정' : 'New Meeting');
 
-    // Get all availabilities
-    const availabilityKeys = await redis.keys(`availability:${id}:*`);
-    const availabilities: { availableDates: string[] }[] = [];
+    // Calculate top dates using centralized utility
+    const topDatesData = calculateTopDates(meeting, availabilities, 3);
 
-    for (const key of availabilityKeys) {
-      const data = await redis.get(key);
-      if (data) {
-        const parsedData = data as StoredAvailability | string[];
-
-        if (Array.isArray(parsedData)) {
-          availabilities.push({
-            availableDates: parsedData,
-          });
-        } else {
-          availabilities.push({
-            availableDates: parsedData.dates || [],
-          });
-        }
-      }
-    }
-
-    // Calculate top dates
-    const dateScores: { [date: string]: number } = {};
-
-    meeting.dates.forEach((date: string) => {
-      let count = 0;
-      availabilities.forEach((availability: { availableDates: string[] }) => {
-        if (availability.availableDates.includes(date)) {
-          count++;
-        }
-      });
-      dateScores[date] = count;
-    });
-
-    const topDates = Object.entries(dateScores)
-      .sort((a, b) => b[1] - a[1])
-      .filter(([, count]) => count > 0)
-      .slice(0, 3);
+    // Convert to the format expected by the template
+    const topDates: [string, number][] = topDatesData.map((td) => [
+      td.date,
+      td.count,
+    ]);
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');

@@ -118,7 +118,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
       const data = await response.json();
       setMeeting(data.meeting);
-      
+
       // If preserveLocalLockState is true, maintain current client's lock state
       if (preserveLocalLockState) {
         const currentLocked = new Set(lockedParticipants);
@@ -131,7 +131,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
     } catch (error) {
       console.error('Error fetching meeting:', error);
-      alert(t('meeting.alerts.notFound'));
+      setToastMessage(t('meeting.alerts.notFound'));
+      setToastType('error');
       router.push('/');
     } finally {
       setIsLoading(false);
@@ -140,12 +141,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
 
   const handleAddParticipant = async () => {
     if (!newParticipantName.trim()) {
-      alert(t('meeting.alerts.enterName'));
+      setToastMessage(t('meeting.alerts.enterName'));
+      setToastType('warning');
       return;
     }
 
     if (newParticipantName.trim().length > 10) {
-      alert(t('meeting.alerts.nameTooLong'));
+      setToastMessage(t('meeting.alerts.nameTooLong'));
+      setToastType('warning');
       return;
     }
 
@@ -167,7 +170,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       }
     } catch (error) {
       console.error('Error adding participant:', error);
-      alert(t('meeting.alerts.addParticipantFailed'));
+      setToastMessage(t('meeting.alerts.addParticipantFailed'));
+      setToastType('error');
     } finally {
       setIsSubmitting(false);
     }
@@ -241,14 +245,16 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       if (!response.ok) {
         // Rollback on error, but preserve lock state
         await fetchMeetingData(true);
-        alert(t('meeting.alerts.updateFailed'));
+        setToastMessage(t('meeting.alerts.updateFailed'));
+        setToastType('error');
       }
       // Success - keep optimistic update
     } catch (error) {
       console.error('Error updating status:', error);
       // Rollback on error, but preserve lock state
       await fetchMeetingData(true);
-      alert(t('meeting.alerts.networkError'));
+      setToastMessage(t('meeting.alerts.networkError'));
+      setToastType('error');
     }
   };
 
@@ -330,12 +336,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   // Schedule update handler
   const handleUpdateDates = async () => {
     if (!meeting || editingDates.length === 0) {
-      alert(t('meeting.alerts.selectDates'));
+      setToastMessage(t('meeting.alerts.selectDates'));
+      setToastType('warning');
       return;
     }
 
     if (!editingTitle.trim()) {
-      alert(t('meeting.alerts.enterTitle'));
+      setToastMessage(t('meeting.alerts.enterTitle'));
+      setToastType('warning');
       return;
     }
 
@@ -354,13 +362,16 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       if (response.ok) {
         await fetchMeetingData(true);
         setShowEditModal(false);
-        alert(t('meeting.edit.updateSuccess'));
+        setToastMessage(t('meeting.edit.updateSuccess'));
+        setToastType('success');
       } else {
-        alert(t('meeting.edit.updateFailed'));
+        setToastMessage(t('meeting.edit.updateFailed'));
+        setToastType('error');
       }
     } catch (error) {
       console.error('Error updating dates:', error);
-      alert(t('meeting.alerts.updateScheduleFailed'));
+      setToastMessage(t('meeting.alerts.updateScheduleFailed'));
+      setToastType('error');
     } finally {
       setIsUpdating(false);
     }

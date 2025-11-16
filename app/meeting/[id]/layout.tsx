@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
-import redis from '@/lib/redis';
-import { Meeting, StoredAvailability } from '@/lib/types';
+import {
+  fetchMeetingWithAvailabilities,
+  calculateTopDates,
+} from '@/lib/utils/redis';
 
 export async function generateMetadata({
   params,
@@ -9,54 +11,27 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   try {
     const { id } = await params;
-    const meetingData = await redis.get(`meeting:${id}`);
-    const meeting = meetingData as Meeting | null;
 
-    if (!meeting) {
+    // Use optimized fetch (solves N+1 query problem)
+    const result = await fetchMeetingWithAvailabilities(id);
+
+    if (!result) {
       return {
         title: '언제만나? - 일정을 찾을 수 없습니다',
         description: '간편한 일정 조율 서비스',
       };
     }
 
-    // Get all availabilities
-    const availabilityKeys = await redis.keys(`availability:${id}:*`);
-    const availabilities: { availableDates: string[] }[] = [];
+    const { meeting, availabilities } = result;
 
-    for (const key of availabilityKeys) {
-      const data = await redis.get(key);
-      if (data) {
-        const parsedData = data as StoredAvailability | string[];
+    // Calculate top dates using centralized utility
+    const topDatesData = calculateTopDates(meeting, availabilities, 3);
 
-        if (Array.isArray(parsedData)) {
-          availabilities.push({
-            availableDates: parsedData,
-          });
-        } else {
-          availabilities.push({
-            availableDates: parsedData.dates || [],
-          });
-        }
-      }
-    }
-
-    // Calculate top date
-    const dateScores: { [date: string]: number } = {};
-
-    meeting.dates.forEach((date: string) => {
-      let count = 0;
-      availabilities.forEach((availability: { availableDates: string[] }) => {
-        if (availability.availableDates.includes(date)) {
-          count++;
-        }
-      });
-      dateScores[date] = count;
-    });
-
-    const topDates = Object.entries(dateScores)
-      .sort((a, b) => b[1] - a[1])
-      .filter(([, count]) => count > 0)
-      .slice(0, 3);
+    // Convert to the format expected below
+    const topDates: [string, number][] = topDatesData.map((td) => [
+      td.date,
+      td.count,
+    ]);
 
     const formatDate = (dateString: string) => {
       const date = new Date(dateString + 'T00:00:00');

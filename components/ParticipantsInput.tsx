@@ -12,6 +12,7 @@ interface ParticipantsInputProps {
   placeholder?: string;
   label?: string;
   countText?: string;
+  onError?: (message: string) => void;
 }
 
 export default function ParticipantsInput({
@@ -20,11 +21,12 @@ export default function ParticipantsInput({
   disabled = false,
   placeholder,
   label,
-  countText
+  countText,
+  onError
 }: ParticipantsInputProps) {
   const { t } = useTranslation();
   const [inputValue, setInputValue] = useState('');
-  
+
   const displayLabel = label || t('landing.participants.label');
   const displayPlaceholder = placeholder || t('landing.participants.placeholder');
 
@@ -39,7 +41,7 @@ export default function ParticipantsInput({
         if (!name) return false;
         if (participants.includes(name)) return false;
         if (name.length > 10) {
-          alert(t('landing.participants.nameTooLong'));
+          onError?.(t('landing.participants.nameTooLong'));
           return false;
         }
         return true;
