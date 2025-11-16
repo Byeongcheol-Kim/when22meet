@@ -3,7 +3,7 @@
 import { X, Github, Linkedin, Instagram, Mail } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
-import { MODAL_COLORS, TEXT_COLORS, LINK_COLORS, SUPPORT_COLORS } from '@/lib/constants/colors';
+import { MODAL_COLORS, TEXT_COLORS, LINK_COLORS, SUPPORT_COLORS, ROLE_BADGE_COLORS, SECTION_BADGE_COLORS } from '@/lib/constants/colors';
 
 interface AboutModalProps {
   onClose: () => void;
@@ -65,7 +65,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-semibold ${TEXT_COLORS.primary}`}>
-                  {t('about.team.designer.name')} - <span className="bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded text-xs font-bold">{t('about.team.designer.role')}</span>
+                  {t('about.team.designer.name')} - <span className={`${ROLE_BADGE_COLORS.designer.bg} ${ROLE_BADGE_COLORS.designer.text} px-2 py-0.5 rounded text-xs font-bold`}>{t('about.team.designer.role')}</span>
                 </span>
                 <div className="flex gap-2">
                   <a
@@ -82,7 +82,7 @@ export default function AboutModal({ onClose }: AboutModalProps) {
 
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-semibold ${TEXT_COLORS.primary}`}>
-                  {t('about.team.developer.name')} - <span className="bg-gray-300 text-gray-700 px-2 py-0.5 rounded text-xs font-bold">{t('about.team.developer.role')}</span>
+                  {t('about.team.developer.name')} - <span className={`${ROLE_BADGE_COLORS.developer.bg} ${ROLE_BADGE_COLORS.developer.text} px-2 py-0.5 rounded text-xs font-bold`}>{t('about.team.developer.role')}</span>
                 </span>
                 <div className="flex gap-2">
                   <a
@@ -127,9 +127,9 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                   href="/faq"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-semibold text-gray-900"
+                  className={`text-sm font-semibold ${TEXT_COLORS.primary}`}
                 >
-                  <span className="bg-orange-400 text-orange-900 px-2 py-0.5 rounded text-xs font-bold">{t('about.viewFAQ')}</span>
+                  <span className={`${SECTION_BADGE_COLORS.dates.bg} ${SECTION_BADGE_COLORS.dates.text} px-2 py-0.5 rounded text-xs font-bold`}>{t('about.viewFAQ')}</span>
                 </Link>
               </div>
             </div>

@@ -242,6 +242,15 @@
       "6": "Saturday"
     }
   },
+  "dateSelector": {
+    "today": "Today"
+  },
+  "seo": {
+    "title": "Schedule Meeting App - When22Meet",
+    "description": "When22Meet is a free scheduling app that makes it easy to coordinate meetings, find meeting times, and schedule group events. Use immediately without sign-up to see everyone's availability at a glance and find the perfect meeting time.",
+    "features": "Key features: Select multiple dates by dragging, real-time attendance tracking, easy sharing via messaging apps, mobile-optimized design",
+    "keywords": "scheduling, calendar coordination, meeting planner, group calendar, event planning, free scheduling app"
+  },
   "faq": {
     "title": "Frequently Asked Questions",
     "subtitle": "Find answers to common questions about When22Meet",

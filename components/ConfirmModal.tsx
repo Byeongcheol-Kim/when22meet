@@ -2,7 +2,7 @@
 
 import { AlertCircle, X } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
-import { MODAL_COLORS, BUTTON_COLORS } from '@/lib/constants/colors';
+import { MODAL_COLORS, BUTTON_COLORS, CONFIRM_MODAL_COLORS } from '@/lib/constants/colors';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -39,18 +39,18 @@ export default function ConfirmModal({
   const getIconColor = () => {
     switch (type) {
       case 'danger':
-        return 'text-red-500';
+        return CONFIRM_MODAL_COLORS.danger.icon;
       case 'warning':
-        return 'text-yellow-500';
+        return CONFIRM_MODAL_COLORS.warning.icon;
       case 'info':
-        return 'text-blue-500';
+        return CONFIRM_MODAL_COLORS.info.icon;
     }
   };
 
   const getConfirmButtonStyle = () => {
     switch (type) {
       case 'danger':
-        return 'bg-red-500 hover:bg-red-600';
+        return `${CONFIRM_MODAL_COLORS.danger.button.bg} ${CONFIRM_MODAL_COLORS.danger.button.hover}`;
       case 'warning':
         return `${BUTTON_COLORS.yellow.bg} ${BUTTON_COLORS.yellow.hover}`;
       case 'info':

@@ -104,6 +104,7 @@ export const BUTTON_COLORS = {
     bg: 'bg-[#FFC354]',
     text: 'text-gray-800',
     hover: 'hover:bg-[#FFD580]',
+    hoverBg: 'bg-[#FFD580]',
   },
   secondary: {
     bg: 'bg-gray-200',
@@ -249,6 +250,7 @@ export const INPUT_COLORS = {
   label: 'text-gray-800',
   border: 'border-gray-300',
   focus: 'focus:border-blue-500',
+  focusPrimary: 'focus:border-[#FFC354]',
   disabled: {
     bg: 'bg-gray-100',
     text: 'text-gray-500',
@@ -432,3 +434,103 @@ export function getDayOfWeekColor(day: number, isHighlighted: boolean = false) {
   if (day === 6) return DATE_COLUMN_COLORS.saturday;
   return DATE_COLUMN_COLORS.weekday;
 }
+
+/**
+ * 역할 배지 색상 (팀원 역할, 참여자 역할 등)
+ */
+export const ROLE_BADGE_COLORS = {
+  designer: {
+    bg: 'bg-yellow-400',
+    text: 'text-yellow-900',
+  },
+  developer: {
+    bg: 'bg-gray-300',
+    text: 'text-gray-700',
+  },
+  organizer: {
+    bg: 'bg-yellow-400',
+    text: 'text-yellow-900',
+    border: 'border-yellow-400',
+    ring: 'ring-yellow-100',
+    bgLight: 'bg-yellow-50',
+  },
+  participant: {
+    bg: 'bg-amber-500',
+    text: 'text-amber-950',
+    border: 'border-amber-400',
+    ring: 'ring-amber-100',
+    bgLight: 'bg-amber-50',
+  },
+} as const;
+
+/**
+ * 비활성 상태 색상
+ */
+export const DISABLED_COLORS = {
+  button: {
+    bg: 'bg-gray-300',
+    text: 'text-gray-500',
+    cursor: 'cursor-not-allowed',
+  },
+  input: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-500',
+  },
+} as const;
+
+/**
+ * 아이콘 색상
+ */
+export const ICON_COLORS = {
+  danger: 'text-red-500',
+  warning: 'text-yellow-500',
+  info: 'text-blue-500',
+  success: 'text-green-500',
+  muted: 'text-gray-400',
+  primary: 'text-yellow-600',
+  secondary: 'text-gray-600',
+} as const;
+
+/**
+ * 확인 모달 색상
+ */
+export const CONFIRM_MODAL_COLORS = {
+  danger: {
+    icon: 'text-red-500',
+    button: {
+      bg: 'bg-red-500',
+      hover: 'hover:bg-red-600',
+      text: 'text-white',
+    },
+  },
+  warning: {
+    icon: 'text-yellow-500',
+    button: {
+      bg: 'bg-yellow-500',
+      hover: 'hover:bg-yellow-600',
+      text: 'text-white',
+    },
+  },
+  info: {
+    icon: 'text-blue-500',
+    button: {
+      bg: 'bg-blue-500',
+      hover: 'hover:bg-blue-600',
+      text: 'text-white',
+    },
+  },
+} as const;
+
+/**
+ * FAQ 페이지 색상
+ */
+export const FAQ_COLORS = {
+  accordion: {
+    open: 'text-yellow-600',
+    closed: 'text-gray-400',
+  },
+  link: {
+    text: 'text-orange-600',
+    hover: 'hover:text-orange-700',
+  },
+} as const;

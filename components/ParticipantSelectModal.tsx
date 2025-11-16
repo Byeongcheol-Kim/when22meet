@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, User, Users, Crown } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
 import { UserRole } from '@/hooks/useCurrentUser';
+import { ROLE_BADGE_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
 
 interface ParticipantSelectModalProps {
   isOpen: boolean;
@@ -77,14 +78,14 @@ export default function ParticipantSelectModal({
               }}
               className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
                 selectedRole === 'organizer'
-                  ? 'border-yellow-400 bg-yellow-50 ring-2 ring-yellow-100'
+                  ? `${ROLE_BADGE_COLORS.organizer.border} ${ROLE_BADGE_COLORS.organizer.bgLight} ring-2 ${ROLE_BADGE_COLORS.organizer.ring}`
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
                   selectedRole === 'organizer'
-                    ? 'bg-yellow-400 text-yellow-900'
+                    ? `${ROLE_BADGE_COLORS.organizer.bg} ${ROLE_BADGE_COLORS.organizer.text}`
                     : 'bg-gray-100 text-gray-600'
                 }`}
               >
@@ -94,7 +95,7 @@ export default function ParticipantSelectModal({
                 <div className="font-medium">{t('meeting.selectParticipant.joinAsOrganizer')}</div>
               </div>
               {selectedRole === 'organizer' && (
-                <span className="text-xs bg-yellow-400 text-yellow-900 px-2 py-0.5 rounded-full">
+                <span className={`text-xs ${ROLE_BADGE_COLORS.organizer.bg} ${ROLE_BADGE_COLORS.organizer.text} px-2 py-0.5 rounded-full`}>
                   {t('meeting.selectParticipant.selected')}
                 </span>
               )}
@@ -122,14 +123,14 @@ export default function ParticipantSelectModal({
                 }}
                 className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${
                   selectedParticipant === participant && selectedRole === 'participant'
-                    ? 'border-amber-400 bg-amber-50 ring-2 ring-amber-100'
+                    ? `${ROLE_BADGE_COLORS.participant.border} ${ROLE_BADGE_COLORS.participant.bgLight} ring-2 ${ROLE_BADGE_COLORS.participant.ring}`
                     : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                 }`}
               >
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center ${
                     selectedParticipant === participant && selectedRole === 'participant'
-                      ? 'bg-amber-500 text-amber-950'
+                      ? `${ROLE_BADGE_COLORS.participant.bg} ${ROLE_BADGE_COLORS.participant.text}`
                       : 'bg-gray-100 text-gray-600'
                   }`}
                 >
@@ -137,7 +138,7 @@ export default function ParticipantSelectModal({
                 </div>
                 <span className="font-medium">{participant}</span>
                 {selectedParticipant === participant && selectedRole === 'participant' && (
-                  <span className="ml-auto text-xs bg-amber-500 text-amber-950 px-2 py-0.5 rounded-full">
+                  <span className={`ml-auto text-xs ${ROLE_BADGE_COLORS.participant.bg} ${ROLE_BADGE_COLORS.participant.text} px-2 py-0.5 rounded-full`}>
                     {t('meeting.selectParticipant.selected')}
                   </span>
                 )}
@@ -158,10 +159,10 @@ export default function ParticipantSelectModal({
           <button
             onClick={handleConfirm}
             disabled={!isConfirmEnabled}
-            className={`w-full py-2.5 font-medium rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors ${
+            className={`w-full py-2.5 font-medium rounded-lg disabled:${DISABLED_COLORS.button.bg} disabled:${DISABLED_COLORS.button.cursor} transition-colors ${
               selectedRole === 'organizer'
-                ? 'bg-yellow-400 text-yellow-900 hover:bg-yellow-500'
-                : 'bg-amber-500 text-amber-950 hover:bg-amber-600'
+                ? `${ROLE_BADGE_COLORS.organizer.bg} ${ROLE_BADGE_COLORS.organizer.text} hover:bg-yellow-500`
+                : `${ROLE_BADGE_COLORS.participant.bg} ${ROLE_BADGE_COLORS.participant.text} hover:bg-amber-600`
             }`}
           >
             {t('meeting.selectParticipant.confirm')}

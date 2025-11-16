@@ -5,7 +5,7 @@ import DateSelector from '@/components/DateSelector';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { useTranslation } from '@/lib/useTranslation';
-import { MODAL_COLORS, BUTTON_COLORS } from '@/lib/constants/colors';
+import { MODAL_COLORS, BUTTON_COLORS, TEXT_COLORS, SECTION_BADGE_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
 
 interface EditMeetingModalProps {
   isOpen: boolean;
@@ -85,10 +85,10 @@ export default function EditMeetingModal({
           />
 
           <div>
-            <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <h3 className={`text-lg font-bold ${TEXT_COLORS.primary} mb-4`}>
               {t('meeting.edit.dateSelection')}
               {dates.length > 0 && (
-                <span className="ml-2 text-xs font-normal bg-orange-400 text-orange-900 px-2 py-0.5 rounded">
+                <span className={`ml-2 text-xs font-normal ${SECTION_BADGE_COLORS.dates.bg} ${SECTION_BADGE_COLORS.dates.text} px-2 py-0.5 rounded`}>
                   {t('landing.dateSelection.selectedCount').replace('%count%', dates.length.toString())}
                 </span>
               )}
@@ -113,7 +113,7 @@ export default function EditMeetingModal({
             disabled={isUpdating}
             className={`flex-1 py-3 ${
               !title || dates.length === 0 || participants.length === 0
-                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                ? `${DISABLED_COLORS.button.bg} ${DISABLED_COLORS.button.text} ${DISABLED_COLORS.button.cursor}`
                 : `${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} ${BUTTON_COLORS.primary.hover}`
             } rounded-xl font-semibold transition-colors`}
           >

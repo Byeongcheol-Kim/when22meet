@@ -17,8 +17,8 @@ export interface DateSelectorRef {
 }
 
 const DateSelector = forwardRef<DateSelectorRef, DateSelectorProps>(({ selectedDates, onDatesChange, disabled = false, title }, ref) => {
-  const { locale } = useTranslation();
-  const todayLabel = locale === 'ko' ? '오늘' : 'Today';
+  const { locale, t } = useTranslation();
+  const todayLabel = t('dateSelector.today');
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<string | null>(null);
   const calendarRef = useRef<HTMLDivElement>(null);

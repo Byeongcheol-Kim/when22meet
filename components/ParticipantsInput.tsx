@@ -3,7 +3,7 @@
 import { useState, KeyboardEvent } from 'react';
 import { X, UserPlus } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
-import { SECTION_BADGE_COLORS } from '@/lib/constants/colors';
+import { SECTION_BADGE_COLORS, TEXT_COLORS, BUTTON_COLORS, INPUT_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
 
 interface ParticipantsInputProps {
   participants: string[];
@@ -85,7 +85,7 @@ export default function ParticipantsInput({
 
   return (
     <div>
-      <label className="text-lg font-bold text-gray-800 block mb-4">
+      <label className={`text-lg font-bold ${TEXT_COLORS.primary} block mb-4`}>
         {displayLabel}
         {participants.length > 0 && countText && (
           <span className={`ml-2 text-xs font-normal ${SECTION_BADGE_COLORS.participants.bg} ${SECTION_BADGE_COLORS.participants.text} px-2 py-0.5 rounded`}>
@@ -100,13 +100,13 @@ export default function ParticipantsInput({
           {participants.map((participant, index) => (
             <div
               key={index}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-[#FFC354] text-gray-800 rounded-full text-sm font-medium"
+              className={`inline-flex items-center gap-1 px-3 py-1 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-full text-sm font-medium`}
             >
               <span>{participant}</span>
               {!disabled && (
                 <button
                   onClick={() => removeParticipant(participant)}
-                  className="hover:bg-[#FFD580] rounded-full p-0.5 transition-colors"
+                  className={`${BUTTON_COLORS.primary.hover} rounded-full p-0.5 transition-colors`}
                   type="button"
                 >
                   <X className="w-3 h-3" />
@@ -135,9 +135,9 @@ export default function ParticipantsInput({
           placeholder={displayPlaceholder}
           disabled={disabled}
           maxLength={10}
-          className="w-full px-4 py-3 pr-10 border rounded-lg outline-none focus:border-[#FFC354] disabled:bg-gray-50 disabled:text-gray-500"
+          className={`w-full px-4 py-3 pr-10 border rounded-lg outline-none ${INPUT_COLORS.focusPrimary} disabled:bg-gray-50 disabled:${DISABLED_COLORS.input.text}`}
         />
-        <UserPlus className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-600" />
+        <UserPlus className={`absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${TEXT_COLORS.tertiary}`} />
       </div>
     </div>
   );

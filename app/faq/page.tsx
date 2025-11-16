@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, ChevronUp, Home } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from '@/lib/useTranslation';
+import { FAQ_COLORS, BUTTON_COLORS, TEXT_COLORS } from '@/lib/constants/colors';
 
 export default function FAQPage() {
   const { t } = useTranslation();
@@ -48,9 +49,9 @@ export default function FAQPage() {
                   </div>
                   <div className="ml-4 flex-shrink-0 mt-1">
                     {openIndex === index ? (
-                      <ChevronUp className="w-5 h-5 text-yellow-600" />
+                      <ChevronUp className={`w-5 h-5 ${FAQ_COLORS.accordion.open}`} />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                      <ChevronDown className={`w-5 h-5 ${FAQ_COLORS.accordion.closed}`} />
                     )}
                   </div>
                 </button>
@@ -62,20 +63,20 @@ export default function FAQPage() {
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-[#FFC354] text-gray-800 rounded-lg hover:bg-[#FFD580] transition-colors font-medium"
+            className={`inline-flex items-center gap-2 px-6 py-3 ${BUTTON_COLORS.primary.bg} ${BUTTON_COLORS.primary.text} rounded-lg ${BUTTON_COLORS.primary.hover} transition-colors font-medium`}
           >
             <Home className="w-5 h-5" />
             {t('faq.backHome')}
           </Link>
         </div>
 
-        <div className="mt-8 text-center text-sm text-gray-600">
+        <div className={`mt-8 text-center text-sm ${TEXT_COLORS.tertiary}`}>
           <p className="font-medium">{t('faq.moreQuestions')}</p>
           <p className="mt-1">
             {t('faq.contactEmail')}{' '}
             <a
               href="mailto:benchely.kim@gmail.com"
-              className="text-orange-600 hover:text-orange-700 font-medium underline transition-colors"
+              className={`${FAQ_COLORS.link.text} ${FAQ_COLORS.link.hover} font-medium underline transition-colors`}
             >
               benchely.kim@gmail.com
             </a>

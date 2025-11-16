@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import { PlusCircle, Info, X, Menu, Pencil, Link } from 'lucide-react';
+import { MEETING_PAGE_COLORS, TEXT_COLORS } from '@/lib/constants/colors';
 
 interface FloatingActionButtonProps {
   isOpen: boolean;
@@ -32,7 +33,7 @@ export const FloatingActionButton = memo(function FloatingActionButton({
             className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
             title={t('meeting.fab.share')}
           >
-            <Link className="w-5 h-5 text-gray-600" />
+            <Link className={`w-5 h-5 ${TEXT_COLORS.tertiary}`} />
           </button>
 
           <button
@@ -40,7 +41,7 @@ export const FloatingActionButton = memo(function FloatingActionButton({
             className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
             title={t('meeting.edit.title')}
           >
-            <Pencil className="w-5 h-5 text-gray-600" />
+            <Pencil className={`w-5 h-5 ${TEXT_COLORS.tertiary}`} />
           </button>
 
           <button
@@ -48,7 +49,7 @@ export const FloatingActionButton = memo(function FloatingActionButton({
             className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
             title={t('meeting.fab.newMeeting')}
           >
-            <PlusCircle className="w-5 h-5 text-gray-600" />
+            <PlusCircle className={`w-5 h-5 ${TEXT_COLORS.tertiary}`} />
           </button>
 
           <button
@@ -56,7 +57,7 @@ export const FloatingActionButton = memo(function FloatingActionButton({
             className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
             title={t('meeting.fab.info')}
           >
-            <Info className="w-5 h-5 text-gray-600" />
+            <Info className={`w-5 h-5 ${TEXT_COLORS.tertiary}`} />
           </button>
         </div>
       )}
@@ -64,7 +65,7 @@ export const FloatingActionButton = memo(function FloatingActionButton({
       {/* Main FAB button */}
       <button
         onClick={onToggle}
-        className={`w-12 h-12 bg-gray-400 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center ${
+        className={`w-12 h-12 ${MEETING_PAGE_COLORS.addParticipant.bg} ${MEETING_PAGE_COLORS.addParticipant.text} rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center ${
           isOpen ? 'rotate-45' : ''
         }`}
       >
