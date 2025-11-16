@@ -42,23 +42,30 @@ export function useCurrentUser({
       // Organizer mode (not tied to specific participant)
       setCurrentUserState('__organizer__');
       setUserRole('organizer');
-    } else if (savedUser && participants.includes(savedUser)) {
-      // User exists in localStorage and is still a valid participant
-      setCurrentUserState(savedUser);
+      setIsInitialized(true);
+    } else if (savedUser && participants.length > 0) {
+      // Only check participant validity when participants are loaded
+      if (participants.includes(savedUser)) {
+        // User exists in localStorage and is still a valid participant
+        setCurrentUserState(savedUser);
 
-      // Load role
-      const roleKey = `${ROLE_KEY_PREFIX}${meetingId}`;
-      const savedRole = localStorage.getItem(roleKey);
-      if (savedRole === 'organizer' || savedRole === 'participant') {
-        setUserRole(savedRole);
+        // Load role
+        const roleKey = `${ROLE_KEY_PREFIX}${meetingId}`;
+        const savedRole = localStorage.getItem(roleKey);
+        if (savedRole === 'organizer' || savedRole === 'participant') {
+          setUserRole(savedRole);
+        }
+      } else {
+        // User was saved but is no longer a participant (removed)
+        localStorage.removeItem(storageKey);
+        setCurrentUserState(null);
       }
-    } else if (savedUser && !participants.includes(savedUser) && savedUser !== '__organizer__') {
-      // User was saved but is no longer a participant (removed)
-      localStorage.removeItem(storageKey);
-      setCurrentUserState(null);
+      setIsInitialized(true);
+    } else if (!savedUser && participants.length > 0) {
+      // No saved user and participants are loaded
+      setIsInitialized(true);
     }
-
-    setIsInitialized(true);
+    // Don't set initialized if participants haven't loaded yet (except for organizer)
   }, [meetingId, participants]);
 
   // Set current user and persist to localStorage
