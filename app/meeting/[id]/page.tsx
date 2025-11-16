@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, use, useCallback } from 'react';
+import { useEffect, useState, use, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
@@ -36,6 +36,20 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   // Toast state
   const { toastMessage, toastType, showToast, hideToast } = useToast();
 
+  // Use refs to avoid dependency issues in callbacks
+  const showToastRef = useRef(showToast);
+  const tRef = useRef(t);
+  const routerRef = useRef(router);
+  showToastRef.current = showToast;
+  tRef.current = t;
+  routerRef.current = router;
+
+  // Error handler for meeting data (stable reference)
+  const handleMeetingError = useCallback(() => {
+    showToastRef.current(tRef.current('meeting.alerts.notFound'), 'error');
+    routerRef.current.push('/');
+  }, []);
+
   // Meeting data and state
   const {
     meeting,
@@ -48,10 +62,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     allParticipants,
   } = useMeetingData({
     meetingId: resolvedParams.id,
-    onError: () => {
-      showToast(t('meeting.alerts.notFound'), 'error');
-      router.push('/');
-    },
+    onError: handleMeetingError,
   });
 
   // Scroll management
@@ -102,10 +113,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNewMeetingConfirm, setShowNewMeetingConfirm] = useState(false);
 
-  // Initial data fetch
+  // Initial data fetch - only on mount
   useEffect(() => {
     fetchMeetingData();
-  }, [fetchMeetingData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolvedParams.id]);
 
   // Load current data when opening edit modal
   useEffect(() => {
@@ -128,12 +140,12 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   // Add participant handler
   const handleAddParticipantSubmit = useCallback(async () => {
     if (!newParticipantName.trim()) {
-      showToast(t('meeting.alerts.enterName'), 'warning');
+      showToastRef.current(tRef.current('meeting.alerts.enterName'), 'warning');
       return;
     }
 
     if (newParticipantName.trim().length > 10) {
-      showToast(t('meeting.alerts.nameTooLong'), 'warning');
+      showToastRef.current(tRef.current('meeting.alerts.nameTooLong'), 'warning');
       return;
     }
 
@@ -143,17 +155,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       setNewParticipantName('');
     }
     setIsSubmitting(false);
-  }, [newParticipantName, handleAddParticipant, showToast, t]);
+  }, [newParticipantName, handleAddParticipant]);
 
   // Update meeting handler
   const handleUpdateDates = useCallback(async () => {
     if (!meeting || editingDates.length === 0) {
-      showToast(t('meeting.alerts.selectDates'), 'warning');
+      showToastRef.current(tRef.current('meeting.alerts.selectDates'), 'warning');
       return;
     }
 
     if (!editingTitle.trim()) {
-      showToast(t('meeting.alerts.enterTitle'), 'warning');
+      showToastRef.current(tRef.current('meeting.alerts.enterTitle'), 'warning');
       return;
     }
 
@@ -161,17 +173,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     const success = await handleUpdateMeeting(editingTitle, editingDates, editingParticipants);
     if (success) {
       setShowEditModal(false);
-      showToast(t('meeting.edit.updateSuccess'), 'success');
+      showToastRef.current(tRef.current('meeting.edit.updateSuccess'), 'success');
     }
     setIsUpdating(false);
-  }, [meeting, editingDates, editingTitle, editingParticipants, handleUpdateMeeting, showToast, t]);
+  }, [meeting, editingDates, editingTitle, editingParticipants, handleUpdateMeeting]);
 
   // Share handlers
   const handleShareLink = useCallback(() => {
     const meetingUrl = `${window.location.origin}/meeting/${resolvedParams.id}`;
     navigator.clipboard.writeText(meetingUrl);
-    showToast(t('meeting.toast.linkCopied'), 'success');
-  }, [resolvedParams.id, showToast, t]);
+    showToastRef.current(tRef.current('meeting.toast.linkCopied'), 'success');
+  }, [resolvedParams.id]);
 
   const handleShareTemplate = useCallback(() => {
     if (!meeting) return;
@@ -183,8 +195,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     }
 
     navigator.clipboard.writeText(templateUrl.toString());
-    showToast(t('meeting.toast.templateCopied'), 'success');
-  }, [meeting, allParticipants, showToast, t]);
+    showToastRef.current(tRef.current('meeting.toast.templateCopied'), 'success');
+  }, [meeting, allParticipants]);
 
   const handleShareTemplateFromEditModal = useCallback(async () => {
     const templateUrl = new URL('/', window.location.origin);
@@ -193,8 +205,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       templateUrl.searchParams.set('participants', editingParticipants.join(','));
     }
     await navigator.clipboard.writeText(templateUrl.toString());
-    showToast(t('meeting.toast.shareTemplateCopied'), 'success');
-  }, [editingTitle, editingParticipants, showToast, t]);
+    showToastRef.current(tRef.current('meeting.toast.shareTemplateCopied'), 'success');
+  }, [editingTitle, editingParticipants]);
 
   // Loading state
   if (isLoading) {

@@ -31,6 +31,12 @@ export function useMeetingData({
   );
   const [participantOrder, setParticipantOrder] = useState<string[]>([]);
   const isInitialLoadRef = useRef(true);
+  const lockedParticipantsRef = useRef<Set<string>>(new Set());
+  const onErrorRef = useRef(onError);
+
+  // Keep refs in sync with props/state
+  lockedParticipantsRef.current = lockedParticipants;
+  onErrorRef.current = onError;
 
   const fetchMeetingData = useCallback(
     async (preserveLocalLockState = false) => {
@@ -44,7 +50,7 @@ export function useMeetingData({
 
         // If preserveLocalLockState is true, maintain current client's lock state
         if (preserveLocalLockState) {
-          const currentLocked = new Set(lockedParticipants);
+          const currentLocked = new Set(lockedParticipantsRef.current);
           setAvailabilities(
             data.availabilities.map((a: Availability) => ({
               ...a,
@@ -99,12 +105,12 @@ export function useMeetingData({
         }
       } catch (error) {
         console.error('Error fetching meeting:', error);
-        onError?.('Meeting not found');
+        onErrorRef.current?.('Meeting not found');
       } finally {
         setIsLoading(false);
       }
     },
-    [meetingId, lockedParticipants, onError]
+    [meetingId] // Only depend on meetingId for stable reference
   );
 
   // Create Map for O(1) lookup (solves O(N²) problem)

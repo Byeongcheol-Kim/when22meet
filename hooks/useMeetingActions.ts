@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { Availability } from '@/lib/types';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
@@ -20,22 +20,33 @@ interface UseMeetingActionsProps {
 export function useMeetingActions({
   meetingId,
   availabilities,
-  setAvailabilities,
   lockedParticipants,
   setLockedParticipants,
   fetchMeetingData,
   onError,
   t,
 }: UseMeetingActionsProps) {
+  // Use refs for values that change frequently to avoid recreating callbacks
+  const availabilitiesRef = useRef(availabilities);
+  const lockedParticipantsRef = useRef(lockedParticipants);
+  const onErrorRef = useRef(onError);
+  const tRef = useRef(t);
+
+  // Keep refs in sync
+  availabilitiesRef.current = availabilities;
+  lockedParticipantsRef.current = lockedParticipants;
+  onErrorRef.current = onError;
+  tRef.current = t;
+
   const handleAddParticipant = useCallback(
     async (participantName: string) => {
       if (!participantName.trim()) {
-        onError?.(t('meeting.alerts.enterName'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.enterName'));
         return false;
       }
 
       if (participantName.trim().length > 10) {
-        onError?.(t('meeting.alerts.nameTooLong'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.nameTooLong'));
         return false;
       }
 
@@ -59,11 +70,11 @@ export function useMeetingActions({
         return false;
       } catch (error) {
         console.error('Error adding participant:', error);
-        onError?.(t('meeting.alerts.addParticipantFailed'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.addParticipantFailed'));
         return false;
       }
     },
-    [meetingId, fetchMeetingData, onError, t]
+    [meetingId, fetchMeetingData]
   );
 
   const handleStatusClick = useCallback(
@@ -83,41 +94,10 @@ export function useMeetingActions({
       }
 
       // Find current participant's availability
-      const currentAvailability = availabilities.find(
+      const currentAvailability = availabilitiesRef.current.find(
         (a) => a.participantName === participant
       );
       const currentAvailableDates = currentAvailability?.availableDates || [];
-      const currentUnavailableDates =
-        currentAvailability?.unavailableDates || [];
-
-      // Optimistic UI - Update status immediately
-      const optimisticAvailabilities = availabilities.map((a) => {
-        if (a.participantName === participant) {
-          let newAvailableDates = [...currentAvailableDates];
-          let newUnavailableDates = [...currentUnavailableDates];
-
-          // Remove from all lists first
-          newAvailableDates = newAvailableDates.filter((d) => d !== date);
-          newUnavailableDates = newUnavailableDates.filter((d) => d !== date);
-
-          // Add to appropriate list
-          if (newStatus === 'available') {
-            newAvailableDates.push(date);
-          } else if (newStatus === 'unavailable') {
-            newUnavailableDates.push(date);
-          }
-
-          return {
-            ...a,
-            availableDates: newAvailableDates,
-            unavailableDates: newUnavailableDates,
-          };
-        }
-        return a;
-      });
-
-      // Optimistic update
-      setAvailabilities(optimisticAvailabilities);
 
       // Calculate final dates for API
       let newAvailableDates = [...currentAvailableDates];
@@ -137,42 +117,30 @@ export function useMeetingActions({
               availableDates: newAvailableDates,
               unavailableDates: newStatus === 'unavailable' ? [date] : [],
               statusUpdate: { date, status: newStatus },
-              isLocked: lockedParticipants.has(participant),
+              isLocked: lockedParticipantsRef.current.has(participant),
             }),
           }
         );
 
         if (!response.ok) {
-          // Rollback on error, but preserve lock state
-          await fetchMeetingData(true);
-          onError?.(t('meeting.alerts.updateFailed'));
+          onErrorRef.current?.(tRef.current('meeting.alerts.updateFailed'));
         }
       } catch (error) {
         console.error('Error updating status:', error);
-        // Rollback on error, but preserve lock state
-        await fetchMeetingData(true);
-        onError?.(t('meeting.alerts.networkError'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.networkError'));
       }
     },
-    [
-      availabilities,
-      setAvailabilities,
-      lockedParticipants,
-      meetingId,
-      fetchMeetingData,
-      onError,
-      t,
-    ]
+    [meetingId]
   );
 
   const handleToggleLock = useCallback(
     async (participant: string) => {
-      const currentAvailability = availabilities.find(
+      const currentAvailability = availabilitiesRef.current.find(
         (a) => a.participantName === participant
       );
       if (!currentAvailability) return;
 
-      const newIsLocked = !lockedParticipants.has(participant);
+      const newIsLocked = !lockedParticipantsRef.current.has(participant);
 
       // Optimistic update
       setLockedParticipants((prev) => {
@@ -211,24 +179,18 @@ export function useMeetingActions({
         await fetchMeetingData();
       }
     },
-    [
-      availabilities,
-      lockedParticipants,
-      setLockedParticipants,
-      meetingId,
-      fetchMeetingData,
-    ]
+    [meetingId, setLockedParticipants, fetchMeetingData]
   );
 
   const handleUpdateMeeting = useCallback(
     async (title: string, dates: string[], participants: string[]) => {
       if (dates.length === 0) {
-        onError?.(t('meeting.alerts.selectDates'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.selectDates'));
         return false;
       }
 
       if (!title.trim()) {
-        onError?.(t('meeting.alerts.enterTitle'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.enterTitle'));
         return false;
       }
 
@@ -247,16 +209,16 @@ export function useMeetingActions({
           await fetchMeetingData(true);
           return true;
         } else {
-          onError?.(t('meeting.edit.updateFailed'));
+          onErrorRef.current?.(tRef.current('meeting.edit.updateFailed'));
           return false;
         }
       } catch (error) {
         console.error('Error updating dates:', error);
-        onError?.(t('meeting.alerts.updateScheduleFailed'));
+        onErrorRef.current?.(tRef.current('meeting.alerts.updateScheduleFailed'));
         return false;
       }
     },
-    [meetingId, fetchMeetingData, onError, t]
+    [meetingId, fetchMeetingData]
   );
 
   return {
