@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { CONFIG } from '@/lib/constants/config';
 
 type ToastType = 'success' | 'error' | 'info' | 'warning';
 

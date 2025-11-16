@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import redis from '@/lib/redis';
 import { generateMeetingId } from '@/lib/utils';
 import { Meeting } from '@/lib/types';
+import { saveMeeting, saveAvailability } from '@/lib/utils/redis';
+import { CONFIG } from '@/lib/constants/config';
 
 // Create a new meeting
 export async function POST(request: NextRequest) {
@@ -17,17 +18,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate title length
-    if (title.length > 100) {
+    if (title.length > CONFIG.MAX_MEETING_TITLE_LENGTH) {
       return NextResponse.json(
-        { error: 'Title is too long (max 100 characters)' },
+        { error: `Title is too long (max ${CONFIG.MAX_MEETING_TITLE_LENGTH} characters)` },
         { status: 400 }
       );
     }
 
     // Validate dates array length
-    if (dates.length > 365) {
+    if (dates.length > CONFIG.MAX_DATES) {
       return NextResponse.json(
-        { error: 'Too many dates selected (max 365)' },
+        { error: `Too many dates selected (max ${CONFIG.MAX_DATES})` },
         { status: 400 }
       );
     }
@@ -39,38 +40,30 @@ export async function POST(request: NextRequest) {
       dates,
       participants: [], // Initially empty array
       createdAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 18 * 30 * 24 * 60 * 60 * 1000).toISOString(), // 18 months
+      expiresAt: new Date(Date.now() + CONFIG.MEETING_TTL_SECONDS * 1000).toISOString(),
       locale, // Save user's language preference
     };
 
-    // Save to Redis with 18-month TTL
-    await redis.setex(
-      `meeting:${meetingId}`,
-      18 * 30 * 24 * 60 * 60, // 18 months
-      meeting
-    );
+    // Save to Redis with centralized TTL
+    await saveMeeting(meeting);
 
     // If participants were provided, add them as availabilities
     if (participants && participants.length > 0) {
+      const timestamp = Date.now();
       for (const participantName of participants) {
-        const availability = {
-          participantName,
-          availableDates: [],
+        await saveAvailability(meetingId, participantName, {
+          dates: [],
           unavailableDates: [],
-          isLocked: false
-        };
-        await redis.setex(
-          `availability:${meetingId}:${participantName}`,
-          18 * 30 * 24 * 60 * 60, // 18 months
-          availability
-        );
+          timestamp, // CRITICAL: Include timestamp for proper sorting
+          isLocked: false,
+        });
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       meetingId,
-      meeting 
+      meeting,
     });
   } catch (error) {
     console.error('Error creating meeting:', error);

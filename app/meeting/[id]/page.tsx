@@ -1,47 +1,97 @@
 'use client';
 
-import { useEffect, useState, use, useRef, useMemo } from 'react';
+import { useEffect, useState, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Meeting, Availability } from '@/lib/types';
-import { Plus, PlusCircle, Info, X, Menu, Pencil, Link } from 'lucide-react';
 import AboutModal from '@/components/AboutModal';
 import MeetingStructuredData from '@/components/MeetingStructuredData';
 import ShareModal from '@/components/ShareModal';
 import EditMeetingModal from '@/components/EditMeetingModal';
 import ConfirmModal from '@/components/ConfirmModal';
 import Toast from '@/components/Toast';
-import { formatYearMonth, parseStringToDate } from '@/lib/utils/date';
 import { useTranslation } from '@/lib/useTranslation';
-import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS } from '@/lib/constants/colors';
+import { useMeetingData } from '@/hooks/useMeetingData';
+import { useMeetingActions } from '@/hooks/useMeetingActions';
+import { useMeetingGrid } from '@/hooks/useMeetingGrid';
+import { useScrollManager } from '@/hooks/useScrollManager';
+import { useToast } from '@/hooks/useToast';
+import {
+  DateCell,
+  StatusCell,
+  ParticipantHeader,
+  MonthSeparator,
+  HeaderCorner,
+} from '@/components/MeetingGrid/GridCell';
+import { FloatingActionButton } from '@/components/MeetingGrid/FloatingActionButton';
+import { TopDatesIndicator } from '@/components/MeetingGrid/TopDatesIndicator';
+import { AddParticipantInput } from '@/components/MeetingGrid/AddParticipantInput';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
-
-interface GridCell {
-  type: 'header-corner' | 'header-participant' | 'date' | 'status' | 'month-separator' | 'add-input';
-  content?: string;
-  date?: string;
-  participant?: string;
-  status?: ParticipantStatus;
-  month?: string;
-}
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
   const { t } = useTranslation();
   const resolvedParams = use(params);
-  const [meeting, setMeeting] = useState<Meeting | null>(null);
-  const [availabilities, setAvailabilities] = useState<Availability[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  // Toast state
+  const { toastMessage, toastType, showToast, hideToast } = useToast();
+
+  // Meeting data and state
+  const {
+    meeting,
+    availabilities,
+    isLoading,
+    lockedParticipants,
+    setLockedParticipants,
+    fetchMeetingData,
+    availabilityMap,
+    allParticipants,
+  } = useMeetingData({
+    meetingId: resolvedParams.id,
+    onError: () => {
+      showToast(t('meeting.alerts.notFound'), 'error');
+      router.push('/');
+    },
+  });
+
+  // Scroll management
+  const {
+    scrollContainerRef,
+    currentMonth,
+    datePositions,
+    scrollTop,
+    clientHeight,
+    highlightedDate,
+    scrollToDate,
+  } = useScrollManager({ meeting });
+
+  // Grid data calculation
+  const { gridData, topDates } = useMeetingGrid({
+    meeting,
+    availabilities,
+    availabilityMap,
+    allParticipants,
+    currentMonth,
+    t,
+  });
+
+  // Meeting actions with useCallback
+  const { handleAddParticipant, handleStatusClick, handleToggleLock, handleUpdateMeeting } =
+    useMeetingActions({
+      meetingId: resolvedParams.id,
+      availabilities,
+      setAvailabilities: () => {}, // Will be handled differently
+      lockedParticipants,
+      setLockedParticipants,
+      fetchMeetingData,
+      onError: (message) => showToast(message, 'error'),
+      t,
+    });
+
+  // UI state
   const [showAddInput, setShowAddInput] = useState(false);
   const [newParticipantName, setNewParticipantName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [currentMonth, setCurrentMonth] = useState('');
-  const [lockedParticipants, setLockedParticipants] = useState<Set<string>>(new Set());
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [participantOrder, setParticipantOrder] = useState<string[]>([]);
-  const [datePositions, setDatePositions] = useState<{[date: string]: number}>({});
-  const [scrollTop, setScrollTop] = useState(0);
-  const [clientHeight, setClientHeight] = useState(0);
-  const [highlightedDate, setHighlightedDate] = useState<string | null>(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
   const [showFabMenu, setShowFabMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -51,516 +101,102 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [isUpdating, setIsUpdating] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNewMeetingConfirm, setShowNewMeetingConfirm] = useState(false);
-  const [toastMessage, setToastMessage] = useState('');
-  const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
+  // Initial data fetch
   useEffect(() => {
     fetchMeetingData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolvedParams.id]);
-  
-  // Set initial lock state and participant order (on first load only)
-  useEffect(() => {
-    if (isInitialLoad && availabilities.length > 0 && meeting) {
-      const locked = new Set<string>();
-      availabilities.forEach(a => {
-        if (a.isLocked) {
-          locked.add(a.participantName);
-        }
-      });
-      setLockedParticipants(locked);
-
-      // 초기 로드 시에만 참석자 순서 정렬하여 저장
-      const sortedParticipants = Array.from(new Set(availabilities.map(a => a.participantName)))
-        .map(name => {
-          const availability = availabilities.find(a => a.participantName === name);
-          const isLocked = locked.has(name);
-
-          // 미정 개수 계산
-          const totalDates = meeting?.dates.length || 0;
-          const availableCount = availability?.availableDates.length || 0;
-          const unavailableCount = availability?.unavailableDates?.length || 0;
-          const undecidedCount = totalDates - availableCount - unavailableCount;
-
-          return { name, isLocked, undecidedCount };
-        })
-        .sort((a, b) => {
-          // 1. 확정 여부로 먼저 정렬 (미확정이 앞에)
-          if (a.isLocked !== b.isLocked) {
-            return a.isLocked ? 1 : -1;
-          }
-          // 2. 미정이 많은 순으로 정렬
-          return b.undecidedCount - a.undecidedCount;
-        })
-        .map(p => p.name);
-
-      setParticipantOrder(sortedParticipants);
-      setIsInitialLoad(false);
-    }
-  }, [availabilities, isInitialLoad, meeting]);
-  
-  // Set initial month
-  useEffect(() => {
-    if (meeting && meeting.dates.length > 0 && !currentMonth) {
-      const firstDate = parseStringToDate(meeting.dates[0]);
-      setCurrentMonth(formatYearMonth(firstDate));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meeting]);
-
-  const fetchMeetingData = async (preserveLocalLockState = false) => {
-    try {
-      const response = await fetch(`/api/meetings/${resolvedParams.id}`);
-      if (!response.ok) {
-        throw new Error('Meeting not found');
-      }
-      const data = await response.json();
-      setMeeting(data.meeting);
-
-      // If preserveLocalLockState is true, maintain current client's lock state
-      if (preserveLocalLockState) {
-        const currentLocked = new Set(lockedParticipants);
-        setAvailabilities(data.availabilities.map((a: Availability) => ({
-          ...a,
-          isLocked: currentLocked.has(a.participantName) || a.isLocked
-        })));
-      } else {
-        setAvailabilities(data.availabilities);
-      }
-    } catch (error) {
-      console.error('Error fetching meeting:', error);
-      setToastMessage(t('meeting.alerts.notFound'));
-      setToastType('error');
-      router.push('/');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddParticipant = async () => {
-    if (!newParticipantName.trim()) {
-      setToastMessage(t('meeting.alerts.enterName'));
-      setToastType('warning');
-      return;
-    }
-
-    if (newParticipantName.trim().length > 10) {
-      setToastMessage(t('meeting.alerts.nameTooLong'));
-      setToastType('warning');
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participantName: newParticipantName.trim(),
-          availableDates: []
-        })
-      });
-
-      if (response.ok) {
-        await fetchMeetingData(true); // Refresh data while maintaining lock state
-        setNewParticipantName(''); // Only reset input, keep input field open
-        // Don't close input field - allow continuous addition
-      }
-    } catch (error) {
-      console.error('Error adding participant:', error);
-      setToastMessage(t('meeting.alerts.addParticipantFailed'));
-      setToastType('error');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleStatusClick = async (participant: string, date: string, currentStatus: ParticipantStatus) => {
-    // Status cycle: undecided -> available -> unavailable -> undecided
-    let newStatus: ParticipantStatus;
-    if (currentStatus === 'undecided') {
-      newStatus = 'available';
-    } else if (currentStatus === 'available') {
-      newStatus = 'unavailable';
-    } else {
-      newStatus = 'undecided';
-    }
-
-    // Find current participant's availability
-    const currentAvailability = availabilities.find(a => a.participantName === participant);
-    const currentAvailableDates = currentAvailability?.availableDates || [];
-    const currentUnavailableDates = currentAvailability?.unavailableDates || [];
-    
-    // Optimistic UI - Update status immediately
-    const optimisticAvailabilities = availabilities.map(a => {
-      if (a.participantName === participant) {
-        let newAvailableDates = [...currentAvailableDates];
-        let newUnavailableDates = [...currentUnavailableDates];
-        
-        // Remove from all lists first
-        newAvailableDates = newAvailableDates.filter(d => d !== date);
-        newUnavailableDates = newUnavailableDates.filter(d => d !== date);
-        
-        // Add to appropriate list
-        if (newStatus === 'available') {
-          newAvailableDates.push(date);
-        } else if (newStatus === 'unavailable') {
-          newUnavailableDates.push(date);
-        }
-        
-        return {
-          ...a,
-          availableDates: newAvailableDates,
-          unavailableDates: newUnavailableDates
-        };
-      }
-      return a;
-    });
-    
-    // Optimistic update
-    setAvailabilities(optimisticAvailabilities);
-    
-    // Calculate final dates for API
-    let newAvailableDates = [...currentAvailableDates];
-    newAvailableDates = newAvailableDates.filter(d => d !== date);
-    if (newStatus === 'available') {
-      newAvailableDates.push(date);
-    }
-
-    try {
-      const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          participantName: participant,
-          availableDates: newAvailableDates,
-          unavailableDates: newStatus === 'unavailable' ? [date] : [],
-          statusUpdate: { date, status: newStatus },
-          isLocked: lockedParticipants.has(participant) // Maintain current lock state
-        })
-      });
-
-      if (!response.ok) {
-        // Rollback on error, but preserve lock state
-        await fetchMeetingData(true);
-        setToastMessage(t('meeting.alerts.updateFailed'));
-        setToastType('error');
-      }
-      // Success - keep optimistic update
-    } catch (error) {
-      console.error('Error updating status:', error);
-      // Rollback on error, but preserve lock state
-      await fetchMeetingData(true);
-      setToastMessage(t('meeting.alerts.networkError'));
-      setToastType('error');
-    }
-  };
-
-  // Scroll handler for month display
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!scrollContainerRef.current || !meeting) return;
-      
-      const container = scrollContainerRef.current;
-      const scrollTop = container.scrollTop;
-      const rowHeight = 56; // Approximate row height
-      
-      // Calculate visible date index from scroll position
-      const visibleIndex = Math.floor((scrollTop + 40) / rowHeight); // Consider header height 40px
-      const dateIndex = Math.max(0, Math.min(visibleIndex - 1, meeting.dates.length - 1)); // Consider month separator row
-      
-      if (meeting.dates[dateIndex]) {
-        const date = parseStringToDate(meeting.dates[dateIndex]);
-        const month = formatYearMonth(date);
-        
-        if (month !== currentMonth) {
-          setCurrentMonth(month);
-        }
-      }
-    };
-    
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll);
-      // Set initial value
-      setTimeout(() => handleScroll(), 100);
-      
-      return () => {
-        container.removeEventListener('scroll', handleScroll);
-      };
-    }
-  }, [meeting, availabilities, currentMonth]); // Add currentMonth dependency
-  
-  // useEffect for tracking scroll position
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (container) {
-      const handleScroll = () => {
-        setScrollTop(container.scrollTop);
-        setClientHeight(container.clientHeight);
-      };
-      
-      container.addEventListener('scroll', handleScroll);
-      handleScroll(); // Set initial value
-      
-      // Calculate date positions
-      const positions: {[date: string]: number} = {};
-      const dateRows = container.querySelectorAll('[data-date-row]');
-      dateRows.forEach((row) => {
-        const date = (row as HTMLElement).querySelector('.flex-col')?.parentElement?.getAttribute('data-date-row');
-        if (date && row instanceof HTMLElement) {
-          const dateAttr = row.getAttribute('data-date-row');
-          if (dateAttr) {
-            positions[dateAttr] = row.offsetTop;
-          }
-        }
-      });
-      setDatePositions(positions);
-      
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
-  }, [meeting, availabilities]);
-
-  // Auto-remove highlight
-  useEffect(() => {
-    if (highlightedDate) {
-      const timer = setTimeout(() => {
-        setHighlightedDate(null);
-      }, 2000); // Remove highlight after 2 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [highlightedDate]);
-
-  // Schedule update handler
-  const handleUpdateDates = async () => {
-    if (!meeting || editingDates.length === 0) {
-      setToastMessage(t('meeting.alerts.selectDates'));
-      setToastType('warning');
-      return;
-    }
-
-    if (!editingTitle.trim()) {
-      setToastMessage(t('meeting.alerts.enterTitle'));
-      setToastType('warning');
-      return;
-    }
-
-    setIsUpdating(true);
-    try {
-      const response = await fetch(`/api/meetings/${resolvedParams.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: editingTitle.trim(),
-          dates: editingDates.sort(),
-          participants: editingParticipants
-        })
-      });
-
-      if (response.ok) {
-        await fetchMeetingData(true);
-        setShowEditModal(false);
-        setToastMessage(t('meeting.edit.updateSuccess'));
-        setToastType('success');
-      } else {
-        setToastMessage(t('meeting.edit.updateFailed'));
-        setToastType('error');
-      }
-    } catch (error) {
-      console.error('Error updating dates:', error);
-      setToastMessage(t('meeting.alerts.updateScheduleFailed'));
-      setToastType('error');
-    } finally {
-      setIsUpdating(false);
-    }
-  };
+  }, [fetchMeetingData]);
 
   // Load current data when opening edit modal
   useEffect(() => {
     if (showEditModal && meeting) {
       setEditingDates(meeting.dates);
       setEditingTitle(meeting.title);
-      // Load current participant list
-      const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
-      setEditingParticipants(currentParticipants);
+      setEditingParticipants(allParticipants);
     }
-  }, [showEditModal, meeting, availabilities]);
+  }, [showEditModal, meeting, allParticipants]);
+
+  // Optimistic status update handler
+  const handleOptimisticStatusClick = useCallback(
+    async (participant: string, date: string, currentStatus: ParticipantStatus) => {
+      await handleStatusClick(participant, date, currentStatus);
+      await fetchMeetingData(true);
+    },
+    [handleStatusClick, fetchMeetingData]
+  );
+
+  // Add participant handler
+  const handleAddParticipantSubmit = useCallback(async () => {
+    if (!newParticipantName.trim()) {
+      showToast(t('meeting.alerts.enterName'), 'warning');
+      return;
+    }
+
+    if (newParticipantName.trim().length > 10) {
+      showToast(t('meeting.alerts.nameTooLong'), 'warning');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const success = await handleAddParticipant(newParticipantName.trim());
+    if (success) {
+      setNewParticipantName('');
+    }
+    setIsSubmitting(false);
+  }, [newParticipantName, handleAddParticipant, showToast, t]);
+
+  // Update meeting handler
+  const handleUpdateDates = useCallback(async () => {
+    if (!meeting || editingDates.length === 0) {
+      showToast(t('meeting.alerts.selectDates'), 'warning');
+      return;
+    }
+
+    if (!editingTitle.trim()) {
+      showToast(t('meeting.alerts.enterTitle'), 'warning');
+      return;
+    }
+
+    setIsUpdating(true);
+    const success = await handleUpdateMeeting(editingTitle, editingDates, editingParticipants);
+    if (success) {
+      setShowEditModal(false);
+      showToast(t('meeting.edit.updateSuccess'), 'success');
+    }
+    setIsUpdating(false);
+  }, [meeting, editingDates, editingTitle, editingParticipants, handleUpdateMeeting, showToast, t]);
 
   // Share handlers
-  const handleShareLink = () => {
+  const handleShareLink = useCallback(() => {
     const meetingUrl = `${window.location.origin}/meeting/${resolvedParams.id}`;
     navigator.clipboard.writeText(meetingUrl);
-    setToastMessage(t('meeting.toast.linkCopied'));
-    setToastType('success');
-  };
+    showToast(t('meeting.toast.linkCopied'), 'success');
+  }, [resolvedParams.id, showToast, t]);
 
-  const handleShareTemplate = () => {
+  const handleShareTemplate = useCallback(() => {
     if (!meeting) return;
 
-    const participants = Array.from(new Set(availabilities.map(a => a.participantName)));
     const templateUrl = new URL('/', window.location.origin);
     templateUrl.searchParams.set('title', meeting.title);
-    if (participants.length > 0) {
-      templateUrl.searchParams.set('participants', participants.join(','));
+    if (allParticipants.length > 0) {
+      templateUrl.searchParams.set('participants', allParticipants.join(','));
     }
 
     navigator.clipboard.writeText(templateUrl.toString());
-    setToastMessage(t('meeting.toast.templateCopied'));
-    setToastType('success');
-  };
+    showToast(t('meeting.toast.templateCopied'), 'success');
+  }, [meeting, allParticipants, showToast, t]);
 
-  const handleShareTemplateFromEditModal = async () => {
+  const handleShareTemplateFromEditModal = useCallback(async () => {
     const templateUrl = new URL('/', window.location.origin);
     templateUrl.searchParams.set('title', editingTitle);
     if (editingParticipants.length > 0) {
       templateUrl.searchParams.set('participants', editingParticipants.join(','));
     }
     await navigator.clipboard.writeText(templateUrl.toString());
-    setToastMessage(t('meeting.toast.shareTemplateCopied'));
-    setToastType('success');
-  };
+    showToast(t('meeting.toast.shareTemplateCopied'), 'success');
+  }, [editingTitle, editingParticipants, showToast, t]);
 
-  // participantOrder가 있으면 그것 사용, 없으면 availabilities에서 추출
-  const allParticipants = useMemo(() => {
-    if (participantOrder.length > 0) {
-      const currentParticipants = new Set(availabilities.map(a => a.participantName));
-      const orderSet = new Set(participantOrder);
-
-      return [
-        ...participantOrder.filter(name => currentParticipants.has(name)),
-        ...Array.from(currentParticipants).filter(name => !orderSet.has(name))
-      ];
-    }
-    return Array.from(new Set(availabilities.map(a => a.participantName)));
-  }, [availabilities, participantOrder]);
-
-  // useMemo로 불필요한 재계산 방지
-  const gridData = useMemo(() => {
-    if (!meeting) return [];
-
-    const participants = allParticipants;
-    const result: GridCell[][] = [];
-
-    // Use first date's month as default
-    let defaultYear = '';
-    let defaultMonth = '';
-    if (meeting.dates.length > 0) {
-      const firstDate = new Date(meeting.dates[0] + 'T00:00:00');
-      defaultYear = String(firstDate.getFullYear());
-      defaultMonth = String(firstDate.getMonth() + 1).padStart(2, '0');
-    }
-
-    // Parse current month
-    const [currentYear, currentMonthOnly] = currentMonth ? currentMonth.split('.') : [defaultYear, defaultMonth];
-
-    // Generate header row
-    const headerRow: GridCell[] = [
-      { type: 'header-corner', content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}` }
-    ];
-
-    // Add participant headers
-    participants.forEach(name => {
-      headerRow.push({ type: 'header-participant', content: name, participant: name });
-    });
-
-    result.push(headerRow);
-
-    // Generate rows by date
-    let lastMonth = '';
-    meeting.dates.forEach((date) => {
-      const dateObj = new Date(date + 'T00:00:00');
-      const currentMonth = `${dateObj.getFullYear()}.${String(dateObj.getMonth() + 1).padStart(2, '0')}`;
-      // Use short day names from translation
-      const dayNames = Array.from({ length: 7 }, (_, i) => t(`dayNames.short.${i}`));
-
-      // Add separator when month changes
-      if (lastMonth && lastMonth !== currentMonth) {
-        const [year, month] = currentMonth.split('.');
-        const separatorRow: GridCell[] = [
-          { type: 'month-separator', content: `${year}\n${month}`, month: currentMonth }
-        ];
-        // Add empty cells for participants
-        for (let i = 0; i < participants.length; i++) {
-          separatorRow.push({ type: 'month-separator' });
-        }
-        result.push(separatorRow);
-      }
-      lastMonth = currentMonth;
-
-      // Generate date row
-      const dateRow: GridCell[] = [
-        {
-          type: 'date',
-          content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
-          date: date,
-          month: currentMonth
-        }
-      ];
-
-      // Add each participant's status
-      participants.forEach(name => {
-        const availability = availabilities.find(a => a.participantName === name);
-        let status: ParticipantStatus;
-
-        if (!availability) {
-          // Newly added participant
-          status = 'undecided';
-        } else if (availability.availableDates.includes(date)) {
-          // Available
-          status = 'available';
-        } else if (availability.unavailableDates?.includes(date)) {
-          // Explicitly unavailable
-          status = 'unavailable';
-        } else {
-          // Undecided (not selected yet)
-          status = 'undecided';
-        }
-
-        dateRow.push({
-          type: 'status',
-          status,
-          participant: name,
-          date: date
-        });
-      });
-
-      result.push(dateRow);
-    });
-
-    return result;
-  }, [meeting, availabilities, allParticipants, currentMonth, t]);
-  
-  // useMemo로 Top 3 날짜 계산 최적화 (meeting, availabilities 변경 시에만)
-  const topDates = useMemo(() => {
-    if (!meeting || availabilities.length === 0) return [];
-
-    const dateScores: { [date: string]: number } = {};
-
-    // Calculate number of available people for each date
-    meeting.dates.forEach(date => {
-      let count = 0;
-      availabilities.forEach(availability => {
-        if (availability.availableDates.includes(date)) {
-          count++;
-        }
-      });
-      dateScores[date] = count;
-    });
-
-    // Sort by score and extract TOP 3
-    return Object.entries(dateScores)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .filter(([, count]) => count > 0)
-      .map(([date, count], index) => ({
-        date,
-        count,
-        rank: index + 1
-      }));
-  }, [meeting, availabilities]);
-
+  // Loading state
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -574,76 +210,45 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   return (
     <div className="h-screen bg-white flex flex-col overflow-hidden">
       {/* Structured Data for SEO */}
-      {meeting && (
-        <MeetingStructuredData
-          meeting={meeting}
-          participantCount={availabilities.length}
-          topDate={topDates[0] ? { date: topDates[0].date, count: topDates[0].count } : undefined}
-        />
-      )}
-      {/* 상단 정보 영역 - 이 부분은 스크롤되지 않음 */}
+      <MeetingStructuredData
+        meeting={meeting}
+        participantCount={availabilities.length}
+        topDate={topDates[0] ? { date: topDates[0].date, count: topDates[0].count } : undefined}
+      />
+
+      {/* Header */}
       <div className="flex-shrink-0 bg-gray-50">
         <div className="flex">
-          <div className={DATE_COLUMN_COLORS.bg} style={{ minWidth: '50px', maxWidth: 'min-content' }}></div>
+          <div className={DATE_COLUMN_COLORS.bg} style={{ minWidth: '50px', maxWidth: 'min-content' }} />
           <div className="flex-1 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-base font-bold text-gray-800">
-                {meeting?.title || t('meeting.defaultTitle')} - {availabilities.length}{t('meeting.participantCount')}
+                {meeting.title} - {availabilities.length}
+                {t('meeting.participantCount')}
               </span>
             </div>
             <div className="flex items-center gap-2">
-            {showAddInput ? (
-              <>
-                <input
-                  type="text"
-                  value={newParticipantName}
-                  onChange={(e) => setNewParticipantName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !isSubmitting) {
-                      handleAddParticipant();
-                    } else if (e.key === 'Escape') {
-                      setShowAddInput(false);
-                      setNewParticipantName('');
-                    }
-                  }}
-                  placeholder={t('meeting.enterName')}
-                  maxLength={10}
-                  className="w-28 px-2 py-1 text-sm border border-gray-200 rounded-md outline-none focus:border-[#FFC354] focus:ring-1 focus:ring-yellow-100"
-                  autoFocus
-                />
-                <button
-                  onClick={handleAddParticipant}
-                  disabled={isSubmitting || !newParticipantName.trim()}
-                  className="px-3 py-1 text-sm bg-[#6B7280] text-white rounded-md disabled:bg-gray-300 hover:bg-gray-700 transition-colors"
-                >
-                  {t('common.add')}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowAddInput(false);
-                    setNewParticipantName('');
-                  }}
-                  className="px-2 py-1 text-sm text-gray-600"
-                >
-                  {t('common.cancel')}
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setShowAddInput(true)}
-                className="flex items-center gap-1 px-3 py-1 text-sm font-medium text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-md transition-colors"
-              >
-                {t('common.add')} <Plus className="w-4 h-4" />
-              </button>
-            )}
+              <AddParticipantInput
+                showInput={showAddInput}
+                inputValue={newParticipantName}
+                isSubmitting={isSubmitting}
+                onShowInput={() => setShowAddInput(true)}
+                onHideInput={() => {
+                  setShowAddInput(false);
+                  setNewParticipantName('');
+                }}
+                onInputChange={setNewParticipantName}
+                onSubmit={handleAddParticipantSubmit}
+                t={t}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Grid 컨테이너 */}
+      {/* Grid Container */}
       <div className="flex-1 relative overflow-hidden" style={{ isolation: 'isolate' }}>
-        <div 
+        <div
           ref={scrollContainerRef}
           className="absolute inset-0 overflow-auto overscroll-none"
           style={{
@@ -652,317 +257,113 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
             touchAction: 'pan-x pan-y',
           }}
         >
-          <div 
+          <div
             className="meeting-grid-container"
             style={{
               gridTemplateColumns: `minmax(50px, min-content) ${allParticipants.map(() => 'var(--col-width)').join(' ')}`,
               ['--col-width' as string]: 'clamp(90px, 10vw, 120px)',
               position: 'relative',
-              paddingBottom: '100px', // Add padding to ensure bottom content is visible
+              paddingBottom: '100px',
             } as React.CSSProperties}
           >
-          {gridData.map((row, rowIndex) => (
-            row.map((cell, colIndex) => {
-              // Month separator
-              if (cell.type === 'month-separator') {
-                if (colIndex === 0) {
+            {gridData.map((row, rowIndex) =>
+              row.map((cell, colIndex) => {
+                const key = `${rowIndex}-${colIndex}`;
+
+                if (cell.type === 'month-separator') {
                   return (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      className={`px-2 py-1 ${DATE_COLUMN_COLORS.bg}`}
-                      style={{ position: 'sticky', left: 0, zIndex: 10 }}
-                    >
-                      <div className="flex flex-col items-end justify-center">
-                        <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>{cell.content?.split('\n')[0]}</span>
-                        <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>{cell.content?.split('\n')[1]}</span>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div
-                      key={`${rowIndex}-${colIndex}`}
-                      className="bg-gray-50"
+                    <MonthSeparator
+                      key={key}
+                      content={cell.content || ''}
+                      isFirst={colIndex === 0}
                     />
                   );
                 }
-              }
-              
-              // Header corner (date/participant intersection)
-              if (cell.type === 'header-corner') {
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}
-                    style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
-                  >
-                    <div className="flex flex-col items-end justify-center">
-                      <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>{cell.content?.split('\n')[0]}</span>
-                      <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>{cell.content?.split('\n')[1]}</span>
-                    </div>
-                  </div>
-                );
-              }
-              
-              // Participant header
-              if (cell.type === 'header-participant') {
-                const isLocked = lockedParticipants.has(cell.participant || '');
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={`px-2 py-1 text-center text-sm font-bold ${
-                      isLocked ? 'bg-gray-50' : 'bg-white'
-                    }`}
-                    style={{ position: 'sticky', top: 0, zIndex: 20 }}
-                  >
-                    <button
-                      onClick={async () => {
-                        const participant = cell.participant || '';
-                        const currentAvailability = availabilities.find(a => a.participantName === participant);
-                        if (!currentAvailability) return;
-                        
-                        const newIsLocked = !lockedParticipants.has(participant);
-                        
-                        // Optimistic update
-                        setLockedParticipants(prev => {
-                          const newSet = new Set(prev);
-                          if (newIsLocked) {
-                            newSet.add(participant);
-                          } else {
-                            newSet.delete(participant);
-                          }
-                          return newSet;
-                        });
-                        
-                        // Send to backend
-                        try {
-                          const response = await fetch(`/api/meetings/${resolvedParams.id}/availability`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              participantName: participant,
-                              availableDates: currentAvailability.availableDates,
-                              unavailableDates: currentAvailability.unavailableDates,
-                              isLocked: newIsLocked
-                            })
-                          });
-                          
-                          if (!response.ok) {
-                            // Rollback on error
-                            await fetchMeetingData();
-                          }
-                        } catch (error) {
-                          console.error('Error updating lock status:', error);
-                          // Rollback on error
-                          await fetchMeetingData();
-                        }
-                      }}
-                      className={`w-full ${
-                        isLocked ? 'text-gray-500' : 'text-gray-800 hover:text-blue-500 transition-colors'
-                      }`}
-                    >
-                      {cell.content}
-                      {isLocked && <span className="ml-1 text-xs">✓</span>}
-                    </button>
-                  </div>
-                );
-              }
-              
-              // Date cell
-              if (cell.type === 'date') {
-                const dateObj = new Date(cell.date + 'T00:00:00');
-                const dayNumber = String(dateObj.getDate()).padStart(2, '0');
-                const dayOfWeek = cell.content?.split(' ')[1];
-                const day = dateObj.getDay(); // 0: 일요일, 6: 토요일
 
-                // 요일별 색상
-                const dayColor = getDayOfWeekColor(day, highlightedDate === cell.date);
+                if (cell.type === 'header-corner') {
+                  return <HeaderCorner key={key} content={cell.content || ''} />;
+                }
 
-                // Check if this date is in TOP 3
-                const topDateInfo = topDates.find(td => td.date === cell.date);
+                if (cell.type === 'header-participant') {
+                  return (
+                    <ParticipantHeader
+                      key={key}
+                      name={cell.content || ''}
+                      isLocked={lockedParticipants.has(cell.participant || '')}
+                      onToggleLock={handleToggleLock}
+                    />
+                  );
+                }
 
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={`px-2 py-1.5 relative transition-all duration-300 ${
-                      highlightedDate === cell.date
-                        ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg scale-105 z-20`
-                        : DATE_COLUMN_COLORS.bg
-                    }`}
-                    style={{ position: 'sticky', left: 0, zIndex: highlightedDate === cell.date ? 20 : 10 }}
-                    data-date-row={cell.date}
-                    data-month={cell.month}
-                  >
-                    <div className="flex flex-col items-end justify-center">
-                      <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
-                      <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
-                    </div>
-                    {topDateInfo && (
-                      <div className={`absolute top-1 left-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                        getTopDateClasses(topDateInfo.rank as 1 | 2 | 3, 'indicator')
-                      }`}>
-                        {topDateInfo.rank}
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-              
-              // Status cell
-              if (cell.type === 'status') {
-                const isLocked = lockedParticipants.has(cell.participant || '');
-                const isEditable = !isLocked;
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className="px-2 py-2 bg-white"
-                  >
-                    <button
-                      onClick={() => {
-                        if (isEditable && cell.participant && cell.date) {
-                          handleStatusClick(cell.participant, cell.date, cell.status!);
-                        }
-                      }}
-                      disabled={!isEditable}
-                      className={`w-full h-10 rounded-md flex items-center justify-center text-sm font-medium transition-all ${
-                        getStatusClasses(cell.status!, isEditable)
-                      }`}
-                    >
-                      {cell.status === 'available' ? t('meeting.status.available') : 
-                       cell.status === 'unavailable' ? t('meeting.status.unavailable') : t('meeting.status.undecided')}
-                    </button>
-                  </div>
-                );
-              }
-              
-              return null;
-            })
-          ))}
+                if (cell.type === 'date') {
+                  const topDateInfo = topDates.find((td) => td.date === cell.date);
+                  return (
+                    <DateCell
+                      key={key}
+                      date={cell.date || ''}
+                      content={cell.content || ''}
+                      month={cell.month || ''}
+                      highlightedDate={highlightedDate}
+                      topDateInfo={topDateInfo ? { rank: topDateInfo.rank as 1 | 2 | 3 } : undefined}
+                    />
+                  );
+                }
+
+                if (cell.type === 'status') {
+                  return (
+                    <StatusCell
+                      key={key}
+                      status={cell.status!}
+                      participant={cell.participant || ''}
+                      date={cell.date || ''}
+                      isLocked={lockedParticipants.has(cell.participant || '')}
+                      onStatusClick={handleOptimisticStatusClick}
+                      t={t}
+                    />
+                  );
+                }
+
+                return null;
+              })
+            )}
           </div>
         </div>
       </div>
-      
-      {/* 스크롤 인디케이터 */}
-      {topDates.length > 0 && (
-        <div 
-          className="fixed right-4 top-1/2 transform -translate-y-1/2 flex flex-col gap-2 z-50"
-        >
-          {topDates.map((item) => {
-            const position = datePositions[item.date];
-            const isAbove = position !== undefined && position < scrollTop;
-            const isBelow = position !== undefined && position > scrollTop + clientHeight;
-            const isVisible = !isAbove && !isBelow;
-            
-            const date = new Date(item.date + 'T00:00:00');
-            const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-            
-            return (
-              <button
-                key={item.date}
-                onClick={() => {
-                  const container = scrollContainerRef.current;
-                  if (container && position !== undefined) {
-                    container.scrollTo({ top: position - 50, behavior: 'smooth' });
-                    setHighlightedDate(item.date);
-                  }
-                }}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg shadow-md transition-all cursor-pointer hover:scale-110 ${
-                  getTopDateClasses(item.rank as 1 | 2 | 3, 'badge')
-                }`}
-                title={t('meeting.topDatesLabel')
-                  .replace('{rank}', String(item.rank))
-                  .replace('{date}', dateStr)
-                  .replace('{count}', String(item.count))}
-              >
-                <span className="text-xs font-bold">
-                  {t('meeting.peopleCount').replace('{count}', String(item.count))}
-                </span>
-                {isVisible ? (
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                ) : isAbove ? (
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                  </svg>
-                ) : (
-                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      )}
 
-      {/* 하단 플로팅 버튼 (FAB) */}
-      <div className="fixed bottom-6 right-6 z-40">
-        {/* 확장된 메뉴 */}
-        {showFabMenu && (
-          <div className="absolute bottom-14 right-1 flex flex-col gap-2 mb-2">
-            <button
-              onClick={() => {
-                setShowShareModal(true);
-                setShowFabMenu(false);
-              }}
-              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title={t('meeting.fab.share')}
-            >
-              <Link className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <button
-              onClick={() => {
-                setShowEditModal(true);
-                setShowFabMenu(false);
-              }}
-              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title={t('meeting.edit.title')}
-            >
-              <Pencil className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <button
-              onClick={() => {
-                setShowNewMeetingConfirm(true);
-                setShowFabMenu(false);
-              }}
-              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title={t('meeting.fab.newMeeting')}
-            >
-              <PlusCircle className="w-5 h-5 text-gray-600" />
-            </button>
-            
-            <button
-              onClick={() => {
-                setShowCreatorModal(true);
-                setShowFabMenu(false);
-              }}
-              className="w-10 h-10 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center"
-              title={t('meeting.fab.info')}
-            >
-              <Info className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-        )}
-        
-        {/* 메인 FAB 버튼 */}
-        <button
-          onClick={() => setShowFabMenu(!showFabMenu)}
-          className={`w-12 h-12 bg-gray-400 text-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 flex items-center justify-center ${
-            showFabMenu ? 'rotate-45' : ''
-          }`}
-        >
-          {showFabMenu ? (
-            <X className="w-5 h-5" />
-          ) : (
-            <Menu className="w-5 h-5" />
-          )}
-        </button>
-      </div>
+      {/* Top Dates Indicator */}
+      <TopDatesIndicator
+        topDates={topDates}
+        datePositions={datePositions}
+        scrollTop={scrollTop}
+        clientHeight={clientHeight}
+        onDateClick={scrollToDate}
+        t={t}
+      />
 
-      {/* 일정 수정 모달 */}
+      {/* Floating Action Button */}
+      <FloatingActionButton
+        isOpen={showFabMenu}
+        onToggle={() => setShowFabMenu(!showFabMenu)}
+        onShareClick={() => {
+          setShowShareModal(true);
+          setShowFabMenu(false);
+        }}
+        onEditClick={() => {
+          setShowEditModal(true);
+          setShowFabMenu(false);
+        }}
+        onNewMeetingClick={() => {
+          setShowNewMeetingConfirm(true);
+          setShowFabMenu(false);
+        }}
+        onInfoClick={() => {
+          setShowCreatorModal(true);
+          setShowFabMenu(false);
+        }}
+        t={t}
+      />
+
+      {/* Modals */}
       <EditMeetingModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
@@ -975,18 +376,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         isUpdating={isUpdating}
         onUpdate={handleUpdateDates}
         onShareTemplate={handleShareTemplateFromEditModal}
-        onShowToast={(message, type) => {
-          setToastMessage(message);
-          setToastType(type);
-        }}
+        onShowToast={showToast}
       />
 
-      {/* About Modal */}
-      {showCreatorModal && (
-        <AboutModal onClose={() => setShowCreatorModal(false)} />
-      )}
+      {showCreatorModal && <AboutModal onClose={() => setShowCreatorModal(false)} />}
 
-      {/* Share Modal */}
       {showShareModal && (
         <ShareModal
           onClose={() => setShowShareModal(false)}
@@ -995,33 +389,23 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         />
       )}
 
-      {/* Toast */}
-      {toastMessage && (
-        <Toast
-          message={toastMessage}
-          type={toastType}
-          onClose={() => setToastMessage('')}
-        />
-      )}
-
-      {/* New Meeting Confirm Modal */}
       <ConfirmModal
         isOpen={showNewMeetingConfirm}
         onClose={() => setShowNewMeetingConfirm(false)}
         title={t('meeting.newMeeting.title')}
         message={t('meeting.newMeeting.message')}
         confirmText={t('meeting.newMeeting.confirm')}
-        confirmLink={(() => {
-          const currentParticipants = Array.from(new Set(availabilities.map(a => a.participantName)));
-          if (currentParticipants.length > 0) {
-            return `/?participants=${encodeURIComponent(currentParticipants.join(','))}`;
-          }
-          return '/';
-        })()}
+        confirmLink={
+          allParticipants.length > 0
+            ? `/?participants=${encodeURIComponent(allParticipants.join(','))}`
+            : '/'
+        }
         confirmLinkNewTab={true}
         type="info"
       />
 
+      {/* Toast */}
+      {toastMessage && <Toast message={toastMessage} type={toastType} onClose={hideToast} />}
     </div>
   );
 }
