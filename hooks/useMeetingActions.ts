@@ -121,8 +121,8 @@ export function useMeetingActions({
       const currentUnavailableDates = currentAvailability?.unavailableDates || [];
 
       // Calculate new dates
-      let newAvailableDates = currentAvailableDates.filter((d) => d !== date);
-      let newUnavailableDates = currentUnavailableDates.filter((d) => d !== date);
+      const newAvailableDates = currentAvailableDates.filter((d) => d !== date);
+      const newUnavailableDates = currentUnavailableDates.filter((d) => d !== date);
 
       if (newStatus === 'available') {
         newAvailableDates.push(date);
