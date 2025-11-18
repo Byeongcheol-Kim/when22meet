@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🚀 Running pre-push checks..."
+
+# TypeScript 타입 체크
+echo "📝 Running TypeScript type check..."
+npx tsc --noEmit || {
+  echo "❌ TypeScript type check failed!"
+  exit 1
+}
+
+# ESLint 검사
+echo "🔍 Running ESLint..."
+npm run lint || {
+  echo "❌ ESLint check failed!"
+  exit 1
+}
+
+# Playwright E2E 테스트
+echo "🎭 Running Playwright E2E tests..."
+npx playwright test || {
+  echo "❌ E2E tests failed!"
+  exit 1
+}
+
+echo "✅ All pre-push checks passed!"
+echo "🎉 Ready to push!"
