@@ -99,6 +99,7 @@
       "title": "Edit Schedule",
       "manageParticipants": "Manage Participants",
       "participantPlaceholder": "Enter participant name to add",
+      "dateSelection": "Date Selection",
       "updating": "Updating...",
       "updateComplete": "Update Complete",
       "updateSuccess": "Schedule has been updated.",
