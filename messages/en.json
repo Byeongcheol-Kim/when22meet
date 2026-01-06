@@ -207,6 +207,17 @@
         "name": "Benchley Kim",
         "role": "Development"
       }
+    },
+    "relatedServices": {
+      "title": "Related Services",
+      "gaita": {
+        "name": "Gaita",
+        "description": "Taxi carpool matching service"
+      },
+      "celltown": {
+        "name": "Celltown",
+        "description": "Housing recommendation service"
+      }
     }
   },
   "monthNames": {

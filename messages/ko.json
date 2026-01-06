@@ -207,6 +207,17 @@
         "name": "Benchley Kim",
         "role": "개발"
       }
+    },
+    "relatedServices": {
+      "title": "관련 서비스",
+      "gaita": {
+        "name": "같이타",
+        "description": "택시 합승 매칭 서비스"
+      },
+      "celltown": {
+        "name": "셀타운",
+        "description": "주거지 추천 서비스"
+      }
     }
   },
   "monthNames": {

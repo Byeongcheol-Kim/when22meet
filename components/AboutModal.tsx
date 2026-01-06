@@ -1,6 +1,6 @@
 'use client';
 
-import { X, Github, Linkedin, Instagram, Mail } from 'lucide-react';
+import { X, Github, Linkedin, Instagram, Mail, ExternalLink } from 'lucide-react';
 import { useTranslation } from '@/lib/useTranslation';
 import Link from 'next/link';
 import { MODAL_COLORS, TEXT_COLORS, LINK_COLORS, SUPPORT_COLORS, ROLE_BADGE_COLORS, SECTION_BADGE_COLORS } from '@/lib/constants/colors';
@@ -132,6 +132,37 @@ export default function AboutModal({ onClose }: AboutModalProps) {
                   <span className={`${SECTION_BADGE_COLORS.dates.bg} ${SECTION_BADGE_COLORS.dates.text} px-2 py-0.5 rounded text-xs font-bold`}>{t('about.viewFAQ')}</span>
                 </Link>
               </div>
+            </div>
+          </div>
+
+          {/* Related Services Section */}
+          <div className="pt-4 border-t">
+            <h3 className="font-semibold mb-3">{t('about.relatedServices.title')}</h3>
+            <div className="space-y-2">
+              <a
+                href="https://dispatchcell-web.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+              >
+                <div>
+                  <p className={`font-semibold ${TEXT_COLORS.primary}`}>{t('about.relatedServices.gaita.name')}</p>
+                  <p className={`text-sm ${TEXT_COLORS.info}`}>{t('about.relatedServices.gaita.description')}</p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+              </a>
+              <a
+                href="https://celltown.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors group"
+              >
+                <div>
+                  <p className={`font-semibold ${TEXT_COLORS.primary}`}>{t('about.relatedServices.celltown.name')}</p>
+                  <p className={`text-sm ${TEXT_COLORS.info}`}>{t('about.relatedServices.celltown.description')}</p>
+                </div>
+                <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
+              </a>
             </div>
           </div>
         </div>
