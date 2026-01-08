@@ -272,9 +272,10 @@
       "dawn": "Dawn"
     },
     "selectAtLeastOne": "Please select at least one time slot",
-    "consecutiveCount": "Consecutive slots",
-    "consecutiveCountDescription": "How many consecutive time slots are needed?",
-    "consecutiveHint": "Recommends people available for all {count} consecutive slots"
+    "meetingDuration": "Meeting duration",
+    "meetingDurationDescription": "How long will you meet?",
+    "meetingDurationHint": "Recommends people available for {minutes} minutes",
+    "minutes": "{minutes} min"
   },
   "seo": {
     "title": "Schedule Meeting App - When22Meet",

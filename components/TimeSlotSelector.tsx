@@ -93,17 +93,12 @@ export default function TimeSlotSelector({
   }, []);
 
   return (
-    <div className="space-y-3">
-      {/* 토글 스위치 */}
+    <div className="space-y-4">
+      {/* 토글 스위치 - 날짜 선택 스타일과 일치 */}
       <div className="flex items-center justify-between">
-        <div className="flex flex-col">
-          <span className={`text-sm font-medium ${TIME_SLOT_COLORS.label.text}`}>
-            {t('timeSlot.toggle')}
-          </span>
-          <span className="text-xs text-gray-500">
-            {t('timeSlot.toggleDescription')}
-          </span>
-        </div>
+        <h3 className="text-lg font-bold text-gray-800">
+          {t('timeSlot.toggle')}
+        </h3>
         <button
           type="button"
           onClick={handleToggle}
@@ -209,16 +204,16 @@ export default function TimeSlotSelector({
             </div>
           </div>
 
-          {/* 연속 시간대 개수 설정 */}
+          {/* 미팅 시간 설정 (30분 단위) */}
           {selectedSlots.length >= 2 && onConsecutiveSlotCountChange && (
             <div className="space-y-2 pt-2 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs text-gray-500 font-medium">
-                    {t('timeSlot.consecutiveCount')}
+                    {t('timeSlot.meetingDuration')}
                   </span>
                   <span className="text-[10px] text-gray-400">
-                    {t('timeSlot.consecutiveCountDescription')}
+                    {t('timeSlot.meetingDurationDescription')}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -234,7 +229,9 @@ export default function TimeSlotSelector({
                   >
                     -
                   </button>
-                  <span className="w-8 text-center text-sm font-bold">{consecutiveSlotCount}</span>
+                  <span className="w-12 text-center text-sm font-bold">
+                    {t('timeSlot.minutes').replace('{minutes}', String(consecutiveSlotCount * 30))}
+                  </span>
                   <button
                     type="button"
                     onClick={() => onConsecutiveSlotCountChange(Math.min(selectedSlots.length, consecutiveSlotCount + 1))}
@@ -251,7 +248,7 @@ export default function TimeSlotSelector({
               </div>
               {consecutiveSlotCount > 1 && (
                 <p className="text-[10px] text-blue-600">
-                  {t('timeSlot.consecutiveHint').replace('{count}', String(consecutiveSlotCount))}
+                  {t('timeSlot.meetingDurationHint').replace('{minutes}', String(consecutiveSlotCount * 30))}
                 </p>
               )}
             </div>

@@ -49,7 +49,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const { title, dates, participants } = body;
+    const { title, dates, participants, consecutiveSlotCount } = body;
 
     if (!dates || dates.length === 0) {
       return NextResponse.json(
@@ -81,6 +81,9 @@ export async function PATCH(
       meeting.title = title.trim();
     }
     meeting.dates = dates;
+    if (consecutiveSlotCount !== undefined) {
+      meeting.consecutiveSlotCount = consecutiveSlotCount;
+    }
     meeting.updatedAt = new Date().toISOString();
 
     // Save updated meeting with centralized TTL

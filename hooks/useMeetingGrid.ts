@@ -54,11 +54,13 @@ interface UseMeetingGridProps {
   locale?: string;
 }
 
-// 시간대 레이블 가져오기
+// 시간대 레이블 가져오기 (HH:MM 형식만 지원)
 function getTimeSlotLabel(slotValue: TimeSlotValue, locale: string = 'ko'): string {
   const slot = TIME_SLOTS.find((s) => s.value === slotValue);
-  if (!slot) return slotValue;
-  return locale === 'en' ? slot.labelEn : slot.label;
+  if (slot) {
+    return locale === 'en' ? slot.labelEn : slot.label;
+  }
+  return slotValue;
 }
 
 // 상태 확인 헬퍼 함수

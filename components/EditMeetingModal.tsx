@@ -6,6 +6,7 @@ import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { useTranslation } from '@/lib/useTranslation';
 import { MODAL_COLORS, BUTTON_COLORS, TEXT_COLORS, SECTION_BADGE_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
+import { TimeSlotValue } from '@/lib/types';
 
 interface EditMeetingModalProps {
   isOpen: boolean;
@@ -20,6 +21,11 @@ interface EditMeetingModalProps {
   onUpdate: () => void;
   onShareTemplate?: () => void;
   onShowToast?: (message: string, type: 'warning' | 'error' | 'success' | 'info') => void;
+  // 시간대 관련 props
+  hasTimeSlots?: boolean;
+  timeSlots?: TimeSlotValue[];
+  consecutiveSlotCount?: number;
+  onConsecutiveSlotCountChange?: (count: number) => void;
 }
 
 export default function EditMeetingModal({
@@ -34,6 +40,10 @@ export default function EditMeetingModal({
   isUpdating,
   onUpdate,
   onShowToast,
+  hasTimeSlots,
+  timeSlots,
+  consecutiveSlotCount = 1,
+  onConsecutiveSlotCountChange,
 }: EditMeetingModalProps) {
   const { t } = useTranslation();
 
@@ -99,6 +109,56 @@ export default function EditMeetingModal({
               disabled={isUpdating}
             />
           </div>
+
+          {/* 미팅 시간 설정 (시간대 모드일 때만 표시) */}
+          {hasTimeSlots && timeSlots && timeSlots.length >= 2 && onConsecutiveSlotCountChange && (
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium text-gray-700">
+                    {t('timeSlot.meetingDuration')}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {t('timeSlot.meetingDurationDescription')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onConsecutiveSlotCountChange(Math.max(1, consecutiveSlotCount - 1))}
+                    disabled={isUpdating || consecutiveSlotCount <= 1}
+                    className={`w-7 h-7 rounded border flex items-center justify-center text-sm font-medium ${
+                      consecutiveSlotCount <= 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    -
+                  </button>
+                  <span className="w-12 text-center text-sm font-bold">
+                    {t('timeSlot.minutes').replace('{minutes}', String(consecutiveSlotCount * 30))}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onConsecutiveSlotCountChange(Math.min(timeSlots.length, consecutiveSlotCount + 1))}
+                    disabled={isUpdating || consecutiveSlotCount >= timeSlots.length}
+                    className={`w-7 h-7 rounded border flex items-center justify-center text-sm font-medium ${
+                      consecutiveSlotCount >= timeSlots.length
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              {consecutiveSlotCount > 1 && (
+                <p className="text-xs text-blue-600 mt-2">
+                  {t('timeSlot.meetingDurationHint').replace('{minutes}', String(consecutiveSlotCount * 30))}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2 mt-6">

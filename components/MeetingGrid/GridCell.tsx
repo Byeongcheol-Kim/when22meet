@@ -231,10 +231,10 @@ export const HeaderCorner = memo(function HeaderCorner({
 
     return (
       <div
-        className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}
+        className={`px-2 py-1 flex items-center ${DATE_COLUMN_COLORS.header.bg}`}
         style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
       >
-        <div className="flex flex-col items-end justify-center">
+        <div className="flex flex-col items-end justify-center w-full">
           <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
             {year}.{month}
           </span>
@@ -250,14 +250,14 @@ export const HeaderCorner = memo(function HeaderCorner({
   // 기본 모드: 연/월만 표시
   return (
     <div
-      className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}
+      className={`px-2 py-1 flex items-center ${DATE_COLUMN_COLORS.header.bg}`}
       style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
     >
-      <div className="flex flex-col items-end justify-center">
-        <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+      <div className="flex flex-col items-end justify-center w-full">
+        <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
           {content.split('\n')[0]}
         </span>
-        <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>
+        <span className={`text-xs font-bold ${DATE_COLUMN_COLORS.header.month}`}>
           {content.split('\n')[1]}
         </span>
       </div>
@@ -281,24 +281,23 @@ interface DateSeparatorCellProps {
 export const DateSeparatorCell = memo(function DateSeparatorCell({
   date,
   content,
-  month,
+  month: _month,
   highlightedDate,
   isFirst = false,
-  isFirstOfMonth = false,
+  isFirstOfMonth: _isFirstOfMonth,
   isExpanded = true,
   onToggleExpand,
   dateSummary,
 }: DateSeparatorCellProps) {
   const isHighlighted = highlightedDate === date;
 
-  // 첫 번째 셀: 날짜 정보
+  // 첫 번째 셀: 날짜 정보 (헤더에서 연월 표시하므로 여기서는 일+요일만)
   if (isFirst) {
     const dateObj = new Date(date + 'T00:00:00');
     const dayNumber = String(dateObj.getDate()).padStart(2, '0');
     const dayOfWeek = content.split(' ')[1];
     const day = dateObj.getDay();
     const dayColor = getDayOfWeekColor(day, isHighlighted);
-    const [year, monthNum] = month.split('.');
 
     return (
       <button
@@ -311,18 +310,9 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
         style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
         data-date-row={date}
       >
-        <div className="flex flex-col items-end justify-center">
-          {/* 월 변경 시 연.월 표시 */}
-          {isFirstOfMonth && (
-            <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
-              {year}.{monthNum}
-            </span>
-          )}
-          {/* 일 + 요일 */}
-          <div className="flex items-baseline gap-0.5">
-            <span className={`text-sm font-bold ${dayColor}`}>{dayNumber}</span>
-            <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
-          </div>
+        <div className="flex items-baseline justify-end gap-0.5">
+          <span className={`text-sm font-bold ${dayColor}`}>{dayNumber}</span>
+          <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
         </div>
       </button>
     );
@@ -398,8 +388,8 @@ export const TimeSlotCell = memo(function TimeSlotCell({
       style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
       data-date-row={dateSlotKey}
     >
-      <div className="flex items-center justify-end h-full">
-        <span className={`text-xs ${TIME_SLOT_COLORS.grid.timeSlotLabel.text}`}>
+      <div className="flex items-center justify-end h-full w-full">
+        <span className={`text-xs text-right ${TIME_SLOT_COLORS.grid.timeSlotLabel.text}`}>
           {timeSlotLabel}
         </span>
       </div>

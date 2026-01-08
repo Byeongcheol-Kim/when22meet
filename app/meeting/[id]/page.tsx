@@ -97,6 +97,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     highlightedDate,
     scrollToDate,
     currentVisibleDate,
+    hasScrolled,
   } = useScrollManager({ meeting });
 
   // Grid data calculation
@@ -136,6 +137,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [showParticipantSelectModal, setShowParticipantSelectModal] = useState(false);
   // 시간대 모드에서 날짜별 접기/펼치기 상태 (기본: 모두 펼침)
   const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
+  // 연속 시간대 개수 (미팅에서 가져옴)
+  const [consecutiveSlotCount, setConsecutiveSlotCount] = useState(1);
 
   // Initial data fetch - only on mount
   useEffect(() => {
@@ -149,6 +152,38 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       setExpandedDates(new Set(meeting.dates));
     }
   }, [meeting?.dates, hasTimeSlots]);
+
+  // 미팅 데이터에서 연속 시간대 개수 초기화
+  useEffect(() => {
+    if (meeting?.consecutiveSlotCount) {
+      setConsecutiveSlotCount(meeting.consecutiveSlotCount);
+    }
+  }, [meeting?.consecutiveSlotCount]);
+
+  // 연속 시간대 개수 변경 핸들러
+  const handleConsecutiveSlotCountChange = useCallback(async (newCount: number) => {
+    if (!meeting || !hasTimeSlots) return;
+
+    const validCount = Math.max(1, Math.min(newCount, meeting.timeSlots?.length || 1));
+    setConsecutiveSlotCount(validCount);
+
+    try {
+      const response = await fetch(`/api/meetings/${resolvedParams.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          dates: meeting.dates,
+          consecutiveSlotCount: validCount,
+        }),
+      });
+
+      if (response.ok) {
+        fetchMeetingData();
+      }
+    } catch (error) {
+      console.error('Error updating consecutive slot count:', error);
+    }
+  }, [meeting, hasTimeSlots, resolvedParams.id, fetchMeetingData]);
 
   // 날짜 접기/펼치기 토글 핸들러
   const handleToggleDateExpand = useCallback((date: string) => {
@@ -273,7 +308,10 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       {/* Header */}
       <div className="flex-shrink-0 bg-gray-50">
         <div className="flex">
-          <div className={DATE_COLUMN_COLORS.bg} style={{ minWidth: '50px', maxWidth: 'min-content' }} />
+          <div
+            className={DATE_COLUMN_COLORS.bg}
+            style={{ width: 'var(--date-col-width, 50px)', minWidth: '50px', flexShrink: 0 }}
+          />
           <div className="flex-1 px-4 py-2 flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-base font-bold text-gray-800">
@@ -378,7 +416,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                     <HeaderCorner
                       key={key}
                       content={cell.content || ''}
-                      currentDate={currentVisibleDate}
+                      currentDate={hasScrolled ? currentVisibleDate : null}
                       hasTimeSlots={hasTimeSlots}
                       getDayName={(day) => t(`dayNames.short.${day}`)}
                     />
@@ -526,6 +564,10 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         onUpdate={handleUpdateDates}
         onShareTemplate={handleShareTemplateFromEditModal}
         onShowToast={showToast}
+        hasTimeSlots={hasTimeSlots}
+        timeSlots={meeting.timeSlots}
+        consecutiveSlotCount={consecutiveSlotCount}
+        onConsecutiveSlotCountChange={handleConsecutiveSlotCountChange}
       />
 
       {showCreatorModal && <AboutModal onClose={() => setShowCreatorModal(false)} />}

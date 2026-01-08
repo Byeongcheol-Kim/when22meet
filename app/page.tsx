@@ -323,7 +323,7 @@ function HomeContent() {
               />
 
               {/* Time Slot Selection */}
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <div className="mt-6">
                 <TimeSlotSelector
                   enabled={timeSlotEnabled}
                   onEnabledChange={setTimeSlotEnabled}
