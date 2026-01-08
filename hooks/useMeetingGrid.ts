@@ -102,24 +102,27 @@ export function useMeetingGrid({
       ? currentMonth.split('.')
       : [defaultYear, defaultMonth];
 
-    // Generate header row
-    const headerRow: GridCell[] = [
-      {
-        type: 'header-corner',
-        content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}`,
-      },
-    ];
+    // 시간대 모드에서는 날짜별 헤더를 사용하므로 최상단 헤더 행 생략
+    if (!hasTimeSlots) {
+      // Generate header row (날짜 전용 모드)
+      const headerRow: GridCell[] = [
+        {
+          type: 'header-corner',
+          content: `${currentYear || defaultYear}\n${currentMonthOnly || defaultMonth}`,
+        },
+      ];
 
-    // Add participant headers
-    participants.forEach((name) => {
-      headerRow.push({
-        type: 'header-participant',
-        content: name,
-        participant: name,
+      // Add participant headers
+      participants.forEach((name) => {
+        headerRow.push({
+          type: 'header-participant',
+          content: name,
+          participant: name,
+        });
       });
-    });
 
-    result.push(headerRow);
+      result.push(headerRow);
+    }
 
     // Generate rows by date
     let lastMonth = '';
@@ -153,9 +156,9 @@ export function useMeetingGrid({
       lastMonth = currentDateMonth;
 
       if (hasTimeSlots && meeting.timeSlots) {
-        // 시간대 모드: 날짜 구분 행 + 시간대별 서브행 (월 구분 통합)
+        // 시간대 모드: 날짜별 헤더 행 + 시간대별 서브행
 
-        // 1. 날짜 구분 행 추가 (월 변경 시 월 정보도 포함)
+        // 1. 날짜별 헤더 행 (날짜 정보 + 참여자 이름)
         const dateSeparatorRow: GridCell[] = [
           {
             type: 'date-separator',
@@ -165,10 +168,15 @@ export function useMeetingGrid({
             isFirstOfMonth: isFirstOfMonth,
           },
         ];
-        // 빈 셀 추가 (참여자 열)
-        for (let i = 0; i < participants.length; i++) {
-          dateSeparatorRow.push({ type: 'date-separator', date: date, isFirstOfMonth: isFirstOfMonth });
-        }
+        // 참여자 이름 추가 (헤더 역할)
+        participants.forEach((name) => {
+          dateSeparatorRow.push({
+            type: 'date-separator',
+            date: date,
+            isFirstOfMonth: isFirstOfMonth,
+            participant: name,
+          });
+        });
         result.push(dateSeparatorRow);
 
         // 2. 시간대별 서브행 추가

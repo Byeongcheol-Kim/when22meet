@@ -352,6 +352,8 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'date-separator') {
+                  const isCurrent = !isOrganizer && cell.participant === currentUser;
+                  const participantIsLocked = lockedParticipants.has(cell.participant || '');
                   return (
                     <DateSeparatorCell
                       key={key}
@@ -361,6 +363,11 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       highlightedDate={highlightedDate}
                       isFirst={colIndex === 0}
                       isFirstOfMonth={cell.isFirstOfMonth}
+                      participant={cell.participant}
+                      isCurrentUser={isCurrent}
+                      isCurrentUserEditing={isCurrent && isEditing}
+                      isLocked={participantIsLocked}
+                      onToggleLock={handleToggleLock}
                     />
                   );
                 }
