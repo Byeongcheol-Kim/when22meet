@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
       locale = 'ko',
       timeSlotEnabled = false,
       timeSlots = [],
+      consecutiveSlotCount = 1,
     } = body;
 
     if (!title || !dates || dates.length === 0) {
@@ -74,6 +75,7 @@ export async function POST(request: NextRequest) {
       locale, // Save user's language preference
       timeSlotEnabled: timeSlotEnabled || undefined,
       timeSlots: timeSlotEnabled ? (timeSlots as TimeSlotValue[]) : undefined,
+      consecutiveSlotCount: timeSlotEnabled && consecutiveSlotCount > 1 ? consecutiveSlotCount : undefined,
     };
 
     // Save to Redis with centralized TTL

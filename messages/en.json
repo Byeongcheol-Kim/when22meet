@@ -271,7 +271,10 @@
       "late_night": "Late Night",
       "dawn": "Dawn"
     },
-    "selectAtLeastOne": "Please select at least one time slot"
+    "selectAtLeastOne": "Please select at least one time slot",
+    "consecutiveCount": "Consecutive slots",
+    "consecutiveCountDescription": "How many consecutive time slots are needed?",
+    "consecutiveHint": "Recommends people available for all {count} consecutive slots"
   },
   "seo": {
     "title": "Schedule Meeting App - When22Meet",

@@ -271,7 +271,10 @@
       "late_night": "심야",
       "dawn": "새벽"
     },
-    "selectAtLeastOne": "시간대를 최소 하나 선택해주세요"
+    "selectAtLeastOne": "시간대를 최소 하나 선택해주세요",
+    "consecutiveCount": "연속 시간대 개수",
+    "consecutiveCountDescription": "몇 개의 연속된 시간대가 필요한가요?",
+    "consecutiveHint": "연속 {count}개 시간대에 모두 참석 가능한 인원을 추천합니다"
   },
   "seo": {
     "title": "약속일정 잡기 앱 - 언제만나",

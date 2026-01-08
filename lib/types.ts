@@ -84,6 +84,7 @@ export interface Meeting {
   locale?: string; // Language preference (ko or en)
   timeSlotEnabled?: boolean; // Whether time slots are enabled
   timeSlots?: TimeSlotValue[]; // Selected time slots (if enabled)
+  consecutiveSlotCount?: number; // Number of consecutive time slots for recommendation (default: 1)
 }
 
 export interface Availability {

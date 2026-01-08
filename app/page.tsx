@@ -38,6 +38,7 @@ function HomeContent() {
   const [selectedTemplate, setSelectedTemplate] = useState<DateTemplate | null>(null);
   const [timeSlotEnabled, setTimeSlotEnabled] = useState(false);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<TimeSlotValue[]>([]);
+  const [consecutiveSlotCount, setConsecutiveSlotCount] = useState(1);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const router = useRouter();
@@ -181,6 +182,7 @@ function HomeContent() {
           locale, // Save user's language preference
           timeSlotEnabled,
           timeSlots: timeSlotEnabled ? selectedTimeSlots : undefined,
+          consecutiveSlotCount: timeSlotEnabled ? consecutiveSlotCount : undefined,
         })
       });
 
@@ -327,6 +329,8 @@ function HomeContent() {
                   onEnabledChange={setTimeSlotEnabled}
                   selectedSlots={selectedTimeSlots}
                   onSlotsChange={setSelectedTimeSlots}
+                  consecutiveSlotCount={consecutiveSlotCount}
+                  onConsecutiveSlotCountChange={setConsecutiveSlotCount}
                 />
               </div>
             </div>

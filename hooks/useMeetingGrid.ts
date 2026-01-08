@@ -269,22 +269,49 @@ export function useMeetingGrid({
   const topDates = useMemo((): TopDate[] => {
     if (!meeting || availabilities.length === 0) return [];
 
+    const consecutiveCount = meeting.consecutiveSlotCount || 1;
     const dateScores: { [key: string]: number } = {};
 
     if (hasTimeSlots && meeting.timeSlots) {
-      // 시간대 모드: date:slot 키로 집계
-      meeting.dates.forEach((date) => {
-        meeting.timeSlots!.forEach((slot) => {
-          const key = `${date}:${slot}`;
-          let count = 0;
-          availabilities.forEach((availability) => {
-            if (availability.availableDates.includes(key)) {
-              count++;
-            }
-          });
-          dateScores[key] = count;
+      const slots = meeting.timeSlots;
+
+      if (consecutiveCount > 1 && slots.length >= consecutiveCount) {
+        // 연속 시간대 모드: 연속된 N개 시간대 모두 참석 가능한 인원 계산
+        meeting.dates.forEach((date) => {
+          // 각 시작 시간대에서 연속 N개 시간대 확인
+          for (let i = 0; i <= slots.length - consecutiveCount; i++) {
+            const startSlot = slots[i];
+            const consecutiveSlots = slots.slice(i, i + consecutiveCount);
+            const key = `${date}:${startSlot}`;
+
+            // 모든 연속 시간대에 참석 가능한 인원 수
+            let count = 0;
+            availabilities.forEach((availability) => {
+              const allAvailable = consecutiveSlots.every((slot) =>
+                availability.availableDates.includes(`${date}:${slot}`)
+              );
+              if (allAvailable) {
+                count++;
+              }
+            });
+            dateScores[key] = count;
+          }
         });
-      });
+      } else {
+        // 단일 시간대 모드: date:slot 키로 집계
+        meeting.dates.forEach((date) => {
+          slots.forEach((slot) => {
+            const key = `${date}:${slot}`;
+            let count = 0;
+            availabilities.forEach((availability) => {
+              if (availability.availableDates.includes(key)) {
+                count++;
+              }
+            });
+            dateScores[key] = count;
+          });
+        });
+      }
     } else {
       // 날짜 전용 모드
       meeting.dates.forEach((date) => {

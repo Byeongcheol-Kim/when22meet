@@ -10,6 +10,8 @@ interface TimeSlotSelectorProps {
   onEnabledChange: (enabled: boolean) => void;
   selectedSlots: TimeSlotValue[];
   onSlotsChange: (slots: TimeSlotValue[]) => void;
+  consecutiveSlotCount?: number;
+  onConsecutiveSlotCountChange?: (count: number) => void;
   disabled?: boolean;
 }
 
@@ -18,6 +20,8 @@ export default function TimeSlotSelector({
   onEnabledChange,
   selectedSlots,
   onSlotsChange,
+  consecutiveSlotCount = 1,
+  onConsecutiveSlotCountChange,
   disabled = false,
 }: TimeSlotSelectorProps) {
   const { t, locale } = useTranslation();
@@ -204,6 +208,54 @@ export default function TimeSlotSelector({
               ))}
             </div>
           </div>
+
+          {/* 연속 시간대 개수 설정 */}
+          {selectedSlots.length >= 2 && onConsecutiveSlotCountChange && (
+            <div className="space-y-2 pt-2 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs text-gray-500 font-medium">
+                    {t('timeSlot.consecutiveCount')}
+                  </span>
+                  <span className="text-[10px] text-gray-400">
+                    {t('timeSlot.consecutiveCountDescription')}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onConsecutiveSlotCountChange(Math.max(1, consecutiveSlotCount - 1))}
+                    disabled={disabled || consecutiveSlotCount <= 1}
+                    className={`w-7 h-7 rounded border flex items-center justify-center text-sm font-medium ${
+                      consecutiveSlotCount <= 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    -
+                  </button>
+                  <span className="w-8 text-center text-sm font-bold">{consecutiveSlotCount}</span>
+                  <button
+                    type="button"
+                    onClick={() => onConsecutiveSlotCountChange(Math.min(selectedSlots.length, consecutiveSlotCount + 1))}
+                    disabled={disabled || consecutiveSlotCount >= selectedSlots.length}
+                    className={`w-7 h-7 rounded border flex items-center justify-center text-sm font-medium ${
+                      consecutiveSlotCount >= selectedSlots.length
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-gray-100 border-gray-300'
+                    }`}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              {consecutiveSlotCount > 1 && (
+                <p className="text-[10px] text-blue-600">
+                  {t('timeSlot.consecutiveHint').replace('{count}', String(consecutiveSlotCount))}
+                </p>
+              )}
+            </div>
+          )}
 
           {enabled && selectedSlots.length === 0 && (
             <p className="text-xs text-orange-500">
