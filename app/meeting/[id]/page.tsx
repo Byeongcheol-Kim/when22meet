@@ -99,7 +99,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   } = useScrollManager({ meeting });
 
   // Grid data calculation
-  const { gridData, topDates } = useMeetingGrid({
+  const { gridData, topDates, hasTimeSlots } = useMeetingGrid({
     meeting,
     availabilities,
     availabilityMap,
@@ -133,12 +133,34 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
   const [showShareModal, setShowShareModal] = useState(false);
   const [showNewMeetingConfirm, setShowNewMeetingConfirm] = useState(false);
   const [showParticipantSelectModal, setShowParticipantSelectModal] = useState(false);
+  // 시간대 모드에서 날짜별 접기/펼치기 상태 (기본: 모두 펼침)
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
 
   // Initial data fetch - only on mount
   useEffect(() => {
     fetchMeetingData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resolvedParams.id]);
+
+  // 시간대 모드에서 날짜 로드 시 모든 날짜 펼침 상태로 초기화
+  useEffect(() => {
+    if (meeting?.dates && hasTimeSlots) {
+      setExpandedDates(new Set(meeting.dates));
+    }
+  }, [meeting?.dates, hasTimeSlots]);
+
+  // 날짜 접기/펼치기 토글 핸들러
+  const handleToggleDateExpand = useCallback((date: string) => {
+    setExpandedDates((prev) => {
+      const next = new Set(prev);
+      if (next.has(date)) {
+        next.delete(date);
+      } else {
+        next.add(date);
+      }
+      return next;
+    });
+  }, []);
 
   // Load current data when opening edit modal
   useEffect(() => {
@@ -305,7 +327,17 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               paddingBottom: '100px',
             } as React.CSSProperties}
           >
-            {gridData.map((row, rowIndex) =>
+            {gridData
+              .filter((row) => {
+                // 시간대 모드에서 접힌 날짜의 time-slot 행 필터링
+                if (!hasTimeSlots) return true;
+                const firstCell = row[0];
+                if (firstCell?.type === 'time-slot' && firstCell.date) {
+                  return expandedDates.has(firstCell.date);
+                }
+                return true;
+              })
+              .map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const key = `${rowIndex}-${colIndex}`;
 
@@ -352,22 +384,19 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'date-separator') {
-                  const isCurrent = !isOrganizer && cell.participant === currentUser;
-                  const participantIsLocked = lockedParticipants.has(cell.participant || '');
+                  const dateKey = cell.date || '';
                   return (
                     <DateSeparatorCell
                       key={key}
-                      date={cell.date || ''}
+                      date={dateKey}
                       content={cell.content || ''}
                       month={cell.month || ''}
                       highlightedDate={highlightedDate}
                       isFirst={colIndex === 0}
                       isFirstOfMonth={cell.isFirstOfMonth}
-                      participant={cell.participant}
-                      isCurrentUser={isCurrent}
-                      isCurrentUserEditing={isCurrent && isEditing}
-                      isLocked={participantIsLocked}
-                      onToggleLock={handleToggleLock}
+                      isExpanded={expandedDates.has(dateKey)}
+                      onToggleExpand={handleToggleDateExpand}
+                      timeSlotCount={meeting?.timeSlots?.length || 0}
                     />
                   );
                 }

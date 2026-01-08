@@ -228,7 +228,7 @@ export const HeaderCorner = memo(function HeaderCorner({ content }: HeaderCorner
   );
 });
 
-// 시간대 모드에서 날짜별 헤더 행 (날짜 정보 + 참여자 헤더)
+// 시간대 모드에서 날짜 구분 행 (접기/펼치기 가능)
 interface DateSeparatorCellProps {
   date: string;
   content: string; // "15 수" 형식
@@ -236,11 +236,9 @@ interface DateSeparatorCellProps {
   highlightedDate: string | null;
   isFirst?: boolean; // 첫 번째 셀인지 (날짜 표시용)
   isFirstOfMonth?: boolean; // 해당 월의 첫 번째 날짜인지 (월 정보 표시용)
-  participant?: string; // 참여자 이름 (첫 번째 셀이 아닌 경우)
-  isCurrentUser?: boolean; // 현재 사용자인지
-  isCurrentUserEditing?: boolean; // 현재 사용자가 편집 중인지
-  isLocked?: boolean; // 잠금 상태
-  onToggleLock?: (participant: string) => void;
+  isExpanded?: boolean; // 펼쳐진 상태인지
+  onToggleExpand?: (date: string) => void; // 접기/펼치기 토글
+  timeSlotCount?: number; // 시간대 개수 (접힌 상태에서 표시용)
 }
 
 export const DateSeparatorCell = memo(function DateSeparatorCell({
@@ -249,15 +247,14 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
   month,
   highlightedDate,
   isFirst = false,
-  participant,
-  isCurrentUser = false,
-  isCurrentUserEditing = true,
-  isLocked = false,
-  onToggleLock,
+  isFirstOfMonth = false,
+  isExpanded = true,
+  onToggleExpand,
+  timeSlotCount = 0,
 }: DateSeparatorCellProps) {
   const isHighlighted = highlightedDate === date;
 
-  // 첫 번째 셀: 날짜 정보 표시
+  // 첫 번째 셀: 날짜 정보 + 접기/펼치기 버튼
   if (isFirst) {
     const dateObj = new Date(date + 'T00:00:00');
     const dayNumber = String(dateObj.getDate()).padStart(2, '0');
@@ -267,79 +264,47 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
     const [year, monthNum] = month.split('.');
 
     return (
-      <div
-        className={`px-2 py-1.5 transition-all duration-300 ${
+      <button
+        onClick={() => onToggleExpand?.(date)}
+        className={`w-full px-2 py-1 transition-all duration-300 text-left ${
           isHighlighted
-            ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg`
-            : DATE_COLUMN_COLORS.header.bg
-        }`}
-        style={{ position: 'sticky', left: 0, top: 0, zIndex: 30 }}
+            ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg z-20`
+            : DATE_COLUMN_COLORS.bg
+        } hover:bg-gray-200 cursor-pointer`}
+        style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
         data-date-row={date}
       >
-        <div className="flex flex-col items-end justify-center">
-          {/* 연.월 표시 (컴팩트) */}
-          <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
-            {year}.{monthNum}
+        <div className="flex items-center justify-between gap-1">
+          {/* 접기/펼치기 아이콘 */}
+          <span className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
+            ▶
           </span>
-          {/* 일 + 요일 */}
-          <div className="flex items-baseline gap-0.5">
-            <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
-            <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+          <div className="flex flex-col items-end justify-center flex-1">
+            {/* 월 변경 시 연.월 표시 */}
+            {isFirstOfMonth && (
+              <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+                {year}.{monthNum}
+              </span>
+            )}
+            {/* 일 + 요일 */}
+            <div className="flex items-baseline gap-0.5">
+              <span className={`text-sm font-bold ${dayColor}`}>{dayNumber}</span>
+              <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+            </div>
           </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 참여자 헤더 셀
-  if (participant) {
-    const getHeaderStyle = () => {
-      if (isCurrentUser) {
-        const colors = isCurrentUserEditing
-          ? CURRENT_USER_COLORS.editing.header
-          : CURRENT_USER_COLORS.completed.header;
-        return `${colors.bg} border-b-2 ${colors.border} ${colors.borderX}`;
-      }
-      return isLocked ? 'bg-gray-50' : 'bg-white';
-    };
-
-    const getTextStyle = () => {
-      if (isCurrentUser) {
-        const colors = isCurrentUserEditing
-          ? CURRENT_USER_COLORS.editing.header
-          : CURRENT_USER_COLORS.completed.header;
-        return `${colors.text} font-extrabold`;
-      }
-      return isLocked
-        ? 'text-gray-500'
-        : 'text-gray-800 hover:text-blue-500 transition-colors';
-    };
-
-    return (
-      <div
-        className={`px-2 py-1 text-center text-sm font-bold ${getHeaderStyle()}`}
-        style={{ position: 'sticky', top: 0, zIndex: 20 }}
-      >
-        <button
-          onClick={() => onToggleLock?.(participant)}
-          className={`w-full flex items-center justify-center gap-1 ${getTextStyle()}`}
-        >
-          <span>{participant}</span>
-          {isCurrentUser && (
-            isCurrentUserEditing ? (
-              <Pencil className="w-3 h-3" />
-            ) : (
-              <Check className="w-3 h-3" />
-            )
+          {/* 접힌 상태에서 시간대 개수 표시 */}
+          {!isExpanded && timeSlotCount > 0 && (
+            <span className="text-[10px] text-gray-400 ml-1">
+              ({timeSlotCount})
+            </span>
           )}
-          {isLocked && !isCurrentUser && <Check className="w-3 h-3 opacity-60" />}
-        </button>
-      </div>
+        </div>
+      </button>
     );
   }
 
-  // 빈 셀 (fallback)
-  return <div className="bg-gray-50" style={{ position: 'sticky', top: 0, zIndex: 20 }} />;
+  // 참여자 열의 빈 셀
+  return <div className="bg-gray-50" />;
 });
 
 // 시간대 모드에서 첫 번째가 아닌 시간대 행의 레이블 셀
