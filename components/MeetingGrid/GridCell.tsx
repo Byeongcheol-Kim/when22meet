@@ -254,7 +254,7 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
 }: DateSeparatorCellProps) {
   const isHighlighted = highlightedDate === date;
 
-  // 첫 번째 셀: 날짜 정보 + 접기/펼치기 버튼
+  // 첫 번째 셀: 날짜 정보
   if (isFirst) {
     const dateObj = new Date(date + 'T00:00:00');
     const dayNumber = String(dateObj.getDate()).padStart(2, '0');
@@ -274,37 +274,40 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
         style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
         data-date-row={date}
       >
-        <div className="flex items-center justify-between gap-1">
-          {/* 접기/펼치기 아이콘 */}
-          <span className={`text-gray-400 transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-            ▶
-          </span>
-          <div className="flex flex-col items-end justify-center flex-1">
-            {/* 월 변경 시 연.월 표시 */}
-            {isFirstOfMonth && (
-              <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
-                {year}.{monthNum}
-              </span>
-            )}
-            {/* 일 + 요일 */}
-            <div className="flex items-baseline gap-0.5">
-              <span className={`text-sm font-bold ${dayColor}`}>{dayNumber}</span>
-              <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
-            </div>
-          </div>
-          {/* 접힌 상태에서 시간대 개수 표시 */}
-          {!isExpanded && timeSlotCount > 0 && (
-            <span className="text-[10px] text-gray-400 ml-1">
-              ({timeSlotCount})
+        <div className="flex flex-col items-end justify-center">
+          {/* 월 변경 시 연.월 표시 */}
+          {isFirstOfMonth && (
+            <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+              {year}.{monthNum}
             </span>
           )}
+          {/* 일 + 요일 */}
+          <div className="flex items-baseline gap-0.5">
+            <span className={`text-sm font-bold ${dayColor}`}>{dayNumber}</span>
+            <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+          </div>
         </div>
       </button>
     );
   }
 
-  // 참여자 열의 빈 셀
-  return <div className="bg-gray-50" />;
+  // 참여자 열의 빈 셀 (클릭 가능, 접힌 상태 표시)
+  return (
+    <button
+      onClick={() => onToggleExpand?.(date)}
+      className="w-full h-full bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors flex items-center justify-center"
+    >
+      {/* 접힌 상태에서 표시 */}
+      {!isExpanded && (
+        <div className="flex items-center gap-1 text-gray-400">
+          <span className="text-[10px]">▼</span>
+          {timeSlotCount > 0 && (
+            <span className="text-[10px]">{timeSlotCount}개</span>
+          )}
+        </div>
+      )}
+    </button>
+  );
 });
 
 // 시간대 모드에서 첫 번째가 아닌 시간대 행의 레이블 셀
