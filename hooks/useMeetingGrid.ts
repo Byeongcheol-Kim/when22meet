@@ -5,6 +5,14 @@ import { Meeting, Availability, TimeSlotValue, TIME_SLOTS } from '@/lib/types';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
+// 참석자별 날짜 요약 상태
+export interface ParticipantDateSummary {
+  available: number;
+  unavailable: number;
+  undecided: number;
+  total: number;
+}
+
 export interface GridCell {
   type:
     | 'header-corner'
@@ -24,6 +32,7 @@ export interface GridCell {
   timeSlotLabel?: string; // 시간대 레이블 (표시용)
   dateSlotKey?: string; // "YYYY-MM-DD:timeSlot" 형식의 키
   isFirstOfMonth?: boolean; // 해당 월의 첫 번째 날짜인지 여부 (시간대 모드)
+  dateSummary?: ParticipantDateSummary; // 날짜별 요약 상태 (접힌 상태에서 표시)
 }
 
 export interface TopDate {
@@ -155,7 +164,7 @@ export function useMeetingGrid({
       if (hasTimeSlots && meeting.timeSlots) {
         // 시간대 모드: 날짜 구분 행 + 시간대별 서브행
 
-        // 1. 날짜 구분 행 (날짜 정보만, 참여자 열은 빈 셀)
+        // 1. 날짜 구분 행 (날짜 정보 + 참여자별 요약)
         const dateSeparatorRow: GridCell[] = [
           {
             type: 'date-separator',
@@ -165,10 +174,28 @@ export function useMeetingGrid({
             isFirstOfMonth: isFirstOfMonth,
           },
         ];
-        // 빈 셀 추가 (참여자 열)
-        for (let i = 0; i < participants.length; i++) {
-          dateSeparatorRow.push({ type: 'date-separator', date: date });
-        }
+        // 참여자별 요약 셀 추가
+        participants.forEach((name) => {
+          const availability = availabilityMap.get(name);
+          // 해당 날짜의 모든 시간대에 대한 요약 계산
+          const summary: ParticipantDateSummary = {
+            available: 0,
+            unavailable: 0,
+            undecided: 0,
+            total: meeting.timeSlots!.length,
+          };
+          meeting.timeSlots!.forEach((slot) => {
+            const dateSlotKey = `${date}:${slot}`;
+            const status = getStatus(availability, dateSlotKey);
+            summary[status]++;
+          });
+          dateSeparatorRow.push({
+            type: 'date-separator',
+            date: date,
+            participant: name,
+            dateSummary: summary,
+          });
+        });
         result.push(dateSeparatorRow);
 
         // 2. 시간대별 서브행 추가

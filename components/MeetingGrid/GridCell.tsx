@@ -1,9 +1,10 @@
 'use client';
 
 import { memo } from 'react';
-import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor, CURRENT_USER_COLORS, TIME_SLOT_COLORS } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor, CURRENT_USER_COLORS, TIME_SLOT_COLORS, STATUS_COLORS } from '@/lib/constants/colors';
 import { Check, Pencil } from 'lucide-react';
 import { TimeSlotValue } from '@/lib/types';
+import { ParticipantDateSummary } from '@/hooks/useMeetingGrid';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -238,7 +239,7 @@ interface DateSeparatorCellProps {
   isFirstOfMonth?: boolean; // 해당 월의 첫 번째 날짜인지 (월 정보 표시용)
   isExpanded?: boolean; // 펼쳐진 상태인지
   onToggleExpand?: (date: string) => void; // 접기/펼치기 토글
-  timeSlotCount?: number; // 시간대 개수 (접힌 상태에서 표시용)
+  dateSummary?: ParticipantDateSummary; // 참석자별 요약 (접힌 상태에서 표시)
 }
 
 export const DateSeparatorCell = memo(function DateSeparatorCell({
@@ -250,7 +251,7 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
   isFirstOfMonth = false,
   isExpanded = true,
   onToggleExpand,
-  timeSlotCount = 0,
+  dateSummary,
 }: DateSeparatorCellProps) {
   const isHighlighted = highlightedDate === date;
 
@@ -291,21 +292,43 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
     );
   }
 
-  // 참여자 열의 빈 셀 (클릭 가능, 접힌 상태 표시)
+  // 참여자 열 셀 (클릭 가능, 접힌 상태에서 요약 표시)
+  // 요약 상태에서 가장 많은 상태 결정
+  const getSummaryDisplay = () => {
+    if (!dateSummary || isExpanded) return null;
+
+    const { available, unavailable, total } = dateSummary;
+
+    // 참여가 하나라도 있으면 참여 개수 표시
+    if (available > 0) {
+      return (
+        <div className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS.available.bg} ${STATUS_COLORS.available.text}`}>
+          {available}/{total}
+        </div>
+      );
+    }
+    // 불참이 있으면 불참 표시
+    if (unavailable > 0) {
+      return (
+        <div className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS.unavailable.bg} ${STATUS_COLORS.unavailable.text}`}>
+          0/{total}
+        </div>
+      );
+    }
+    // 전부 미정
+    return (
+      <div className={`px-2 py-0.5 rounded text-xs font-medium border ${STATUS_COLORS.undecided.bg} ${STATUS_COLORS.undecided.text} ${STATUS_COLORS.undecided.border}`}>
+        ?
+      </div>
+    );
+  };
+
   return (
     <button
       onClick={() => onToggleExpand?.(date)}
       className="w-full h-full bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors flex items-center justify-center"
     >
-      {/* 접힌 상태에서 표시 */}
-      {!isExpanded && (
-        <div className="flex items-center gap-1 text-gray-400">
-          <span className="text-[10px]">▼</span>
-          {timeSlotCount > 0 && (
-            <span className="text-[10px]">{timeSlotCount}개</span>
-          )}
-        </div>
-      )}
+      {getSummaryDisplay()}
     </button>
   );
 });

@@ -396,7 +396,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       isFirstOfMonth={cell.isFirstOfMonth}
                       isExpanded={expandedDates.has(dateKey)}
                       onToggleExpand={handleToggleDateExpand}
-                      timeSlotCount={meeting?.timeSlots?.length || 0}
+                      dateSummary={cell.dateSummary}
                     />
                   );
                 }
