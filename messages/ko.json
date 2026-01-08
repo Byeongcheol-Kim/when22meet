@@ -257,6 +257,22 @@
   "dateSelector": {
     "today": "오늘"
   },
+  "timeSlot": {
+    "toggle": "시간대도 선택하기",
+    "toggleDescription": "특정 시간대별로 참석 여부를 확인합니다",
+    "shortcuts": "빠른 선택",
+    "selectSlots": "30분 단위 선택",
+    "selectedCount": "{count}개 선택됨",
+    "slots": {
+      "morning": "오전",
+      "early_afternoon": "이른 오후",
+      "late_afternoon": "늦은 오후",
+      "evening": "저녁",
+      "late_night": "심야",
+      "dawn": "새벽"
+    },
+    "selectAtLeastOne": "시간대를 최소 하나 선택해주세요"
+  },
   "seo": {
     "title": "약속일정 잡기 앱 - 언제만나",
     "description": "언제만나는 약속일정 잡기, 모임 시간 정하기, 회의 시간 조율이 쉬운 무료 일정 조율 앱입니다. 회원가입 없이 바로 사용할 수 있으며, 여러 명의 일정을 한눈에 파악하여 최적의 만남 시간을 찾을 수 있습니다.",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Meeting, Availability } from '@/lib/types';
+import { Meeting, Availability, TimeSlotValue, TIME_SLOTS } from '@/lib/types';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -10,6 +10,8 @@ export interface GridCell {
     | 'header-corner'
     | 'header-participant'
     | 'date'
+    | 'date-header' // 시간대 모드에서 날짜만 표시하는 헤더 행
+    | 'time-slot' // 시간대 레이블 셀
     | 'status'
     | 'month-separator'
     | 'add-input';
@@ -18,10 +20,16 @@ export interface GridCell {
   participant?: string;
   status?: ParticipantStatus;
   month?: string;
+  timeSlot?: TimeSlotValue; // 시간대 값
+  timeSlotLabel?: string; // 시간대 레이블 (표시용)
+  dateSlotKey?: string; // "YYYY-MM-DD:timeSlot" 형식의 키
 }
 
-interface TopDate {
+export interface TopDate {
   date: string;
+  timeSlot?: TimeSlotValue;
+  timeSlotLabel?: string;
+  dateSlotKey: string; // "YYYY-MM-DD" 또는 "YYYY-MM-DD:timeSlot"
   count: number;
   rank: number;
 }
@@ -33,6 +41,25 @@ interface UseMeetingGridProps {
   allParticipants: string[];
   currentMonth: string;
   t: (key: string) => string;
+  locale?: string;
+}
+
+// 시간대 레이블 가져오기
+function getTimeSlotLabel(slotValue: TimeSlotValue, locale: string = 'ko'): string {
+  const slot = TIME_SLOTS.find((s) => s.value === slotValue);
+  if (!slot) return slotValue;
+  return locale === 'en' ? slot.labelEn : slot.label;
+}
+
+// 상태 확인 헬퍼 함수
+function getStatus(
+  availability: Availability | undefined,
+  key: string
+): ParticipantStatus {
+  if (!availability) return 'undecided';
+  if (availability.availableDates.includes(key)) return 'available';
+  if (availability.unavailableDates?.includes(key)) return 'unavailable';
+  return 'undecided';
 }
 
 export function useMeetingGrid({
@@ -42,7 +69,17 @@ export function useMeetingGrid({
   allParticipants,
   currentMonth,
   t,
+  locale = 'ko',
 }: UseMeetingGridProps) {
+  // 시간대 활성화 여부 확인
+  const hasTimeSlots = useMemo(() => {
+    return (
+      meeting?.timeSlotEnabled === true &&
+      Array.isArray(meeting?.timeSlots) &&
+      meeting.timeSlots.length > 0
+    );
+  }, [meeting]);
+
   // Calculate grid data with O(1) lookups
   const gridData = useMemo(() => {
     if (!meeting) return [];
@@ -111,80 +148,134 @@ export function useMeetingGrid({
       }
       lastMonth = currentDateMonth;
 
-      // Generate date row
-      const dateRow: GridCell[] = [
-        {
-          type: 'date',
-          content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
-          date: date,
-          month: currentDateMonth,
-        },
-      ];
+      if (hasTimeSlots && meeting.timeSlots) {
+        // 시간대 모드: 날짜 헤더 행 + 시간대별 서브행
+        meeting.timeSlots.forEach((slot, slotIndex) => {
+          const dateSlotKey = `${date}:${slot}`;
+          const isFirstSlot = slotIndex === 0;
+          const timeSlotLabel = getTimeSlotLabel(slot, locale);
 
-      // Add each participant's status using Map for O(1) lookup
-      participants.forEach((name) => {
-        const availability = availabilityMap.get(name);
-        let status: ParticipantStatus;
+          const row: GridCell[] = [
+            {
+              type: isFirstSlot ? 'date-header' : 'time-slot',
+              content: isFirstSlot
+                ? `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`
+                : '',
+              date: date,
+              month: currentDateMonth,
+              timeSlot: slot,
+              timeSlotLabel: timeSlotLabel,
+              dateSlotKey: dateSlotKey,
+            },
+          ];
 
-        if (!availability) {
-          // Newly added participant
-          status = 'undecided';
-        } else if (availability.availableDates.includes(date)) {
-          // Available
-          status = 'available';
-        } else if (availability.unavailableDates?.includes(date)) {
-          // Explicitly unavailable
-          status = 'unavailable';
-        } else {
-          // Undecided (not selected yet)
-          status = 'undecided';
-        }
+          // Add each participant's status using Map for O(1) lookup
+          participants.forEach((name) => {
+            const availability = availabilityMap.get(name);
+            const status = getStatus(availability, dateSlotKey);
 
-        dateRow.push({
-          type: 'status',
-          status,
-          participant: name,
-          date: date,
+            row.push({
+              type: 'status',
+              status,
+              participant: name,
+              date: date,
+              timeSlot: slot,
+              dateSlotKey: dateSlotKey,
+            });
+          });
+
+          result.push(row);
         });
-      });
+      } else {
+        // 기존 날짜 전용 모드
+        const dateRow: GridCell[] = [
+          {
+            type: 'date',
+            content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
+            date: date,
+            month: currentDateMonth,
+            dateSlotKey: date,
+          },
+        ];
 
-      result.push(dateRow);
+        // Add each participant's status using Map for O(1) lookup
+        participants.forEach((name) => {
+          const availability = availabilityMap.get(name);
+          const status = getStatus(availability, date);
+
+          dateRow.push({
+            type: 'status',
+            status,
+            participant: name,
+            date: date,
+            dateSlotKey: date,
+          });
+        });
+
+        result.push(dateRow);
+      }
     });
 
     return result;
-  }, [meeting, availabilityMap, allParticipants, currentMonth, t]);
+  }, [meeting, availabilityMap, allParticipants, currentMonth, t, hasTimeSlots, locale]);
 
-  // Calculate Top 3 dates with O(N) complexity using Map
+  // Calculate Top 3 dates/slots with O(N) complexity using Map
   const topDates = useMemo((): TopDate[] => {
     if (!meeting || availabilities.length === 0) return [];
 
-    const dateScores: { [date: string]: number } = {};
+    const dateScores: { [key: string]: number } = {};
 
-    // Calculate number of available people for each date
-    meeting.dates.forEach((date) => {
-      let count = 0;
-      availabilities.forEach((availability) => {
-        if (availability.availableDates.includes(date)) {
-          count++;
-        }
+    if (hasTimeSlots && meeting.timeSlots) {
+      // 시간대 모드: date:slot 키로 집계
+      meeting.dates.forEach((date) => {
+        meeting.timeSlots!.forEach((slot) => {
+          const key = `${date}:${slot}`;
+          let count = 0;
+          availabilities.forEach((availability) => {
+            if (availability.availableDates.includes(key)) {
+              count++;
+            }
+          });
+          dateScores[key] = count;
+        });
       });
-      dateScores[date] = count;
-    });
+    } else {
+      // 날짜 전용 모드
+      meeting.dates.forEach((date) => {
+        let count = 0;
+        availabilities.forEach((availability) => {
+          if (availability.availableDates.includes(date)) {
+            count++;
+          }
+        });
+        dateScores[date] = count;
+      });
+    }
 
     // Sort by score and extract TOP 3
     return Object.entries(dateScores)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
       .filter(([, count]) => count > 0)
-      .map(([date, count], index) => ({
-        date,
-        count,
-        rank: index + 1,
-      }));
-  }, [meeting, availabilities]);
+      .map(([key, count], index) => {
+        const parts = key.split(':');
+        const date = parts[0];
+        const timeSlot = parts.length > 1 ? (parts[1] as TimeSlotValue) : undefined;
+
+        return {
+          date,
+          timeSlot,
+          timeSlotLabel: timeSlot ? getTimeSlotLabel(timeSlot, locale) : undefined,
+          dateSlotKey: key,
+          count,
+          rank: (index + 1) as 1 | 2 | 3,
+        };
+      });
+  }, [meeting, availabilities, hasTimeSlots, locale]);
 
   return {
     gridData,
     topDates,
+    hasTimeSlots,
   };
 }

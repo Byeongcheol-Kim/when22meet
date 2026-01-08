@@ -23,13 +23,15 @@ import {
   ParticipantHeader,
   MonthSeparator,
   HeaderCorner,
+  DateHeaderCell,
+  TimeSlotCell,
 } from '@/components/MeetingGrid/GridCell';
 import { FloatingActionButton } from '@/components/MeetingGrid/FloatingActionButton';
 import { TopDatesIndicator } from '@/components/MeetingGrid/TopDatesIndicator';
 import { Check, Pencil, Crown } from 'lucide-react';
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const resolvedParams = use(params);
   const router = useRouter();
 
@@ -104,6 +106,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     allParticipants: orderedParticipants,
     currentMonth,
     t,
+    locale,
   });
 
   // Meeting actions with useCallback
@@ -335,7 +338,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'date') {
-                  const topDateInfo = topDates.find((td) => td.date === cell.date);
+                  const topDateInfo = topDates.find((td) => td.dateSlotKey === cell.dateSlotKey);
                   return (
                     <DateCell
                       key={key}
@@ -344,6 +347,36 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       month={cell.month || ''}
                       highlightedDate={highlightedDate}
                       topDateInfo={topDateInfo ? { rank: topDateInfo.rank as 1 | 2 | 3 } : undefined}
+                    />
+                  );
+                }
+
+                if (cell.type === 'date-header') {
+                  const topDateInfo = topDates.find((td) => td.dateSlotKey === cell.dateSlotKey);
+                  return (
+                    <DateHeaderCell
+                      key={key}
+                      date={cell.date || ''}
+                      content={cell.content || ''}
+                      timeSlotLabel={cell.timeSlotLabel || ''}
+                      highlightedDate={highlightedDate}
+                      topDateInfo={topDateInfo ? { rank: topDateInfo.rank as 1 | 2 | 3 } : undefined}
+                      dateSlotKey={cell.dateSlotKey || ''}
+                    />
+                  );
+                }
+
+                if (cell.type === 'time-slot') {
+                  const topDateInfo = topDates.find((td) => td.dateSlotKey === cell.dateSlotKey);
+                  return (
+                    <TimeSlotCell
+                      key={key}
+                      date={cell.date || ''}
+                      timeSlot={cell.timeSlot!}
+                      timeSlotLabel={cell.timeSlotLabel || ''}
+                      highlightedDate={highlightedDate}
+                      topDateInfo={topDateInfo ? { rank: topDateInfo.rank as 1 | 2 | 3 } : undefined}
+                      dateSlotKey={cell.dateSlotKey || ''}
                     />
                   );
                 }
@@ -365,6 +398,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       status={cell.status!}
                       participant={cell.participant || ''}
                       date={cell.date || ''}
+                      dateSlotKey={cell.dateSlotKey}
                       isLocked={!canEdit}
                       isCurrentUser={isCurrent}
                       onStatusClick={handleStatusClick}

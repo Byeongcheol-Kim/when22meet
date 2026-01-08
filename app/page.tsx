@@ -5,12 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/useTranslation';
 import { Info, Link2, Calendar } from 'lucide-react';
 import DateSelector from '@/components/DateSelector';
+import TimeSlotSelector from '@/components/TimeSlotSelector';
 import AboutModal from '@/components/AboutModal';
 import Toast from '@/components/Toast';
 import MeetingTitleInput from '@/components/MeetingTitleInput';
 import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
 import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS, SECTION_BADGE_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
+import { TimeSlotValue } from '@/lib/types';
 
 function SEOContent() {
   const { t } = useTranslation();
@@ -34,6 +36,8 @@ function HomeContent() {
   const [isCreating, setIsCreating] = useState(false);
   const [showHelpModal, setShowHelpModal] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<DateTemplate | null>(null);
+  const [timeSlotEnabled, setTimeSlotEnabled] = useState(false);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<TimeSlotValue[]>([]);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info' | 'warning'>('success');
   const router = useRouter();
@@ -158,6 +162,12 @@ function HomeContent() {
       setToastType('warning');
       return;
     }
+    // 시간대가 활성화되어 있지만 선택된 시간대가 없으면 경고
+    if (timeSlotEnabled && selectedTimeSlots.length === 0) {
+      setToastMessage(t('timeSlot.selectAtLeastOne'));
+      setToastType('warning');
+      return;
+    }
 
     setIsCreating(true);
     try {
@@ -169,6 +179,8 @@ function HomeContent() {
           dates: selectedDates.sort(),
           participants: participants,
           locale, // Save user's language preference
+          timeSlotEnabled,
+          timeSlots: timeSlotEnabled ? selectedTimeSlots : undefined,
         })
       });
 
@@ -307,6 +319,16 @@ function HomeContent() {
                   setSelectedTemplate(null); // Clear template on manual selection
                 }}
               />
+
+              {/* Time Slot Selection */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <TimeSlotSelector
+                  enabled={timeSlotEnabled}
+                  onEnabledChange={setTimeSlotEnabled}
+                  selectedSlots={selectedTimeSlots}
+                  onSlotsChange={setSelectedTimeSlots}
+                />
+              </div>
             </div>
           </div>
         </div>

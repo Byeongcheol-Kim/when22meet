@@ -257,6 +257,22 @@
   "dateSelector": {
     "today": "Today"
   },
+  "timeSlot": {
+    "toggle": "Also select time slots",
+    "toggleDescription": "Check availability by specific time periods",
+    "shortcuts": "Quick Select",
+    "selectSlots": "30-Minute Intervals",
+    "selectedCount": "{count} selected",
+    "slots": {
+      "morning": "Morning",
+      "early_afternoon": "Early Afternoon",
+      "late_afternoon": "Late Afternoon",
+      "evening": "Evening",
+      "late_night": "Late Night",
+      "dawn": "Dawn"
+    },
+    "selectAtLeastOne": "Please select at least one time slot"
+  },
   "seo": {
     "title": "Schedule Meeting App - When22Meet",
     "description": "When22Meet is a free scheduling app that makes it easy to coordinate meetings, find meeting times, and schedule group events. Use immediately without sign-up to see everyone's availability at a glance and find the perfect meeting time.",

@@ -1,8 +1,9 @@
 'use client';
 
 import { memo } from 'react';
-import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor, CURRENT_USER_COLORS } from '@/lib/constants/colors';
+import { DATE_COLUMN_COLORS, getStatusClasses, getTopDateClasses, getDayOfWeekColor, CURRENT_USER_COLORS, TIME_SLOT_COLORS } from '@/lib/constants/colors';
 import { Check, Pencil } from 'lucide-react';
+import { TimeSlotValue } from '@/lib/types';
 
 type ParticipantStatus = 'available' | 'unavailable' | 'undecided';
 
@@ -59,9 +60,10 @@ interface StatusCellProps {
   status: ParticipantStatus;
   participant: string;
   date: string;
+  dateSlotKey?: string; // "YYYY-MM-DD" 또는 "YYYY-MM-DD:timeSlot"
   isLocked: boolean;
   isCurrentUser?: boolean;
-  onStatusClick: (participant: string, date: string, status: ParticipantStatus) => void;
+  onStatusClick: (participant: string, dateSlotKey: string, status: ParticipantStatus) => void;
   t: (key: string) => string;
 }
 
@@ -69,6 +71,7 @@ export const StatusCell = memo(function StatusCell({
   status,
   participant,
   date,
+  dateSlotKey,
   isLocked,
   isCurrentUser = true,
   onStatusClick,
@@ -76,6 +79,7 @@ export const StatusCell = memo(function StatusCell({
 }: StatusCellProps) {
   const isEditable = !isLocked;
   const isCurrentUserEditing = isCurrentUser && !isLocked;
+  const key = dateSlotKey || date; // dateSlotKey가 없으면 date 사용 (하위 호환성)
 
   const getCellBackground = () => {
     if (isCurrentUser && isCurrentUserEditing) {
@@ -94,7 +98,7 @@ export const StatusCell = memo(function StatusCell({
       <button
         onClick={() => {
           if (isEditable) {
-            onStatusClick(participant, date, status);
+            onStatusClick(participant, key, status);
           }
         }}
         disabled={!isEditable}
@@ -220,6 +224,106 @@ export const HeaderCorner = memo(function HeaderCorner({ content }: HeaderCorner
           {content.split('\n')[1]}
         </span>
       </div>
+    </div>
+  );
+});
+
+// 시간대 모드에서 날짜 헤더 + 첫 번째 시간대를 함께 표시하는 셀
+interface DateHeaderCellProps {
+  date: string;
+  content: string; // "15 수" 형식
+  timeSlotLabel: string; // "오전", "저녁" 등
+  highlightedDate: string | null;
+  topDateInfo?: TopDateInfo;
+  dateSlotKey: string;
+}
+
+export const DateHeaderCell = memo(function DateHeaderCell({
+  date,
+  content,
+  timeSlotLabel,
+  highlightedDate,
+  topDateInfo,
+  dateSlotKey,
+}: DateHeaderCellProps) {
+  const dateObj = new Date(date + 'T00:00:00');
+  const dayNumber = String(dateObj.getDate()).padStart(2, '0');
+  const dayOfWeek = content.split(' ')[1];
+  const day = dateObj.getDay();
+  const isHighlighted = highlightedDate === dateSlotKey || highlightedDate === date;
+  const dayColor = getDayOfWeekColor(day, isHighlighted);
+
+  return (
+    <div
+      className={`px-2 py-1 relative transition-all duration-300 ${
+        isHighlighted
+          ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg z-20`
+          : TIME_SLOT_COLORS.grid.dateHeader.bg
+      }`}
+      style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
+      data-date-row={dateSlotKey}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-col items-start">
+          <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+          <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
+        </div>
+        <span className={`text-xs ${TIME_SLOT_COLORS.grid.timeSlotLabel.text}`}>
+          {timeSlotLabel}
+        </span>
+      </div>
+      {topDateInfo && (
+        <div className={`absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
+          getTopDateClasses(topDateInfo.rank, 'indicator')
+        }`}>
+          {topDateInfo.rank}
+        </div>
+      )}
+    </div>
+  );
+});
+
+// 시간대 모드에서 첫 번째가 아닌 시간대 행의 레이블 셀
+interface TimeSlotCellProps {
+  date: string;
+  timeSlot: TimeSlotValue;
+  timeSlotLabel: string;
+  highlightedDate: string | null;
+  topDateInfo?: TopDateInfo;
+  dateSlotKey: string;
+}
+
+export const TimeSlotCell = memo(function TimeSlotCell({
+  date,
+  timeSlotLabel,
+  highlightedDate,
+  topDateInfo,
+  dateSlotKey,
+}: TimeSlotCellProps) {
+  const isHighlighted = highlightedDate === dateSlotKey || highlightedDate === date;
+
+  return (
+    <div
+      className={`px-2 py-1 relative transition-all duration-300 ${
+        isHighlighted
+          ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg z-20`
+          : TIME_SLOT_COLORS.grid.timeSlotLabel.bg
+      }`}
+      style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
+      data-date-row={dateSlotKey}
+    >
+      <div className="flex items-center justify-end h-full">
+        <span className={`text-xs ${TIME_SLOT_COLORS.grid.timeSlotLabel.text}`}>
+          {timeSlotLabel}
+        </span>
+      </div>
+      {topDateInfo && (
+        <div className={`absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
+          getTopDateClasses(topDateInfo.rank, 'indicator')
+        }`}>
+          {topDateInfo.rank}
+        </div>
+      )}
     </div>
   );
 });

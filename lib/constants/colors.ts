@@ -534,3 +534,46 @@ export const FAQ_COLORS = {
     hover: 'hover:text-orange-700',
   },
 } as const;
+
+/**
+ * 시간대 선택기 색상
+ */
+export const TIME_SLOT_COLORS = {
+  toggle: {
+    enabled: {
+      bg: 'bg-[#FFC354]',
+      dot: 'bg-white',
+    },
+    disabled: {
+      bg: 'bg-gray-300',
+      dot: 'bg-white',
+    },
+  },
+  chip: {
+    selected: {
+      bg: 'bg-[#FFC354]',
+      text: 'text-gray-800',
+      border: 'border-[#FFC354]',
+    },
+    default: {
+      bg: 'bg-white',
+      text: 'text-gray-700',
+      border: 'border-gray-300',
+      hover: 'hover:bg-gray-50',
+    },
+  },
+  label: {
+    text: 'text-gray-700',
+  },
+  // 그리드에서 시간대 행에 사용되는 색상
+  grid: {
+    dateHeader: {
+      bg: 'bg-gray-900',
+      text: 'text-white',
+    },
+    timeSlotLabel: {
+      bg: 'bg-gray-800',
+      text: 'text-gray-300',
+    },
+  },
+} as const;
