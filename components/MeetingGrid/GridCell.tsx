@@ -228,59 +228,49 @@ export const HeaderCorner = memo(function HeaderCorner({ content }: HeaderCorner
   );
 });
 
-// 시간대 모드에서 날짜 헤더 + 첫 번째 시간대를 함께 표시하는 셀
-interface DateHeaderCellProps {
+// 시간대 모드에서 날짜 구분 행 (월 구분과 동일한 스타일)
+interface DateSeparatorCellProps {
   date: string;
   content: string; // "15 수" 형식
-  timeSlotLabel: string; // "오전", "저녁" 등
   highlightedDate: string | null;
-  topDateInfo?: TopDateInfo;
-  dateSlotKey: string;
+  isFirst?: boolean; // 첫 번째 셀인지 (날짜 표시용)
 }
 
-export const DateHeaderCell = memo(function DateHeaderCell({
+export const DateSeparatorCell = memo(function DateSeparatorCell({
   date,
   content,
-  timeSlotLabel,
   highlightedDate,
-  topDateInfo,
-  dateSlotKey,
-}: DateHeaderCellProps) {
-  const dateObj = new Date(date + 'T00:00:00');
-  const dayNumber = String(dateObj.getDate()).padStart(2, '0');
-  const dayOfWeek = content.split(' ')[1];
-  const day = dateObj.getDay();
-  const isHighlighted = highlightedDate === dateSlotKey || highlightedDate === date;
-  const dayColor = getDayOfWeekColor(day, isHighlighted);
+  isFirst = false,
+}: DateSeparatorCellProps) {
+  const isHighlighted = highlightedDate === date;
 
-  return (
-    <div
-      className={`px-2 py-1 relative transition-all duration-300 ${
-        isHighlighted
-          ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg z-20`
-          : TIME_SLOT_COLORS.grid.dateHeader.bg
-      }`}
-      style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
-      data-date-row={dateSlotKey}
-    >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex flex-col items-start">
+  if (isFirst) {
+    const dateObj = new Date(date + 'T00:00:00');
+    const dayNumber = String(dateObj.getDate()).padStart(2, '0');
+    const dayOfWeek = content.split(' ')[1];
+    const day = dateObj.getDay();
+    const dayColor = getDayOfWeekColor(day, isHighlighted);
+
+    return (
+      <div
+        className={`px-2 py-1 transition-all duration-300 ${
+          isHighlighted
+            ? `${DATE_COLUMN_COLORS.highlighted.bg} shadow-lg z-20`
+            : DATE_COLUMN_COLORS.bg
+        }`}
+        style={{ position: 'sticky', left: 0, zIndex: isHighlighted ? 20 : 10 }}
+        data-date-row={date}
+      >
+        <div className="flex flex-col items-end justify-center">
           <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
           <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
         </div>
-        <span className={`text-xs ${TIME_SLOT_COLORS.grid.timeSlotLabel.text}`}>
-          {timeSlotLabel}
-        </span>
       </div>
-      {topDateInfo && (
-        <div className={`absolute top-1 left-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold ${
-          getTopDateClasses(topDateInfo.rank, 'indicator')
-        }`}>
-          {topDateInfo.rank}
-        </div>
-      )}
-    </div>
-  );
+    );
+  }
+
+  // 참여자 열의 빈 셀 (월 구분과 동일)
+  return <div className="bg-gray-50" />;
 });
 
 // 시간대 모드에서 첫 번째가 아닌 시간대 행의 레이블 셀

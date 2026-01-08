@@ -10,7 +10,7 @@ export interface GridCell {
     | 'header-corner'
     | 'header-participant'
     | 'date'
-    | 'date-header' // 시간대 모드에서 날짜만 표시하는 헤더 행
+    | 'date-separator' // 시간대 모드에서 날짜 구분 행 (월 구분과 유사)
     | 'time-slot' // 시간대 레이블 셀
     | 'status'
     | 'month-separator'
@@ -149,18 +149,32 @@ export function useMeetingGrid({
       lastMonth = currentDateMonth;
 
       if (hasTimeSlots && meeting.timeSlots) {
-        // 시간대 모드: 날짜 헤더 행 + 시간대별 서브행
-        meeting.timeSlots.forEach((slot, slotIndex) => {
+        // 시간대 모드: 날짜 구분 행 + 시간대별 서브행
+
+        // 1. 날짜 구분 행 추가 (월 구분과 유사)
+        const dateSeparatorRow: GridCell[] = [
+          {
+            type: 'date-separator',
+            content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
+            date: date,
+            month: currentDateMonth,
+          },
+        ];
+        // 빈 셀 추가 (참여자 열)
+        for (let i = 0; i < participants.length; i++) {
+          dateSeparatorRow.push({ type: 'date-separator', date: date });
+        }
+        result.push(dateSeparatorRow);
+
+        // 2. 시간대별 서브행 추가
+        meeting.timeSlots.forEach((slot) => {
           const dateSlotKey = `${date}:${slot}`;
-          const isFirstSlot = slotIndex === 0;
           const timeSlotLabel = getTimeSlotLabel(slot, locale);
 
           const row: GridCell[] = [
             {
-              type: isFirstSlot ? 'date-header' : 'time-slot',
-              content: isFirstSlot
-                ? `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`
-                : '',
+              type: 'time-slot',
+              content: timeSlotLabel,
               date: date,
               month: currentDateMonth,
               timeSlot: slot,

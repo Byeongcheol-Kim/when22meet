@@ -23,7 +23,7 @@ import {
   ParticipantHeader,
   MonthSeparator,
   HeaderCorner,
-  DateHeaderCell,
+  DateSeparatorCell,
   TimeSlotCell,
 } from '@/components/MeetingGrid/GridCell';
 import { FloatingActionButton } from '@/components/MeetingGrid/FloatingActionButton';
@@ -351,17 +351,14 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                   );
                 }
 
-                if (cell.type === 'date-header') {
-                  const topDateInfo = topDates.find((td) => td.dateSlotKey === cell.dateSlotKey);
+                if (cell.type === 'date-separator') {
                   return (
-                    <DateHeaderCell
+                    <DateSeparatorCell
                       key={key}
                       date={cell.date || ''}
                       content={cell.content || ''}
-                      timeSlotLabel={cell.timeSlotLabel || ''}
                       highlightedDate={highlightedDate}
-                      topDateInfo={topDateInfo ? { rank: topDateInfo.rank as 1 | 2 | 3 } : undefined}
-                      dateSlotKey={cell.dateSlotKey || ''}
+                      isFirst={colIndex === 0}
                     />
                   );
                 }
