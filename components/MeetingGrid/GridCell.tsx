@@ -209,9 +209,45 @@ export const MonthSeparator = memo(function MonthSeparator({
 
 interface HeaderCornerProps {
   content: string;
+  currentDate?: string | null; // 시간대 모드에서 현재 보이는 날짜 (YYYY-MM-DD)
+  hasTimeSlots?: boolean; // 시간대 모드 여부
+  getDayName?: (day: number) => string; // 요일 이름 가져오기
 }
 
-export const HeaderCorner = memo(function HeaderCorner({ content }: HeaderCornerProps) {
+export const HeaderCorner = memo(function HeaderCorner({
+  content,
+  currentDate,
+  hasTimeSlots = false,
+  getDayName,
+}: HeaderCornerProps) {
+  // 시간대 모드에서 현재 날짜 표시
+  if (hasTimeSlots && currentDate) {
+    const dateObj = new Date(currentDate + 'T00:00:00');
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const dayOfWeek = getDayName ? getDayName(dateObj.getDay()) : '';
+    const dayColor = getDayOfWeekColor(dateObj.getDay(), false);
+
+    return (
+      <div
+        className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}
+        style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
+      >
+        <div className="flex flex-col items-end justify-center">
+          <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+            {year}.{month}
+          </span>
+          <div className="flex items-baseline gap-0.5">
+            <span className={`text-sm font-bold ${dayColor}`}>{day}</span>
+            <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 기본 모드: 연/월만 표시
   return (
     <div
       className={`px-2 py-1 ${DATE_COLUMN_COLORS.header.bg}`}

@@ -96,6 +96,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
     clientHeight,
     highlightedDate,
     scrollToDate,
+    currentVisibleDate,
   } = useScrollManager({ meeting });
 
   // Grid data calculation
@@ -161,6 +162,27 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
       return next;
     });
   }, []);
+
+  // 금은동 인디케이터 클릭 핸들러 (접힌 날짜 펼치고 스크롤)
+  const handleTopDateClick = useCallback((dateSlotKey: string) => {
+    // dateSlotKey에서 날짜 부분 추출 (예: "2026-01-09:12:00" -> "2026-01-09")
+    const datePart = dateSlotKey.split(':')[0];
+
+    // 해당 날짜가 접혀있으면 펼치기
+    if (hasTimeSlots && !expandedDates.has(datePart)) {
+      setExpandedDates((prev) => {
+        const next = new Set(prev);
+        next.add(datePart);
+        return next;
+      });
+      // 펼쳐진 후 스크롤 (약간 딜레이 필요)
+      setTimeout(() => {
+        scrollToDate(dateSlotKey);
+      }, 100);
+    } else {
+      scrollToDate(dateSlotKey);
+    }
+  }, [hasTimeSlots, expandedDates, scrollToDate]);
 
   // Load current data when opening edit modal
   useEffect(() => {
@@ -352,7 +374,15 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                 }
 
                 if (cell.type === 'header-corner') {
-                  return <HeaderCorner key={key} content={cell.content || ''} />;
+                  return (
+                    <HeaderCorner
+                      key={key}
+                      content={cell.content || ''}
+                      currentDate={currentVisibleDate}
+                      hasTimeSlots={hasTimeSlots}
+                      getDayName={(day) => t(`dayNames.short.${day}`)}
+                    />
+                  );
                 }
 
                 if (cell.type === 'header-participant') {
@@ -455,7 +485,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
         datePositions={datePositions}
         scrollTop={scrollTop}
         clientHeight={clientHeight}
-        onDateClick={scrollToDate}
+        onDateClick={handleTopDateClick}
         t={t}
       />
 

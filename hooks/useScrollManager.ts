@@ -12,6 +12,7 @@ interface UseScrollManagerProps {
 interface UseScrollManagerReturn {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   currentMonth: string;
+  currentVisibleDate: string | null; // 현재 보이는 날짜 (시간대 모드용)
   datePositions: { [date: string]: number };
   scrollTop: number;
   clientHeight: number;
@@ -25,6 +26,7 @@ export function useScrollManager({
 }: UseScrollManagerProps): UseScrollManagerReturn {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const [currentMonth, setCurrentMonth] = useState('');
+  const [currentVisibleDate, setCurrentVisibleDate] = useState<string | null>(null);
   const [datePositions, setDatePositions] = useState<{ [date: string]: number }>(
     {}
   );
@@ -32,15 +34,20 @@ export function useScrollManager({
   const [clientHeight, setClientHeight] = useState(0);
   const [highlightedDate, setHighlightedDate] = useState<string | null>(null);
 
-  // Set initial month
+  // Set initial month and date
   useEffect(() => {
-    if (meeting && meeting.dates.length > 0 && !currentMonth) {
+    if (meeting && meeting.dates.length > 0) {
       const firstDate = parseStringToDate(meeting.dates[0]);
-      setCurrentMonth(formatYearMonth(firstDate));
+      if (!currentMonth) {
+        setCurrentMonth(formatYearMonth(firstDate));
+      }
+      if (!currentVisibleDate) {
+        setCurrentVisibleDate(meeting.dates[0]);
+      }
     }
-  }, [meeting, currentMonth]);
+  }, [meeting, currentMonth, currentVisibleDate]);
 
-  // Scroll handler for month display with throttling
+  // Scroll handler for month and date display with throttling
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container || !meeting) return;
@@ -52,21 +59,32 @@ export function useScrollManager({
 
       rafId = requestAnimationFrame(() => {
         const scrollTopValue = container.scrollTop;
-        const rowHeight = CONFIG.ROW_HEIGHT_PX;
 
-        // Calculate visible date index from scroll position
-        const visibleIndex = Math.floor(
-          (scrollTopValue + CONFIG.HEADER_HEIGHT_PX) / rowHeight
-        );
-        const dateIndex = Math.max(
-          0,
-          Math.min(visibleIndex - 1, meeting.dates.length - 1)
-        );
+        // date-separator 또는 date 행 중 현재 보이는 것 찾기
+        const dateRows = container.querySelectorAll('[data-date-row]');
+        let visibleDate: string | null = null;
 
-        if (meeting.dates[dateIndex]) {
-          const date = parseStringToDate(meeting.dates[dateIndex]);
+        for (const row of dateRows) {
+          if (row instanceof HTMLElement) {
+            const rowTop = row.offsetTop;
+            // 헤더 높이를 고려하여 현재 뷰포트에 보이는 날짜 찾기
+            if (rowTop <= scrollTopValue + CONFIG.HEADER_HEIGHT_PX + 10) {
+              visibleDate = row.getAttribute('data-date-row');
+            } else {
+              break;
+            }
+          }
+        }
+
+        if (visibleDate) {
+          // dateSlotKey에서 date 부분만 추출 (예: "2026-01-09:12:00" -> "2026-01-09")
+          const datePart = visibleDate.split(':')[0];
+          if (datePart !== currentVisibleDate) {
+            setCurrentVisibleDate(datePart);
+          }
+
+          const date = parseStringToDate(datePart);
           const month = formatYearMonth(date);
-
           if (month !== currentMonth) {
             setCurrentMonth(month);
           }
@@ -89,7 +107,7 @@ export function useScrollManager({
         cancelAnimationFrame(rafId);
       }
     };
-  }, [meeting, currentMonth]);
+  }, [meeting, currentMonth, currentVisibleDate]);
 
   // Calculate date positions
   useEffect(() => {
@@ -141,6 +159,7 @@ export function useScrollManager({
   return {
     scrollContainerRef,
     currentMonth,
+    currentVisibleDate,
     datePositions,
     scrollTop,
     clientHeight,

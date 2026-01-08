@@ -40,7 +40,11 @@ export const TopDatesIndicator = memo(function TopDatesIndicator({
 
         const date = new Date(item.date + 'T00:00:00');
         const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-        const displayStr = item.timeSlotLabel ? `${dateStr} ${item.timeSlotLabel}` : dateStr;
+        // dateSlotKey에서 시간 부분 추출 (예: "2026-01-09:12:00" -> "12:00")
+        const timePart = item.dateSlotKey.includes(':')
+          ? item.dateSlotKey.split(':').slice(1).join(':')
+          : null;
+        const displayStr = timePart ? `${dateStr} ${timePart}` : dateStr;
 
         return (
           <button
@@ -55,10 +59,7 @@ export const TopDatesIndicator = memo(function TopDatesIndicator({
               .replace('{count}', String(item.count))}
           >
             <span className="text-xs font-bold">
-              {item.timeSlotLabel
-                ? `${t('meeting.peopleCount').replace('{count}', String(item.count))} ${item.timeSlotLabel}`
-                : t('meeting.peopleCount').replace('{count}', String(item.count))
-              }
+              {item.count}{t('meeting.participantCount').replace(' people', '')} {displayStr}
             </span>
             {isVisible ? (
               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
