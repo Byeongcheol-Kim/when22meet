@@ -10,7 +10,7 @@ export interface GridCell {
     | 'header-corner'
     | 'header-participant'
     | 'date'
-    | 'date-separator' // 시간대 모드에서 날짜 구분 행 (월 구분과 유사)
+    | 'date-separator' // 시간대 모드에서 날짜 구분 행 (월 구분과 통합)
     | 'time-slot' // 시간대 레이블 셀
     | 'status'
     | 'month-separator'
@@ -23,6 +23,7 @@ export interface GridCell {
   timeSlot?: TimeSlotValue; // 시간대 값
   timeSlotLabel?: string; // 시간대 레이블 (표시용)
   dateSlotKey?: string; // "YYYY-MM-DD:timeSlot" 형식의 키
+  isFirstOfMonth?: boolean; // 해당 월의 첫 번째 날짜인지 여부 (시간대 모드)
 }
 
 export interface TopDate {
@@ -130,8 +131,11 @@ export function useMeetingGrid({
         t(`dayNames.short.${i}`)
       );
 
-      // Add separator when month changes
-      if (lastMonth && lastMonth !== currentDateMonth) {
+      // 월 변경 여부 확인
+      const isFirstOfMonth = !lastMonth || lastMonth !== currentDateMonth;
+
+      // 시간대 모드가 아닐 때만 월 구분 행 추가 (시간대 모드에서는 날짜 구분에 통합)
+      if (!hasTimeSlots && lastMonth && lastMonth !== currentDateMonth) {
         const [year, month] = currentDateMonth.split('.');
         const separatorRow: GridCell[] = [
           {
@@ -149,20 +153,21 @@ export function useMeetingGrid({
       lastMonth = currentDateMonth;
 
       if (hasTimeSlots && meeting.timeSlots) {
-        // 시간대 모드: 날짜 구분 행 + 시간대별 서브행
+        // 시간대 모드: 날짜 구분 행 + 시간대별 서브행 (월 구분 통합)
 
-        // 1. 날짜 구분 행 추가 (월 구분과 유사)
+        // 1. 날짜 구분 행 추가 (월 변경 시 월 정보도 포함)
         const dateSeparatorRow: GridCell[] = [
           {
             type: 'date-separator',
             content: `${dateObj.getDate()} ${dayNames[dateObj.getDay()]}`,
             date: date,
             month: currentDateMonth,
+            isFirstOfMonth: isFirstOfMonth,
           },
         ];
         // 빈 셀 추가 (참여자 열)
         for (let i = 0; i < participants.length; i++) {
-          dateSeparatorRow.push({ type: 'date-separator', date: date });
+          dateSeparatorRow.push({ type: 'date-separator', date: date, isFirstOfMonth: isFirstOfMonth });
         }
         result.push(dateSeparatorRow);
 

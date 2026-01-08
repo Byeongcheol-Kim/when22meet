@@ -357,8 +357,10 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
                       key={key}
                       date={cell.date || ''}
                       content={cell.content || ''}
+                      month={cell.month || ''}
                       highlightedDate={highlightedDate}
                       isFirst={colIndex === 0}
+                      isFirstOfMonth={cell.isFirstOfMonth}
                     />
                   );
                 }

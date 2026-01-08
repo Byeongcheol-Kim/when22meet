@@ -228,19 +228,23 @@ export const HeaderCorner = memo(function HeaderCorner({ content }: HeaderCorner
   );
 });
 
-// 시간대 모드에서 날짜 구분 행 (월 구분과 동일한 스타일)
+// 시간대 모드에서 날짜 구분 행 (월 구분과 통합)
 interface DateSeparatorCellProps {
   date: string;
   content: string; // "15 수" 형식
+  month: string; // "2025.01" 형식
   highlightedDate: string | null;
   isFirst?: boolean; // 첫 번째 셀인지 (날짜 표시용)
+  isFirstOfMonth?: boolean; // 해당 월의 첫 번째 날짜인지 (월 정보 표시용)
 }
 
 export const DateSeparatorCell = memo(function DateSeparatorCell({
   date,
   content,
+  month,
   highlightedDate,
   isFirst = false,
+  isFirstOfMonth = false,
 }: DateSeparatorCellProps) {
   const isHighlighted = highlightedDate === date;
 
@@ -250,6 +254,7 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
     const dayOfWeek = content.split(' ')[1];
     const day = dateObj.getDay();
     const dayColor = getDayOfWeekColor(day, isHighlighted);
+    const [year, monthNum] = month.split('.');
 
     return (
       <div
@@ -262,6 +267,16 @@ export const DateSeparatorCell = memo(function DateSeparatorCell({
         data-date-row={date}
       >
         <div className="flex flex-col items-end justify-center">
+          {isFirstOfMonth && (
+            <>
+              <span className={`text-xs font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+                {year}
+              </span>
+              <span className={`text-sm font-bold ${DATE_COLUMN_COLORS.header.month}`}>
+                {monthNum}
+              </span>
+            </>
+          )}
           <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
           <span className={`text-lg font-black leading-tight ${dayColor}`}>{dayNumber}</span>
         </div>
