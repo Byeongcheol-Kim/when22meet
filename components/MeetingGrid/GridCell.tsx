@@ -224,7 +224,9 @@ export const HeaderCorner = memo(function HeaderCorner({
   if (hasTimeSlots) {
     // content에서 연월 추출 (content는 "2026\n01" 형식)
     const [yearStr, monthStr] = content.split('\n');
-    const yearMonth = `${yearStr}.${monthStr}`;
+    // 연도는 뒤 2자리만 사용 (2026 → 26)
+    const shortYear = yearStr.slice(-2);
+    const yearMonth = `${shortYear}.${monthStr}`;
 
     // 스크롤 후 현재 날짜가 있으면 날짜/요일도 표시
     if (currentDate) {
