@@ -220,15 +220,38 @@ export const HeaderCorner = memo(function HeaderCorner({
   hasTimeSlots = false,
   getDayName,
 }: HeaderCornerProps) {
-  // 시간대 모드에서 현재 날짜 표시
-  if (hasTimeSlots && currentDate) {
-    const dateObj = new Date(currentDate + 'T00:00:00');
-    const year = dateObj.getFullYear();
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const dayOfWeek = getDayName ? getDayName(dateObj.getDay()) : '';
-    const dayColor = getDayOfWeekColor(dateObj.getDay(), false);
+  // 시간대 모드: 항상 한 줄 형식 (연.월), 스크롤 시 날짜/요일 추가
+  if (hasTimeSlots) {
+    // content에서 연월 추출 (content는 "2026\n01" 형식)
+    const [yearStr, monthStr] = content.split('\n');
+    const yearMonth = `${yearStr}.${monthStr}`;
 
+    // 스크롤 후 현재 날짜가 있으면 날짜/요일도 표시
+    if (currentDate) {
+      const dateObj = new Date(currentDate + 'T00:00:00');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      const dayOfWeek = getDayName ? getDayName(dateObj.getDay()) : '';
+      const dayColor = getDayOfWeekColor(dateObj.getDay(), false);
+
+      return (
+        <div
+          className={`px-2 py-1 flex items-center ${DATE_COLUMN_COLORS.header.bg}`}
+          style={{ position: 'sticky', top: 0, left: 0, zIndex: 30 }}
+        >
+          <div className="flex flex-col items-end justify-center w-full">
+            <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
+              {yearMonth}
+            </span>
+            <div className="flex items-baseline gap-0.5">
+              <span className={`text-sm font-bold ${dayColor}`}>{day}</span>
+              <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // 스크롤 전: 연월만 한 줄로 표시, 날짜 영역은 비움
     return (
       <div
         className={`px-2 py-1 flex items-center ${DATE_COLUMN_COLORS.header.bg}`}
@@ -236,18 +259,17 @@ export const HeaderCorner = memo(function HeaderCorner({
       >
         <div className="flex flex-col items-end justify-center w-full">
           <span className={`text-[10px] font-medium ${DATE_COLUMN_COLORS.header.year}`}>
-            {year}.{month}
+            {yearMonth}
           </span>
-          <div className="flex items-baseline gap-0.5">
-            <span className={`text-sm font-bold ${dayColor}`}>{day}</span>
-            <span className={`text-[10px] ${dayColor}`}>{dayOfWeek}</span>
+          <div className="flex items-baseline gap-0.5 h-5">
+            {/* 날짜 영역 placeholder - 스크롤 시 자연스럽게 채워짐 */}
           </div>
         </div>
       </div>
     );
   }
 
-  // 기본 모드: 연/월만 표시
+  // 기본 모드: 연/월을 2줄로 표시
   return (
     <div
       className={`px-2 py-1 flex items-center ${DATE_COLUMN_COLORS.header.bg}`}
