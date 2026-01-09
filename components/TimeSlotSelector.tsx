@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { TIME_SLOTS, TIME_SLOT_SHORTCUTS, TimeSlotValue } from '@/lib/types';
+import { useMemo, useRef } from 'react';
+import { TIME_SLOTS, TIME_SLOT_SHORTCUTS, TimeSlotValue, TimeSlotShortcutId } from '@/lib/types';
 import { TIME_SLOT_COLORS } from '@/lib/constants/colors';
 import { useTranslation } from '@/lib/useTranslation';
 
@@ -15,6 +15,16 @@ interface TimeSlotSelectorProps {
   disabled?: boolean;
 }
 
+// Shortcut ID를 timeGroups 인덱스로 매핑
+const SHORTCUT_TO_GROUP_INDEX: Record<TimeSlotShortcutId, number> = {
+  dawn: 0,           // 00:00-05:30
+  morning: 1,        // 06:00-11:30
+  early_afternoon: 2, // 12:00-17:30
+  late_afternoon: 2,  // 12:00-17:30
+  evening: 3,        // 18:00-23:30
+  late_night: 3,     // 18:00-23:30
+};
+
 export default function TimeSlotSelector({
   enabled,
   onEnabledChange,
@@ -25,6 +35,7 @@ export default function TimeSlotSelector({
   disabled = false,
 }: TimeSlotSelectorProps) {
   const { t, locale } = useTranslation();
+  const gridContainerRef = useRef<HTMLDivElement>(null);
 
   const handleToggle = () => {
     if (disabled) return;
@@ -48,7 +59,19 @@ export default function TimeSlotSelector({
     }
   };
 
-  const handleShortcutClick = (shortcutSlots: readonly string[]) => {
+  const scrollToGroup = (shortcutId: TimeSlotShortcutId) => {
+    const groupIndex = SHORTCUT_TO_GROUP_INDEX[shortcutId];
+    if (gridContainerRef.current) {
+      const groupElement = gridContainerRef.current.querySelector(
+        `[data-group-index="${groupIndex}"]`
+      );
+      if (groupElement) {
+        groupElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  };
+
+  const handleShortcutClick = (shortcutId: TimeSlotShortcutId, shortcutSlots: readonly string[]) => {
     if (disabled || !enabled) return;
 
     const slots = shortcutSlots as unknown as TimeSlotValue[];
@@ -62,6 +85,9 @@ export default function TimeSlotSelector({
       const newSlots = [...new Set([...selectedSlots, ...slots])].sort();
       onSlotsChange(newSlots);
     }
+
+    // 해당 시간대 그룹으로 스크롤
+    setTimeout(() => scrollToGroup(shortcutId), 100);
   };
 
   const isShortcutSelected = (shortcutSlots: readonly string[]) => {
@@ -138,7 +164,7 @@ export default function TimeSlotSelector({
                   <button
                     key={shortcut.id}
                     type="button"
-                    onClick={() => handleShortcutClick(shortcut.slots)}
+                    onClick={() => handleShortcutClick(shortcut.id, shortcut.slots)}
                     disabled={disabled}
                     className={`px-3 py-1.5 text-sm rounded-lg border transition-all duration-200 ${
                       isSelected
@@ -170,9 +196,9 @@ export default function TimeSlotSelector({
             </div>
 
             {/* 시간대 그리드 */}
-            <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+            <div ref={gridContainerRef} className="space-y-3 max-h-64 overflow-y-auto pr-1">
               {timeGroups.map((group, groupIndex) => (
-                <div key={groupIndex} className="space-y-1">
+                <div key={groupIndex} data-group-index={groupIndex} className="space-y-1">
                   <span className="text-[10px] text-gray-400 uppercase tracking-wide">
                     {locale === 'en' ? group.labelEn : group.label}
                   </span>
