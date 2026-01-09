@@ -176,7 +176,7 @@ export default function TimeSlotSelector({
                   <span className="text-[10px] text-gray-400 uppercase tracking-wide">
                     {locale === 'en' ? group.labelEn : group.label}
                   </span>
-                  <div className="grid grid-cols-4 gap-1">
+                  <div className="grid grid-cols-6 gap-1">
                     {group.slots.map((slot) => {
                       const isSelected = selectedSlots.includes(slot.value);
                       // 시간만 간단히 표시 (예: "09:00", "09:30")
@@ -247,7 +247,7 @@ export default function TimeSlotSelector({
                 </div>
               </div>
               {consecutiveSlotCount > 1 && (
-                <p className="text-[10px] text-blue-600">
+                <p className="text-[10px] text-gray-500">
                   {t('timeSlot.meetingDurationHint').replace('{minutes}', String(consecutiveSlotCount * 30))}
                 </p>
               )}

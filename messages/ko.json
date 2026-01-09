@@ -274,7 +274,7 @@
     "selectAtLeastOne": "시간대를 최소 하나 선택해주세요",
     "meetingDuration": "미팅 시간",
     "meetingDurationDescription": "몇 분 동안 만날 건가요?",
-    "meetingDurationHint": "{minutes}분 동안 참석 가능한 인원을 추천합니다",
+    "meetingDurationHint": "{minutes}분 동안 참석 가능한 시간을 추천합니다",
     "minutes": "{minutes}분"
   },
   "seo": {

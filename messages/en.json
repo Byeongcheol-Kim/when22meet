@@ -274,7 +274,7 @@
     "selectAtLeastOne": "Please select at least one time slot",
     "meetingDuration": "Meeting duration",
     "meetingDurationDescription": "How long will you meet?",
-    "meetingDurationHint": "Recommends people available for {minutes} minutes",
+    "meetingDurationHint": "Recommends times when everyone is available for {minutes} minutes",
     "minutes": "{minutes} min"
   },
   "seo": {
