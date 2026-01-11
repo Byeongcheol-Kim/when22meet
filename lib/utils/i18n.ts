@@ -16,6 +16,12 @@ export function detectServerLanguage(acceptLanguage: string | null): Locale {
   if (lang.includes('ko') || lang.includes('kr')) {
     return 'ko';
   }
+  if (lang.includes('zh')) {
+    return 'zh';
+  }
+  if (lang.includes('ja')) {
+    return 'ja';
+  }
 
   return 'en';
 }
@@ -31,6 +37,12 @@ export function detectBrowserLanguage(): Locale {
 
   if (browserLang && (browserLang.startsWith('ko') || browserLang.startsWith('kr'))) {
     return 'ko';
+  }
+  if (browserLang && browserLang.startsWith('zh')) {
+    return 'zh';
+  }
+  if (browserLang && browserLang.startsWith('ja')) {
+    return 'ja';
   }
 
   return 'en';
@@ -57,6 +69,24 @@ export function getLocalizedMetadata(locale: Locale) {
         'meeting scheduler', 'schedule coordination', 'group scheduling app',
         'meeting time finder', 'team meeting schedule', 'group calendar',
         'scheduling app', 'meeting planner', 'availability poll',
+      ],
+    },
+    zh: {
+      title: '什么时候见面 | 日程协调应用 - 简单的会议安排服务',
+      description: '简单易用的免费日程协调应用。无需登录，拖拽选择多个日期，实时同步。团队会议、聚会、活动时间协调的最佳选择。',
+      keywords: [
+        '日程协调', '会议安排', '时间协调应用',
+        '团队会议', '聚会时间', '日程安排',
+        '会议时间', '活动安排', '时间投票',
+      ],
+    },
+    ja: {
+      title: 'いつ会う | スケジュール調整アプリ - 簡単な予定調整サービス',
+      description: '簡単で使いやすい無料のスケジュール調整アプリ。ログイン不要、ドラッグで複数日選択、リアルタイム同期。チームミーティング、イベント、会議の時間調整に最適。',
+      keywords: [
+        'スケジュール調整', '予定調整', '会議スケジューラー',
+        'チームミーティング', 'イベント時間', '日程調整',
+        '会議時間', '予定投票', 'グループスケジュール',
       ],
     },
   };
@@ -101,6 +131,38 @@ export function getLocalizedStructuredData(locale: Locale) {
       ],
       organizationName: 'When22Meet Team',
     },
+    zh: {
+      name: '什么时候见面 - 日程协调应用',
+      alternateName: ['When22Meet', '什么时候见面', '日程协调'],
+      description: '简单易用的免费日程协调应用。无需登录即可使用的排程服务',
+      keywords: '日程协调, 会议安排, 时间协调应用, 团队会议, 日程安排, 时间投票',
+      featureList: [
+        '实时同步',
+        '无需登录',
+        '拖拽选择多个日期',
+        '移动端优化',
+        '免费日程协调',
+        '团队会议管理',
+        '出席投票',
+      ],
+      organizationName: '什么时候见面团队',
+    },
+    ja: {
+      name: 'いつ会う - スケジュール調整アプリ',
+      alternateName: ['When22Meet', 'いつ会う', 'スケジュール調整'],
+      description: '簡単で使いやすい無料のスケジュール調整アプリ。ログイン不要ですぐに使えるスケジューリングサービス',
+      keywords: 'スケジュール調整, 予定調整, 会議スケジューラー, チームミーティング, 日程調整, 出欠投票',
+      featureList: [
+        'リアルタイム同期',
+        'ログイン不要',
+        'ドラッグで複数日選択',
+        'モバイル最適化',
+        '無料スケジュール調整',
+        'チームミーティング管理',
+        '出欠投票',
+      ],
+      organizationName: 'いつ会うチーム',
+    },
   };
 
   return data[locale];
@@ -108,17 +170,19 @@ export function getLocalizedStructuredData(locale: Locale) {
 
 /**
  * 언어 코드를 locale 문자열로 변환
- * ko -> ko_KR
- * en -> en_US
  */
 export function getLocaleString(locale: Locale): string {
-  return locale === 'ko' ? 'ko_KR' : 'en_US';
+  const localeMap: Record<Locale, string> = {
+    ko: 'ko_KR',
+    en: 'en_US',
+    zh: 'zh_CN',
+    ja: 'ja_JP',
+  };
+  return localeMap[locale];
 }
 
 /**
  * hreflang용 언어 코드 변환
- * ko -> ko
- * en -> en
  */
 export function getHreflangCode(locale: Locale): string {
   return locale;
@@ -131,6 +195,8 @@ export function getAlternateUrls(pathname: string, baseUrl: string = 'https://wh
   return {
     ko: `${baseUrl}${pathname}`,
     en: `${baseUrl}${pathname}`,
+    zh: `${baseUrl}${pathname}`,
+    ja: `${baseUrl}${pathname}`,
     'x-default': `${baseUrl}${pathname}`,
   };
 }
@@ -139,15 +205,27 @@ export function getAlternateUrls(pathname: string, baseUrl: string = 'https://wh
  * 언어별 미팅 설명 가져오기
  */
 export function getLocalizedMeetingDescription(locale: Locale, participantCount: number, dateCount: number) {
-  if (locale === 'ko') {
-    return `${participantCount}명이 참여하는 일정 조율. ${dateCount}개의 날짜 중 선택`;
+  switch (locale) {
+    case 'ko':
+      return `${participantCount}명이 참여하는 일정 조율. ${dateCount}개의 날짜 중 선택`;
+    case 'zh':
+      return `${participantCount}人参与的日程协调。从${dateCount}个日期中选择`;
+    case 'ja':
+      return `${participantCount}人が参加するスケジュール調整。${dateCount}件の日付から選択`;
+    default:
+      return `Schedule coordination with ${participantCount} participant${participantCount !== 1 ? 's' : ''}. Choosing from ${dateCount} date${dateCount !== 1 ? 's' : ''}`;
   }
-  return `Schedule coordination with ${participantCount} participant${participantCount !== 1 ? 's' : ''}. Choosing from ${dateCount} date${dateCount !== 1 ? 's' : ''}`;
 }
 
 /**
  * 언어별 조직명 가져오기
  */
 export function getLocalizedOrganizationName(locale: Locale) {
-  return locale === 'ko' ? '언제만나' : 'When22Meet';
+  const names: Record<Locale, string> = {
+    ko: '언제만나',
+    en: 'When22Meet',
+    zh: '什么时候见面',
+    ja: 'いつ会う',
+  };
+  return names[locale];
 }

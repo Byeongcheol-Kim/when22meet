@@ -1,0 +1,336 @@
+{
+  "common": {
+    "loading": "加载中...",
+    "error": "发生错误",
+    "cancel": "取消",
+    "confirm": "确认",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除",
+    "add": "添加",
+    "close": "关闭",
+    "copy": "复制",
+    "copied": "已复制",
+    "share": "分享",
+    "lock": "锁定",
+    "unlock": "解锁",
+    "person": "{count}人",
+    "date": "{count}个日期"
+  },
+  "landing": {
+    "splash": {
+      "title": "简单的日程协调服务",
+      "subtitle": "什么时候见面？"
+    },
+    "title": "什么时候见面！",
+    "meetingTitle": {
+      "label": "约会名称",
+      "placeholder": "例如：团队会议、朋友聚会、学习小组"
+    },
+    "participants": {
+      "label": "参与者",
+      "placeholder": "输入姓名，按Enter或逗号分隔",
+      "count": "%count%人",
+      "nameTooLong": "参与者姓名不能超过10个字符。"
+    },
+    "dateSelection": {
+      "title": "选择日期",
+      "selectDates": "请选择日期",
+      "description": "请在下方选择可用的日期。可以拖动选择多个日期。",
+      "selectedCount": "%count%个",
+      "quickSelection": "快速选择日期",
+      "templates": {
+        "weekend": "周末（周六、周日）",
+        "weekday": "工作日（周一至周五）",
+        "friSatSun": "周五六日",
+        "full": "全部日期"
+      }
+    },
+    "createMeeting": "创建约会",
+    "creating": "创建中...",
+    "shareTemplate": "分享模板链接",
+    "alerts": {
+      "selectRequired": "请输入约会名称并选择日期。",
+      "createFailed": "创建会议失败。",
+      "titleRequired": "请输入约会名称。",
+      "datesRequired": "请选择日期。",
+      "participantsRequired": "请至少添加一位参与者。",
+      "titleAndDatesRequired": "请输入约会名称并选择日期。"
+    }
+  },
+  "meeting": {
+    "title": "{title} - {count}人",
+    "defaultTitle": "约会",
+    "participantCount": "人",
+    "enterName": "输入姓名",
+    "createNew": "新约会",
+    "addParticipant": {
+      "placeholder": "输入姓名",
+      "button": "添加",
+      "alert": "请输入姓名。",
+      "failed": "添加参与者失败。"
+    },
+    "status": {
+      "available": "可以",
+      "unavailable": "不行",
+      "undecided": "待定"
+    },
+    "topDates": {
+      "badge": {
+        "first": "1",
+        "second": "2",
+        "third": "3"
+      }
+    },
+    "editModal": {
+      "title": "编辑日程",
+      "meetingTitle": "约会名称",
+      "participants": "参与者",
+      "dateSelection": "选择日期",
+      "updating": "更新中...",
+      "alerts": {
+        "selectDates": "请选择日期。",
+        "enterTitle": "请输入约会名称。",
+        "updateSuccess": "日程已更新。",
+        "updateFailed": "日程更新失败。"
+      }
+    },
+    "edit": {
+      "title": "编辑日程",
+      "manageParticipants": "管理参与者",
+      "participantPlaceholder": "输入要添加的参与者姓名",
+      "dateSelection": "选择日期",
+      "updating": "更新中...",
+      "updateComplete": "更新完成",
+      "updateSuccess": "日程已更新。",
+      "updateFailed": "日程更新失败。",
+      "shareTemplate": "分享模板链接"
+    },
+    "fab": {
+      "edit": "编辑日程",
+      "newMeeting": "新约会",
+      "info": "信息",
+      "copyLink": "复制链接",
+      "share": "分享",
+      "linkCopied": "链接已复制！"
+    },
+    "alerts": {
+      "notFound": "未找到会议。",
+      "updateFailed": "状态更新失败。请重试。",
+      "networkError": "发生网络错误。请重试。",
+      "enterName": "请输入姓名。",
+      "nameTooLong": "参与者姓名不能超过10个字符。",
+      "addParticipantFailed": "添加参与者失败。",
+      "selectDates": "请选择日期。",
+      "enterTitle": "请输入约会名称。",
+      "updateScheduleFailed": "日程更新失败。"
+    },
+    "topDatesLabel": "第{rank}名：{date}（{count}人可参加）",
+    "peopleCount": "{count}人",
+    "redirecting": "跳转中...",
+    "shortUrl": {
+      "redirecting": "跳转中..."
+    },
+    "share": {
+      "title": "分享",
+      "link": {
+        "title": "复制约会链接",
+        "description": "分享此约会页面链接"
+      },
+      "template": {
+        "title": "复制约会模板",
+        "description": "创建相同参与者的模板链接"
+      }
+    },
+    "toast": {
+      "linkCopied": "约会链接已复制！",
+      "templateCopied": "约会模板已复制！",
+      "shareTemplateCopied": "模板链接已复制！"
+    },
+    "newMeeting": {
+      "title": "创建新约会",
+      "message": "使用当前参与者创建新约会。（在新标签页中打开）",
+      "confirm": "创建"
+    },
+    "selectParticipant": {
+      "title": "选择参与者",
+      "description": "请从此会议中选择您的姓名。\n您只能编辑所选人员的日程。",
+      "selected": "已选择",
+      "noParticipants": "没有参与者",
+      "confirm": "确认",
+      "changeUser": "更换用户",
+      "currentUser": "当前：{name}",
+      "viewingAs": "以{name}身份查看",
+      "editingAs": "编辑中",
+      "completedAs": "已完成",
+      "clickToComplete": "点击完成",
+      "clickToEdit": "点击编辑",
+      "organizer": "组织者",
+      "participant": "参与者",
+      "organizerDescription": "",
+      "joinAsOrganizer": "以组织者身份加入"
+    }
+  },
+  "about": {
+    "title": "什么时候见面？",
+    "description": "最简单快捷的日程协调服务",
+    "serviceIntro": "服务介绍",
+    "creators": "制作团队",
+    "freeService": "无广告免费服务",
+    "supportMessage": "如果对您有帮助，请请我们喝杯咖啡！",
+    "supportButton": "赞助",
+    "viewFAQ": "查看常见问题",
+    "features": {
+      "title": "主要功能",
+      "dragSelect": "拖动选择多个日期",
+      "realTimeSync": "实时同步",
+      "noLogin": "无需登录",
+      "responsive": "移动端优化"
+    },
+    "howTo": {
+      "title": "使用方法",
+      "step1": "选择约会名称和日期",
+      "step2": "分享链接",
+      "step3": "参与者标记可用日期",
+      "step4": "确认最佳日期"
+    },
+    "footer": {
+      "madeBy": "Made by",
+      "contact": "联系我们"
+    },
+    "team": {
+      "designer": {
+        "name": "李镇辉",
+        "role": "设计"
+      },
+      "developer": {
+        "name": "Benchley Kim",
+        "role": "开发"
+      }
+    },
+    "relatedServices": {
+      "title": "相关服务",
+      "gaita": {
+        "name": "Gaita",
+        "description": "出租车拼车匹配服务"
+      },
+      "celltown": {
+        "name": "Celltown",
+        "description": "住房推荐服务"
+      }
+    }
+  },
+  "monthNames": {
+    "1": "一月",
+    "2": "二月",
+    "3": "三月",
+    "4": "四月",
+    "5": "五月",
+    "6": "六月",
+    "7": "七月",
+    "8": "八月",
+    "9": "九月",
+    "10": "十月",
+    "11": "十一月",
+    "12": "十二月"
+  },
+  "dayNames": {
+    "short": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "full": {
+      "0": "星期日",
+      "1": "星期一",
+      "2": "星期二",
+      "3": "星期三",
+      "4": "星期四",
+      "5": "星期五",
+      "6": "星期六"
+    }
+  },
+  "dateSelector": {
+    "today": "今天"
+  },
+  "timeSlot": {
+    "toggle": "也选择时间段",
+    "toggleDescription": "按特定时间段查看出席情况",
+    "shortcuts": "快速选择",
+    "selectSlots": "30分钟间隔选择",
+    "selectedCount": "已选择{count}个",
+    "slots": {
+      "morning": "上午",
+      "early_afternoon": "午后",
+      "late_afternoon": "下午",
+      "evening": "晚上",
+      "late_night": "深夜",
+      "dawn": "凌晨"
+    },
+    "selectAtLeastOne": "请至少选择一个时间段",
+    "meetingDuration": "会议时长",
+    "meetingDurationDescription": "会议需要多长时间？",
+    "meetingDurationHint": "推荐所有人都能参加{minutes}分钟的时间",
+    "minutes": "{minutes}分钟"
+  },
+  "seo": {
+    "title": "日程安排应用 - 什么时候见面",
+    "description": "什么时候见面是一个免费的日程协调应用，可以轻松安排会议时间、确定聚会时间、协调会议日程。无需注册即可使用，可以一目了然地查看多人的日程，找到最佳见面时间。",
+    "features": "主要功能：拖动选择多个日期、实时出席情况查看、通过微信等轻松分享、移动端优化设计",
+    "keywords": "日程协调, 日程安排, 约会安排, 聚会时间, 会议时间, 团队日程, 免费日程应用"
+  },
+  "faq": {
+    "title": "常见问题",
+    "subtitle": "查看使用什么时候见面时的常见问题",
+    "backHome": "返回首页",
+    "moreQuestions": "还有其他问题吗？",
+    "contactEmail": "请发送邮件咨询：",
+    "tryService": "您可以直接使用服务了解更多。",
+    "questions": {
+      "q1": {
+        "question": "什么时候见面是什么服务？",
+        "answer": "什么时候见面是一个可以轻松协调团队日程的免费日程服务。无需登录即可使用，可以标记多个日期中的可用日期来确定聚会时间。"
+      },
+      "q2": {
+        "question": "需要注册吗？",
+        "answer": "不需要，无需注册或登录即可立即使用。创建日程后会生成链接，通过分享链接邀请参与者。"
+      },
+      "q3": {
+        "question": "数据保存多长时间？",
+        "answer": "创建的日程数据会保存18个月，之后会自动删除。如需长期保存，建议截图保存。"
+      },
+      "q4": {
+        "question": "如何一次选择多个日期？",
+        "answer": "在日历上拖动鼠标可以一次选择多个日期。也可以使用'快速选择'按钮（周末、工作日、周五六日）自动选择相应日期。"
+      },
+      "q5": {
+        "question": "可以稍后添加参与者吗？",
+        "answer": "可以，创建日程时可以预先指定参与者，也可以随时通过日程页面的'添加参与者'按钮添加。"
+      },
+      "q6": {
+        "question": "如何标记出席情况？",
+        "answer": "点击每个日期，状态会按 可以（黄色）→ 不行（灰色）→ 待定（白色）的顺序循环切换。选择相应状态来标记您的出席情况。"
+      },
+      "q7": {
+        "question": "能方便地查看最多人可以的日期吗？",
+        "answer": "可以，屏幕顶部会自动显示'可参加人数最多的日期'。实时更新，方便确认最佳聚会日期。"
+      },
+      "q8": {
+        "question": "可以在手机上使用吗？",
+        "answer": "可以，已针对移动浏览器进行优化。无需安装任何应用，直接在网页浏览器中使用即可。"
+      },
+      "q9": {
+        "question": "锁定日程会怎样？",
+        "answer": "点击'确定日程'按钮后，所有参与者的出席情况将被锁定，无法再修改。可以防止最终决定后意外更改。"
+      },
+      "q10": {
+        "question": "链接丢失了怎么办？",
+        "answer": "很遗憾，如果链接丢失，将无法找回该日程。由于没有登录系统，建议将链接保存在微信、备忘录等安全的地方。"
+      }
+    }
+  }
+}

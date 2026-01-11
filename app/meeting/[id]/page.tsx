@@ -29,6 +29,7 @@ import {
 import { FloatingActionButton } from '@/components/MeetingGrid/FloatingActionButton';
 import { TopDatesIndicator } from '@/components/MeetingGrid/TopDatesIndicator';
 import { Check, Pencil, Crown } from 'lucide-react';
+import LanguageSelector from '@/components/LanguageSelector';
 
 export default function MeetingPage({ params }: { params: Promise<{ id: string }> }) {
   const { t, locale } = useTranslation();
@@ -320,6 +321,7 @@ export default function MeetingPage({ params }: { params: Promise<{ id: string }
               </span>
             </div>
             <div className="flex items-center gap-2">
+              <LanguageSelector />
               {/* Current user indicator with editing/completed toggle */}
               {isUserSelected && currentUser && (
                 <div className="flex items-center gap-1">

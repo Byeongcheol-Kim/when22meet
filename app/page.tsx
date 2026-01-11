@@ -13,6 +13,7 @@ import ParticipantsInput from '@/components/ParticipantsInput';
 import { generateDatesFromTemplate, type DateTemplate } from '@/lib/utils/dateTemplates';
 import { TEMPLATE_BUTTON_COLORS, BUTTON_COLORS, TEXT_COLORS, SECTION_BADGE_COLORS, DISABLED_COLORS } from '@/lib/constants/colors';
 import { TimeSlotValue } from '@/lib/types';
+import LanguageSelector from '@/components/LanguageSelector';
 
 function SEOContent() {
   const { t } = useTranslation();
@@ -220,15 +221,18 @@ function HomeContent() {
     <div className="min-h-screen bg-white px-4 py-8">
       <div className="w-full max-w-sm md:max-w-xl lg:max-w-2xl mx-auto">
         <div className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <h1 className="text-xl font-bold">{t('landing.title')}</h1>
-            <button
-              onClick={() => setShowHelpModal(true)}
-              className={`p-1 ${TEXT_COLORS.muted} hover:${TEXT_COLORS.secondary} transition-colors`}
-              title={t('about.title')}
-            >
-              <Info className="w-5 h-5" />
-            </button>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <h1 className="text-xl font-bold">{t('landing.title')}</h1>
+              <button
+                onClick={() => setShowHelpModal(true)}
+                className={`p-1 ${TEXT_COLORS.muted} hover:${TEXT_COLORS.secondary} transition-colors`}
+                title={t('about.title')}
+              >
+                <Info className="w-5 h-5" />
+              </button>
+            </div>
+            <LanguageSelector />
           </div>
           
           <div className="space-y-4">

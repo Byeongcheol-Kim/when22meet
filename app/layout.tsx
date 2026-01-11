@@ -22,14 +22,23 @@ export const metadata: Metadata = {
   title: "언제만나 | 약속일정 잡기 앱 - 간편한 일정 조율 서비스",
   description: "약속일정 잡기, 모임 시간 정하기가 쉬운 무료 일정 조율 앱. 로그인 없이 바로 사용 가능",
   keywords: [
+    // 한국어
     "약속일정 잡기 앱", "약속 일정 조율 앱", "모임 시간 정하기 앱",
     "일정 조율 서비스", "회의 시간 정하기", "팀 미팅 일정",
     "그룹 일정 조율", "약속 잡기 앱", "모임 일정 조율",
-    "언제만나", "when2meet", "스케줄링 앱", "scheduling app",
-    "일정조율", "미팅", "meeting", "약속잡기",
-    "모임시간", "팀미팅", "온라인미팅", "일정관리",
-    "무료 스케줄링", "free scheduling", "meeting scheduler",
-    "회의일정", "약속시간", "단체약속", "일정투표"
+    "언제만나", "when2meet", "스케줄링 앱",
+    "일정조율", "미팅", "약속잡기", "모임시간",
+    "팀미팅", "온라인미팅", "일정관리", "무료 스케줄링",
+    "회의일정", "약속시간", "단체약속", "일정투표",
+    // English
+    "scheduling app", "meeting scheduler", "free scheduling",
+    "meeting planner", "group calendar", "availability poll",
+    // 中文
+    "日程协调", "会议安排", "时间协调", "团队会议",
+    "日程安排", "免费日程", "聚会时间", "什么时候见面",
+    // 日本語
+    "スケジュール調整", "予定調整", "会議スケジューラー",
+    "チームミーティング", "日程調整", "いつ会う",
   ],
   authors: [{ name: "언제만나 팀" }],
   metadataBase: new URL('https://when22meet.vercel.app'),
@@ -50,6 +59,8 @@ export const metadata: Metadata = {
     languages: {
       'ko': '/',
       'en': '/',
+      'zh': '/',
+      'ja': '/',
       'x-default': '/',
     },
   },
@@ -81,7 +92,7 @@ export const metadata: Metadata = {
       }
     ],
     locale: "ko_KR",
-    alternateLocale: "en_US",
+    alternateLocale: ["en_US", "zh_CN", "ja_JP"],
     type: "website",
   },
   twitter: {
